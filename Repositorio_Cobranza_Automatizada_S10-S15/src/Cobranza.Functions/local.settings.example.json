@@ -1,0 +1,28 @@
+{
+  "IsEncrypted": false,
+  "Values": {
+    "AzureWebJobsStorage": "UseDevelopmentStorage=true",
+    "FUNCTIONS_WORKER_RUNTIME": "dotnet-isolated",
+
+    "CRON_SINCRONIZACION": "0 */15 * * * *",
+    "CRON_NOTIFICACIONES": "0 0 12-17 * * 1-5",
+
+    "Cobranza__SqlCobranza": "Server=tcp:PENDIENTE.database.windows.net,1433;Database=PENDIENTE;Authentication=Active Directory Default;Encrypt=True;TrustServerCertificate=False;",
+    "Cobranza__SqlOrigen": "Server=tcp:PENDIENTE.database.windows.net,1433;Database=PENDIENTE;Authentication=Active Directory Default;Encrypt=True;ApplicationIntent=ReadOnly;",
+    "Cobranza__VistaOrigen": "origen_sim.vw_ClientesRegularizados",
+
+    "Cobranza__AcsConnectionString": "PENDIENTE (en Azure: referencia a Key Vault)",
+    "Cobranza__RemitenteCorreo": "PENDIENTE (DoNotReply@<dominio verificado en ACS>)",
+
+    "Cobranza__DiasPreaviso": "PENDIENTE (definir con Finanzas)",
+    "Cobranza__DiasMora1": "PENDIENTE (definir con Finanzas)",
+    "Cobranza__DiasMora2": "PENDIENTE (definir con Finanzas)",
+    "Cobranza__MaxCorreosPorEjecucion": "90",
+    "Cobranza__PausaEntreCorreosMs": "2100",
+
+    "Cobranza__NombreEmpresa": "Embotelladora del Pacifico S.A.",
+    "Cobranza__CanalesPagoTexto": "PENDIENTE (texto oficial entregado por Finanzas)",
+    "Cobranza__TelefonoContacto": "PENDIENTE",
+    "Cobranza__CorreoContacto": "PENDIENTE"
+  }
+}

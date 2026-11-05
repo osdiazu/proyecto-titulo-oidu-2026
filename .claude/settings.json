@@ -1,0 +1,52 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(dotnet restore:*)",
+      "Bash(dotnet build:*)",
+      "Bash(dotnet test:*)",
+      "Bash(dotnet --info)",
+      "Bash(dotnet --version)",
+      "Bash(az version)",
+      "Bash(az bicep build:*)",
+      "Bash(az bicep lint:*)",
+      "Bash(az bicep build-params:*)",
+      "Bash(az bicep version)",
+      "Bash(bicep build:*)",
+      "Bash(bicep lint:*)",
+      "Bash(bicep build-params:*)",
+      "Bash(bicep --version)",
+      "Bash(shellcheck:*)",
+      "Bash(bash -n:*)",
+      "Bash(func --version)",
+      "Bash(git status)",
+      "Bash(git diff:*)",
+      "Bash(git log:*)"
+    ],
+    "deny": [
+      "Bash(az group delete:*)",
+      "Bash(az resource delete:*)",
+      "Bash(az sql db delete:*)",
+      "Bash(az sql server delete:*)",
+      "Bash(az keyvault purge:*)",
+      "Bash(az keyvault delete:*)",
+      "Read(./**/.env)",
+      "Read(./**/local.settings.json)"
+    ],
+    "ask": [
+      "Bash(az deployment group create:*)",
+      "Bash(az deployment sub create:*)",
+      "Bash(az webapp:*)",
+      "Bash(az functionapp:*)",
+      "Bash(az network:*)",
+      "Bash(az sql:*)",
+      "Bash(az keyvault:*)",
+      "Bash(az role assignment:*)",
+      "Bash(sqlcmd:*)",
+      "Bash(./scripts/desplegar.sh:*)",
+      "Bash(./scripts/desplegar_sql.sh:*)",
+      "Bash(bash scripts/desplegar.sh:*)",
+      "Bash(bash scripts/desplegar_sql.sh:*)",
+      "Bash(git push:*)"
+    ]
+  }
+}

@@ -1,0 +1,17 @@
+# .NET
+bin/
+obj/
+*.user
+.vs/
+TestResults/
+
+# Azure Functions (configuración local con secretos)
+local.settings.json
+
+# Variables locales
+.env
+*.env
+
+
+# Configuración local de Claude Code
+.claude/settings.local.json

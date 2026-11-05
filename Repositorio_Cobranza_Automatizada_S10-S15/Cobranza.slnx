@@ -1,0 +1,5 @@
+<Solution>
+  <Project Path="src/Cobranza.Comun/Cobranza.Comun.csproj" />
+  <Project Path="src/Cobranza.Functions/Cobranza.Functions.csproj" />
+  <Project Path="src/Cobranza.Api/Cobranza.Api.csproj" />
+</Solution>

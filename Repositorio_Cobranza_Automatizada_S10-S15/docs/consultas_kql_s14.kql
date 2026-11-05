@@ -1,0 +1,39 @@
+// Proyecto APT Cobranza Automatizada - Consultas de evidencia S14 (pruebas E2E y continuidad)
+// Ejecutar en Log Analytics. Ajustar el rango de fechas al periodo de pruebas.
+
+// 1. Disponibilidad observada de la API (RNF-01 >= 99 %): respuestas exitosas del sondeo /salud
+//    (App Service ejecuta el sondeo de salud configurado en S11 cada minuto por instancia).
+AppRequests
+| where TimeGenerated between (datetime(2026-11-01) .. now())
+| where Url endswith "/salud"
+| summarize Total = count(), Exitosas = countif(Success == true) by bin(TimeGenerated, 1d)
+| extend DisponibilidadPct = round(100.0 * Exitosas / Total, 2)
+| order by TimeGenerated asc
+
+// 2. Latencia de la API por endpoint (KPI < 2 s)
+AppRequests
+| where TimeGenerated > ago(1d) and Url has "/api/v1/"
+| extend Endpoint = case(Url has "/estado", "estado", Url has "/pedidos", "pedidos",
+                         Url has "/indicadores", "indicadores", Url has "/sincronizaciones", "sincronizaciones", "otro")
+| summarize p50 = percentile(DurationMs, 50), p95 = percentile(DurationMs, 95), n = count() by Endpoint
+
+// 3. Solo lectura sobre la fuente (RNF-08): sentencias de escritura sobre origen_sim ejecutadas
+//    por identidades distintas del administrador. Esperado: 0 filas atribuibles a la Function App.
+//    Requiere auditoria SQL de S12. Confirmar nombres de columnas en AzureDiagnostics.
+AzureDiagnostics
+| where Category == "SQLSecurityAuditEvents"
+| where statement_s has "origen_sim"
+| where statement_s has_any ("INSERT", "UPDATE", "DELETE", "MERGE", "ALTER", "DROP")
+| project TimeGenerated, server_principal_name_s, database_principal_name_s, statement_s, succeeded_s
+
+// 4. Ejecuciones de los jobs durante la ventana del simulacro
+AppRequests
+| where Name in ("SincronizarClientesRegularizados", "EnviarNotificacionesCobranza")
+| where TimeGenerated > ago(1d)
+| project TimeGenerated, Name, Success, DurationMs
+| order by TimeGenerated asc
+
+// 5. Alertas disparadas (verificacion de CP-E2E-13). EJECUTAR EN AZURE RESOURCE GRAPH EXPLORER, no en Log Analytics.
+AlertsManagementResources
+| where type =~ "microsoft.alertsmanagement/alerts"
+| project name, properties.essentials.severity, properties.essentials.startDateTime

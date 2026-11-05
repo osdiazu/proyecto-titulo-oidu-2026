@@ -1,0 +1,31 @@
+// Proyecto APT Cobranza Automatizada - Consultas de evidencia S10
+// Ejecutar en el area de trabajo de Log Analytics conectada a Application Insights.
+
+// 1. Ejecuciones de los jobs (ultimas 24 h): exito, duracion
+AppRequests
+| where TimeGenerated > ago(24h)
+| where Name in ("SincronizarClientesRegularizados", "EnviarNotificacionesCobranza")
+| project TimeGenerated, Name, Success, DurationMs, ResultCode
+| order by TimeGenerated desc
+
+// 2. Resumen de envios registrados por el job de notificaciones
+AppTraces
+| where TimeGenerated > ago(7d)
+| where Message startswith "Notificaciones:"
+| project TimeGenerated, Message
+| order by TimeGenerated desc
+
+// 3. Errores de los jobs
+AppExceptions
+| where TimeGenerated > ago(7d)
+| project TimeGenerated, OperationName, ExceptionType, OuterMessage
+| order by TimeGenerated desc
+
+// 4. Tasa de entrega de correos (KPI > 98 %). Requiere configuracion de diagnostico del
+//    recurso ACS con la categoria EmailStatusUpdateOperational hacia este Log Analytics.
+ACSEmailStatusUpdateOperational
+| where TimeGenerated > ago(30d)
+| where isnotempty(DeliveryStatus)
+| summarize Total = dcount(CorrelationId),
+            Entregados = dcountif(CorrelationId, DeliveryStatus == "Delivered")
+| extend TasaEntregaPct = round(100.0 * Entregados / Total, 2)
