@@ -1,0 +1,2 @@
+# Scripts bash: siempre LF, para que se ejecuten bien aunque se clonen en Windows
+*.sh text eol=lf
