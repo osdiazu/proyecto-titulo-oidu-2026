@@ -2,7 +2,7 @@
   <!--
     Proyecto APT Cobranza Automatizada - API interna de consulta (Evidencia S11)
     Azure App Service Linux, runtime DOTNETCORE|10.0.
-    Versiones de paquetes a confirmar con "dotnet list package --outdated";
+    Versiones de paquetes a confirmar con "dotnet list package" con la opcion outdated;
     el proyecto no se compilo en el entorno de redaccion.
   -->
   <PropertyGroup>

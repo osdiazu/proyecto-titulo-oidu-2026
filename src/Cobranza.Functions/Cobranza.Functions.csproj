@@ -2,7 +2,7 @@
   <!--
     Proyecto APT Cobranza Automatizada - Jobs en segundo plano (Evidencia S10)
     Azure Functions v4, modelo de trabajo aislado, .NET 10.
-    Las versiones de paquetes deben confirmarse con "dotnet list package --outdated"
+    Las versiones de paquetes deben confirmarse con "dotnet list package" con la opcion outdated
     antes de la primera compilacion; no se compilo en el entorno de redaccion.
   -->
   <PropertyGroup>
