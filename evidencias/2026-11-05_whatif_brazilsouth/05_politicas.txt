@@ -1,0 +1,39 @@
+# az policy assignment list --disable-scope-strict-match
+[
+  {
+    "ambito": "/subscriptions/b492…0d49",
+    "definicion": "/providers/Microsoft.Authorization/policySetDefinitions/1f3a…70a8",
+    "efecto": null,
+    "nombre": "ASC Default (subscription: b492…0d49)",
+    "ubicaciones": null
+  },
+  {
+    "ambito": "/providers/Microsoft.Management/managementGroups/72fd…e250",
+    "definicion": "/providers/Microsoft.Authorization/policyDefinitions/e569…5c4c",
+    "efecto": null,
+    "nombre": "Ubicaciones permitidas",
+    "ubicaciones": [
+      "brazil",
+      "brazilsouth",
+      "brazilsoutheast",
+      "brazilus",
+      "eastus",
+      "eastus2",
+      "global",
+      "northcentralus",
+      "southcentralus",
+      "unitedstates",
+      "westcentralus",
+      "westus",
+      "westus2",
+      "westus3"
+    ]
+  },
+  {
+    "ambito": "/providers/Microsoft.Management/managementGroups/72fd…e250",
+    "definicion": "/providers/Microsoft.Authorization/policyDefinitions/7509…d087",
+    "efecto": null,
+    "nombre": "Microsoft Azure region access restriction blocking West Europe region",
+    "ubicaciones": null
+  }
+]

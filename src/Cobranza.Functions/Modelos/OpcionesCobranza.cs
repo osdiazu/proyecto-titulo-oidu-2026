@@ -25,11 +25,17 @@ public sealed class OpcionesCobranza
     [Range(1, 180)] public int DiasMora1 { get; set; }
     [Range(2, 365)] public int DiasMora2 { get; set; }
 
-    /// <summary>Limite de envios por ejecucion (limite inicial ACS dominio administrado: 100/h).</summary>
+    /// <summary>
+    /// Limite de envios por ejecucion. Sin valor por defecto (0 no pasa la validacion).
+    /// ACS con dominio administrado: 10 por hora (hallazgo H1). Valor DEMO D12: 10.
+    /// </summary>
     [Range(1, 1000)] public int MaxCorreosPorEjecucion { get; set; }
 
-    /// <summary>Pausa entre envios (2100 ms mantiene el ritmo bajo 30 correos por minuto).</summary>
-    [Range(0, 60000)] public int PausaEntreCorreosMs { get; set; }
+    /// <summary>
+    /// Pausa entre envios en ms. Sin valor por defecto: si falta el ajuste, el valor 0 no pasa la
+    /// validacion y el job no inicia (evita superar 5 por minuto, hallazgo H1). Valor DEMO D12: 15000.
+    /// </summary>
+    [Range(1, 60000)] public int PausaEntreCorreosMs { get; set; }
 
     [Required] public string NombreEmpresa { get; set; } = "";
     [Required] public string CanalesPagoTexto { get; set; } = "";

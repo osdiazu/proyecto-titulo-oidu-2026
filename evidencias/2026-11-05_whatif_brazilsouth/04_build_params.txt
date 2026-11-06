@@ -1,0 +1,25 @@
+# az bicep build-params --file infra/main.bicepparam (JSON generado en /tmp y BORRADO; aqui solo valores con GUID truncados)
+## Sin variables obligatorias (debe fallar):
+ERROR: <repo>\infra\main.bicepparam(13,55) : Error BCP427: Environment variable "SQL_ADMIN_GROUP_OBJECT_ID" does not exist and there's no default value set. [https://aka.ms/bicep/core-diagnostics#BCP427]
+<repo>\infra\main.bicepparam(14,50) : Error BCP427: Environment variable "OPERADOR_OBJECT_ID" does not exist and there's no default value set. [https://aka.ms/bicep/core-diagnostics#BCP427]
+## Con variables (exportadas en linea):
+exit=0
+sqlAdminGroupObjectId = "7074…e6be"
+operadorObjectId = "bf48…f2fe"
+ipOperador = ""
+cicloKeyVault = "1"
+sqlAdminGroupName = "grp-cobranza-sql-admin"
+location = "brazilsouth"
+acsDataLocation = "United States"
+prefijo = "cobranza"
+ambiente = "dev"
+appServicePlanSku = "B1"
+sqlBackupRedundancy = "Zone"
+diasPreaviso = 7
+diasMora1 = 3
+diasMora2 = 7
+maxCorreosPorEjecucion = 10
+pausaEntreCorreosMs = 12000
+canalesPagoTexto = ""
+telefonoContacto = ""
+correoContacto = ""

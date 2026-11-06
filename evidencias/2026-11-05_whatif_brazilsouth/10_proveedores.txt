@@ -1,0 +1,12 @@
+# Proveedores de recursos usados por la plantilla (estado de registro)
+Proveedor                      Estado
+-----------------------------  -------------
+Microsoft.Network              Registered
+Microsoft.Storage              Registered
+Microsoft.Sql                  Registered
+Microsoft.Web                  Registered
+Microsoft.Authorization        Registered
+Microsoft.Communication        NotRegistered
+microsoft.insights             NotRegistered
+Microsoft.KeyVault             NotRegistered
+Microsoft.OperationalInsights  NotRegistered

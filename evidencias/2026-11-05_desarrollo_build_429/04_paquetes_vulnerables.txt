@@ -1,0 +1,12 @@
+# 2026-11-05T19:49:22-03:00 dotnet list Cobranza.slnx package --vulnerable --include-transitive
+  Determinando los proyectos que se van a restaurar...
+  Todos los proyectos están actualizados para la restauración.
+
+Se han usado los orígenes siguientes:
+   https://api.nuget.org/v3/index.json
+
+El proyecto "Cobranza.Api" especificado no tiene paquetes vulnerables en los orígenes actuales.
+El proyecto "Cobranza.Comun" especificado no tiene paquetes vulnerables en los orígenes actuales.
+El proyecto "Cobranza.Functions" especificado no tiene paquetes vulnerables en los orígenes actuales.
+El proyecto "Cobranza.Functions.Tests" especificado no tiene paquetes vulnerables en los orígenes actuales.
+# exit: 0

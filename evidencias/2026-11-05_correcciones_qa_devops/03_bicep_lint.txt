@@ -1,0 +1,10 @@
+# az bicep lint --file infra/main.bicep
+
+exit=0
+# az bicep lint --file infra/main.bicepparam
+ERROR: C:\Users\diazu\Documents\Proyecto de titulo - Final\Cobranza_Automatizada_Contexto_ClaudeCode\cobranza-automatizada\infra\main.bicepparam(22,55) : Error BCP427: Environment variable "SQL_ADMIN_GROUP_OBJECT_ID" does not exist and there's no default value set. [https://aka.ms/bicep/core-diagnostics#BCP427]
+C:\Users\diazu\Documents\Proyecto de titulo - Final\Cobranza_Automatizada_Contexto_ClaudeCode\cobranza-automatizada\infra\main.bicepparam(23,50) : Error BCP427: Environment variable "OPERADOR_OBJECT_ID" does not exist and there's no default value set. [https://aka.ms/bicep/core-diagnostics#BCP427]
+exit=1
+# az bicep lint --file infra/main.bicepparam (con variables de entorno cargadas; IDs truncados)
+
+exit=0

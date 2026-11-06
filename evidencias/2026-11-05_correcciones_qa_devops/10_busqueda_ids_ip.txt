@@ -1,0 +1,13 @@
+# Busqueda de identificadores completos e IP publica del operador en el arbol de trabajo (excluye .git, bin, obj)
+# Valores reales obtenidos en memoria (az ad group show, az ad signed-in-user show, az account show, api.ipify.org); no se imprimen.
+grupo_sql (7074...): archivos con el valor completo = 0
+operador (bf48...): archivos con el valor completo = 0
+suscripcion (b492...): archivos con el valor completo = 0
+tenant (72fd...): archivos con el valor completo = 0
+ip_operador (<IP_OPERADOR>): archivos con el valor completo = 0
+# Patrones por prefijo (GUID completo que empiece por 7074, bf48, b492, 72fd):
+coincidencias = 0
+# Historial git (git log --all -p) con los valores completos:
+conteos = 0 0 0 0 0
+# git status de archivos generados en infra/:
+(ningun .json en infra/)

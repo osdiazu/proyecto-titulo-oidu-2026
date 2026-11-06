@@ -1,0 +1,7 @@
+# az bicep build --file infra/main.bicep --outfile <carpeta temporal fuera del repo>/main.json
+exit=0
+
+# Revalidacion tras @minValue(1) en pausaEntreCorreosMs (alineado con [Range(1,60000)] del desarrollador)
+build exit=0
+
+lint exit=0

@@ -1,0 +1,8 @@
+# bash -n scripts/s10_configurar_jobs.sh
+OK
+  tipo: Bourne-Again shell script, ASCII text executable
+# bash -n scripts/eliminar_entorno.sh
+OK
+  tipo: Bourne-Again shell script, ASCII text executable
+# ShellCheck
+No instalado en el equipo: NO VERIFICADO (B-03)

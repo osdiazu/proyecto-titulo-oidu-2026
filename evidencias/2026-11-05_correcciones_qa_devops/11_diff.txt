@@ -1,0 +1,415 @@
+# Diferencias respecto del estado previo a esta ronda (05-11-2026)
+--- antes/infra/main.bicep
++++ despues/infra/main.bicep
+@@ -47,7 +47,8 @@
+ @maxLength(36)
+ param operadorObjectId string
+ 
+-@description('IP publica IPv4 del operador (con o sin /32). Abre temporalmente Azure SQL (regla operador-temporal) y Key Vault a esa IP. Vacio = cerrado.')
++@description('IP publica IPv4 del operador (con o sin mascara; la mascara se ignora y se usa /32). Abre temporalmente Azure SQL (regla operador-temporal) y Key Vault a esa IP. Vacio = cerrado. El formato se valida con parseCidr: un valor invalido hace fallar la validacion o el what-if, antes de crear recursos.')
++@maxLength(18)
+ param ipOperador string = ''
+ 
+ @description('Ciclo del Key Vault. Con proteccion de purga, un vault eliminado conserva su nombre reservado 90 dias; cambiar este valor tras eliminar el grupo de recursos genera un nombre nuevo. Lo incrementa scripts/eliminar_entorno.sh.')
+@@ -108,23 +109,30 @@
+ @maxValue(365)
+ param diasMora2 int = 7
+ 
+-@description('Maximo de correos por ejecucion. ACS con dominio administrado: 10 por hora (hallazgo H1); el job corre cada hora, por lo que no debe superar 10.')
++// D12 (valores DEMO aprobados por el usuario el 05-11-2026): maximo 10 por ejecucion y
++// pausa de 15000 ms. ACS con dominio administrado: 5 por minuto y 10 por hora (hallazgo H1).
++// 15000 ms => 4 por minuto (margen sobre 5/min); 10 por ejecucion horaria => 10 por hora.
++// Capacidad: 6 ejecuciones (12-17 UTC) x 10 = 60 por dia habil, menor que el promedio
++// simulado de 111 (hallazgo M-05 de QA): requiere dominio propio o escalonar envios.
++@description('Maximo de correos por ejecucion (D12, valor DEMO: 10). ACS con dominio administrado: 10 por hora (hallazgo H1); el job corre cada hora.')
+ @minValue(1)
+ @maxValue(1000)
+ param maxCorreosPorEjecucion int = 10
+ 
+-@description('Pausa entre correos en ms. ACS con dominio administrado: 5 por minuto (hallazgo H1) => al menos 12000 ms.')
+-@minValue(0)
++@description('Pausa entre correos en ms (D12, valor DEMO: 15000). ACS con dominio administrado: 5 por minuto (hallazgo H1); 15000 ms deja 4 por minuto.')
++@minValue(1)
+ @maxValue(60000)
+-param pausaEntreCorreosMs int = 12000
++param pausaEntreCorreosMs int = 15000
+ 
+-@description('Texto oficial de canales de pago (Finanzas). Vacio hasta que Finanzas lo entregue: la Function App no inicia sin este valor (validacion ValidateOnStart).')
++// Textos de Finanzas: sin valor por defecto en la plantilla. Los valores DEMO se fijan en
++// main.bicepparam. La Function App no inicia si estan vacios (ValidateOnStart).
++@description('Texto de canales de pago (Finanzas). La Function App no inicia sin este valor (validacion ValidateOnStart).')
+ param canalesPagoTexto string = ''
+ 
+-@description('Telefono de contacto de cobranza (Finanzas). Vacio hasta definirse.')
++@description('Telefono de contacto de cobranza (Finanzas).')
+ param telefonoContacto string = ''
+ 
+-@description('Correo de contacto de cobranza (Finanzas). Vacio hasta definirse.')
++@description('Correo de contacto de cobranza (Finanzas). Debe ser una direccion valida ([EmailAddress] en OpcionesCobranza).')
+ param correoContacto string = ''
+ 
+ @description('Expresion CRON (UTC) del job de sincronizacion (D7: cada 15 minutos).')
+@@ -136,7 +144,9 @@
+ var sufijo = '${prefijo}-${ambiente}'
+ var unico = uniqueString(resourceGroup().id)
+ var unicoKv = uniqueString(resourceGroup().id, 'keyvault', cicloKeyVault)
+-var ipOperadorSinMascara = empty(ipOperador) ? '' : split(ipOperador, '/')[0]
++// B-08: parseCidr rechaza un valor que no sea una direccion valida. Se fuerza /32 y se toma
++// la direccion de red, que para /32 es la propia IP. Solo se evalua si ipOperador tiene valor.
++var ipOperadorSinMascara = empty(ipOperador) ? '' : parseCidr('${split(ipOperador, '/')[0]}/32').network
+ var accesoOperador = !empty(ipOperadorSinMascara)
+ var etiquetas = {
+   proyecto: 'APT-Cobranza-Automatizada'
+@@ -284,6 +294,8 @@
+     sku: {
+       name: 'PerGB2018'
+     }
++    // SEG-H02 (decision PENDIENTE del equipo, afecta costos): 30 dias es menos que la
++    // ventana PITR de 35 dias. No se cambia sin aprobacion.
+     retentionInDays: 30
+   }
+ }
+@@ -334,6 +346,24 @@
+   }
+ }
+ 
++// SEG-H03: auditoria del plano de datos de Key Vault (lecturas de secretos) hacia Log Analytics.
++// Mismo nombre, ambito y contenido que diagKv de infra/modulos/seguridad_perimetral.bicep:
++// en Azure es UN solo recurso (el par ambito + nombre lo identifica) y desplegar el modulo
++// S12 despues no crea un duplicado ni cambia nada. Si se modifica aqui, mantener el modulo igual.
++resource diagKv 'Microsoft.Insights/diagnosticSettings@2021-05-01-preview' = {
++  name: 'diag-kv'
++  scope: keyVault
++  properties: {
++    workspaceId: logAnalytics.id
++    logs: [
++      {
++        categoryGroup: 'audit'
++        enabled: true
++      }
++    ]
++  }
++}
++
+ // ---------------------------------------------------------------------
+ // 4. Base de datos: Azure SQL (solo autenticacion Entra ID, sin acceso publico)
+ // ---------------------------------------------------------------------
+@@ -366,10 +396,38 @@
+   }
+ }
+ 
+-// C5: auditoria del servidor hacia Azure Monitor (Log Analytics).
++// M-01: la auditoria de servidor con destino Azure Monitor envia los eventos (de todas las
++// bases) a traves de la base master; sin esta configuracion de diagnostico no llegan a
++// Log Analytics. Mismo nombre, ambito y contenido que diagSqlMaster de
++// infra/modulos/seguridad_perimetral.bicep: en Azure es UN solo recurso y el modulo S12 no
++// lo duplica. Si se modifica aqui, mantener el modulo igual.
++resource sqlMaster 'Microsoft.Sql/servers/databases@2021-11-01' existing = {
++  parent: sqlServer
++  name: 'master'
++}
++
++resource diagSqlMaster 'Microsoft.Insights/diagnosticSettings@2021-05-01-preview' = {
++  name: 'diag-auditoria-sql'
++  scope: sqlMaster
++  properties: {
++    workspaceId: logAnalytics.id
++    logs: [
++      {
++        category: 'SQLSecurityAuditEvents'
++        enabled: true
++      }
++    ]
++  }
++}
++
++// C5: auditoria del servidor hacia Azure Monitor (Log Analytics). Se crea despues del
++// diagnostico de master (orden de la plantilla de referencia de Microsoft).
+ resource sqlAuditoria 'Microsoft.Sql/servers/auditingSettings@2021-11-01' = {
+   parent: sqlServer
+   name: 'default'
++  dependsOn: [
++    diagSqlMaster
++  ]
+   properties: {
+     state: 'Enabled'
+     isAzureMonitorTargetEnabled: true
+@@ -416,6 +474,9 @@
+   }
+ }
+ 
++// Diagnostico de sqldb-cobranza (errores). SQLSecurityAuditEvents aqui solo recibe datos si
++// se habilita auditoria a nivel de base; con auditoria de servidor los eventos llegan por
++// diagSqlMaster, por lo que no hay duplicacion.
+ resource sqlAuditDiag 'Microsoft.Insights/diagnosticSettings@2021-05-01-preview' = {
+   name: 'diag-sqldb'
+   scope: sqlDb
+@@ -437,8 +498,10 @@
+ // ---------------------------------------------------------------------
+ // 5. Almacenamiento requerido por Azure Functions (acceso por identidad)
+ // ---------------------------------------------------------------------
++// B-05: sufijo uniqueString de 6 caracteres, como el resto de los nombres (CLAUDE.md
++// seccion 3). La version S6-S8 usaba 8; nada esta desplegado, el cambio no afecta recursos.
+ resource storage 'Microsoft.Storage/storageAccounts@2023-05-01' = {
+-  name: 'st${take(replace(prefijo, '-', ''), 8)}${ambiente}${take(unico, 8)}'
++  name: 'st${take(replace(prefijo, '-', ''), 8)}${ambiente}${take(unico, 6)}'
+   location: location
+   tags: etiquetas
+   sku: {
+@@ -606,7 +669,8 @@
+           value: cronSincronizacion
+         }
+         {
+-          // %CRON_NOTIFICACIONES% en NotificacionesFunction (UTC). 12:00 UTC = 09:00 Chile (UTC-3).
++          // %CRON_NOTIFICACIONES% en NotificacionesFunction (UTC). Chile continental alterna
++          // UTC-3 (verano) y UTC-4 (invierno): 12:00 UTC = 09:00 u 08:00 hora local.
+           name: 'CRON_NOTIFICACIONES'
+           value: cronNotificaciones
+         }
+--- antes/infra/main.bicepparam
++++ despues/infra/main.bicepparam
+@@ -8,6 +8,15 @@
+ // copia local no versionada: infra/entorno.local.env).
+ // La suscripcion se elige en la CLI (az account set), no aqui.
+ // La region la fija el grupo de recursos rg-cobranza-apt (brazilsouth).
++//
++// M-02: "az bicep build-params" escribe por defecto infra/main.json CON los Object ID
++// reales. Usar siempre --outfile hacia una carpeta temporal fuera del repositorio y
++// borrarla al terminar, por ejemplo:
++//   TMP_BP=$(mktemp -d)
++//   az bicep build-params --file infra/main.bicepparam --outfile "$TMP_BP/main.parameters.json"
++//   ...
++//   rm -rf "$TMP_BP"
++// infra/**/*.json esta en .gitignore como segunda barrera, no como sustituto.
+ 
+ // Obligatorias: si la variable no existe, la compilacion de parametros falla.
+ param sqlAdminGroupObjectId = readEnvironmentVariable('SQL_ADMIN_GROUP_OBJECT_ID')
+@@ -34,11 +43,15 @@
+ param diasMora1 = 3
+ param diasMora2 = 7
+ 
+-// Hallazgo H1 (ACS dominio administrado: 5/min, 10/h). Pendiente confirmacion del equipo (D12).
++// D12, valores DEMO aprobados por el usuario (05-11-2026): maximo 10 por ejecucion y
++// pausa de 15000 ms. Hallazgo H1 (ACS dominio administrado: 5/min, 10/h).
+ param maxCorreosPorEjecucion = 10
+-param pausaEntreCorreosMs = 12000
++param pausaEntreCorreosMs = 15000
+ 
+-// Valores de Finanzas: vacios hasta que Finanzas los entregue (no inventar).
+-param canalesPagoTexto = ''
+-param telefonoContacto = ''
+-param correoContacto = ''
++// valores de demostracion inventados, no entregados por Finanzas (pendiente 3, CLAUDE.md seccion 8)
++// Aprobados por el usuario el 05-11-2026 solo para pruebas (M-04). Reemplazar por los
++// textos oficiales de Finanzas antes de cualquier uso real. El dominio .example esta
++// reservado (RFC 2606): no corresponde a ningun buzon real.
++param canalesPagoTexto = 'Transferencia bancaria a Banco Ficticio, cuenta corriente 00-000-00000-0 (DATOS DE DEMOSTRACION)'
++param telefonoContacto = '+56 2 2000 0000 (DEMO)'
++param correoContacto = 'cobranza@embotelladora-demo.example'
+--- antes/infra/entorno.ejemplo.env
++++ despues/infra/entorno.ejemplo.env
+@@ -1,17 +1,26 @@
+-# Variables de entorno que lee infra/main.bicepparam (readEnvironmentVariable).
++# Variables de entorno que lee infra/main.bicepparam (readEnvironmentVariable) y
++# scripts/eliminar_entorno.sh (SUBSCRIPTION_ID_ESPERADA).
+ # Copiar como infra/entorno.local.env (ignorado por git) y completar SOLO en la copia local.
+ # No escribir valores en este archivo.
+ #
+ # Uso en Git Bash:
+ #   set -a; source infra/entorno.local.env; set +a
+ #
++# Compilar parametros sin dejar los Object ID en el repositorio (hallazgo M-02):
++#   TMP_BP=$(mktemp -d)
++#   az bicep build-params --file infra/main.bicepparam --outfile "$TMP_BP/main.parameters.json"
++#   rm -rf "$TMP_BP"
++#
+ # Obtencion de los valores:
+ #   SQL_ADMIN_GROUP_OBJECT_ID : az ad group show -g grp-cobranza-sql-admin --query id -o tsv
+ #   OPERADOR_OBJECT_ID        : az ad signed-in-user show --query id -o tsv
+ #   IP_OPERADOR               : curl -s https://api.ipify.org   (vacio = SQL y Key Vault cerrados)
+ #   CICLO_KV                  : 1 en el primer despliegue; lo incrementa scripts/eliminar_entorno.sh
++#                               (despues de eliminar, volver a cargar este archivo)
++#   SUBSCRIPTION_ID_ESPERADA  : az account show --query id -o tsv (con la suscripcion del proyecto activa)
+ 
+ SQL_ADMIN_GROUP_OBJECT_ID=
+ OPERADOR_OBJECT_ID=
+ IP_OPERADOR=
+ CICLO_KV=1
++SUBSCRIPTION_ID_ESPERADA=
+--- antes/.gitignore
++++ despues/.gitignore
+@@ -17,6 +17,10 @@
+ !infra/entorno.ejemplo.env
+ # Parametros compilados por "bicep build-params" (contienen Object IDs)
+ infra/*.parameters.json
++# Salidas generadas por "bicep build" / "bicep build-params" sin --outfile
++# (build-params escribe infra/main.json con los Object ID reales). Usar --outfile
++# hacia una carpeta temporal fuera del repositorio (ver cabecera de infra/main.bicepparam).
++infra/**/*.json
+ 
+ 
+ # Configuración local de Claude Code
+--- antes/scripts/s10_configurar_jobs.sh
++++ despues/scripts/s10_configurar_jobs.sh
+@@ -2,15 +2,25 @@
+ # =============================================================================
+ # s10_configurar_jobs.sh
+ # Proyecto APT Cobranza Automatizada - Evidencia S10
+-# Configura la Function App existente (desplegada con main.bicep en S6-S8):
+-#   1. guarda la cadena de conexion de ACS como secreto en Key Vault;
+-#   2. carga los ajustes de aplicacion (con referencias a Key Vault);
++# Configura la Function App existente (desplegada con infra/main.bicep):
++#   1. carga los ajustes de aplicacion (con referencias a Key Vault);
++#   2. verifica la referencia al secreto de ACS;
+ #   3. publica el paquete de la Function App.
+ #
+-# Requisitos: Azure CLI con extension "communication", sesion iniciada (az login),
+-# rol Key Vault Secrets Officer sobre el Key Vault y Contributor sobre el grupo de recursos.
+-# Si el Key Vault no admite acceso publico, ejecutar desde un equipo con acceso a la VNet
+-# o agregar temporalmente la IP del operador al firewall del Key Vault (paso 1b).
++# 05-11-2026 (hallazgo M-06 de QA):
++#   - Se retiro el antiguo paso 1 (az communication list-key + az keyvault secret set):
++#     infra/main.bicep ya crea el secreto acs-connection-string por el plano de control
++#     (recurso secretAcs; docs/05), que funciona con el vault cerrado. Recrearlo por el
++#     plano de datos era redundante y obligaba a abrir el Key Vault a la IP del operador.
++#   - MaxCorreosPorEjecucion y PausaEntreCorreosMs quedan en los valores DEMO de D12
++#     (10 y 15000, aprobados por el usuario), iguales a infra/main.bicepparam. Los valores
++#     anteriores (90 / 2100) superaban los limites de ACS con dominio administrado (H1).
++#   - Los ajustes coinciden con los que ya fija infra/main.bicep; este script solo hace
++#     falta para publicar o para cambiar valores sin redesplegar. Un redespliegue de main
++#     vuelve a imponer los valores de la plantilla.
++#
++# Requisitos: Azure CLI, sesion iniciada (az login) y Contributor (o Website Contributor)
++# sobre la Function App. No requiere acceso al plano de datos del Key Vault.
+ #
+ # Todos los valores marcados PENDIENTE deben completarse antes de ejecutar.
+ # =============================================================================
+@@ -19,7 +29,6 @@
+ RG="${RG:?Definir RG (grupo de recursos)}"
+ FUNC_APP="${FUNC_APP:?Definir FUNC_APP (nombre de la Function App)}"
+ KV_NAME="${KV_NAME:?Definir KV_NAME (nombre del Key Vault)}"
+-ACS_NAME="${ACS_NAME:?Definir ACS_NAME (recurso Communication Services)}"
+ SQL_SERVER="${SQL_SERVER:?Definir SQL_SERVER (nombre sin .database.windows.net)}"
+ SQL_DB="${SQL_DB:?Definir SQL_DB}"
+ REMITENTE="${REMITENTE:?Definir REMITENTE (DoNotReply@dominio verificado)}"
+@@ -31,17 +40,11 @@
+ CORREO_CONTACTO="${CORREO_CONTACTO:?Definir CORREO_CONTACTO}"
+ PAQUETE="${PAQUETE:-functions.zip}"
+ 
+-echo "== 1. Secreto de ACS en Key Vault"
+-# 1b (opcional): az keyvault network-rule add -n "$KV_NAME" --ip-address "$(curl -s https://ifconfig.me)/32"
+-ACS_CS=$(az communication list-key -n "$ACS_NAME" -g "$RG" --query primaryConnectionString -o tsv)
+-az keyvault secret set --vault-name "$KV_NAME" -n acs-connection-string --value "$ACS_CS" --output none
+-unset ACS_CS
+-
+ SQL_CS="Server=tcp:${SQL_SERVER}.database.windows.net,1433;Database=${SQL_DB};Authentication=Active Directory Managed Identity;Encrypt=True;TrustServerCertificate=False;"
+ # Mientras la base de la embotelladora no este definida, la fuente es origen_sim en la misma base.
+ SQL_ORIGEN_CS="${SQL_CS}ApplicationIntent=ReadOnly;"
+ 
+-echo "== 2. Ajustes de aplicacion"
++echo "== 1. Ajustes de aplicacion"
+ az functionapp config appsettings set -g "$RG" -n "$FUNC_APP" --output none --settings \
+   "CRON_SINCRONIZACION=0 */15 * * * *" \
+   "CRON_NOTIFICACIONES=0 0 12-17 * * 1-5" \
+@@ -53,19 +56,19 @@
+   "Cobranza__DiasPreaviso=${DIAS_PREAVISO}" \
+   "Cobranza__DiasMora1=${DIAS_MORA1}" \
+   "Cobranza__DiasMora2=${DIAS_MORA2}" \
+-  "Cobranza__MaxCorreosPorEjecucion=90" \
+-  "Cobranza__PausaEntreCorreosMs=2100" \
++  "Cobranza__MaxCorreosPorEjecucion=10" \
++  "Cobranza__PausaEntreCorreosMs=15000" \
+   "Cobranza__NombreEmpresa=Embotelladora del Pacifico S.A." \
+   "Cobranza__CanalesPagoTexto=${CANALES_PAGO}" \
+   "Cobranza__TelefonoContacto=${TELEFONO}" \
+   "Cobranza__CorreoContacto=${CORREO_CONTACTO}"
+ 
+-echo "== 3. Verificacion de la referencia a Key Vault (debe indicar Resolved)"
++echo "== 2. Verificacion de la referencia a Key Vault (debe indicar Resolved)"
+ az rest --method get \
+   --url "$(az functionapp show -g "$RG" -n "$FUNC_APP" --query id -o tsv)/config/configreferences/appsettings/Cobranza__AcsConnectionString?api-version=2023-12-01" \
+   --query "properties.status" -o tsv || echo "Revisar manualmente en el portal: Configuracion > Referencias de Key Vault"
+ 
+-echo "== 4. Publicacion (paquete generado con: dotnet publish -c Release -o publish && cd publish && zip -r ../functions.zip .)"
++echo "== 3. Publicacion (paquete generado con: dotnet publish -c Release -o publish && cd publish && zip -r ../functions.zip .)"
+ az functionapp deployment source config-zip -g "$RG" -n "$FUNC_APP" --src "$PAQUETE"
+ 
+ echo "Listo. Revisar ejecuciones en Application Insights (consultas en docs/consultas_kql_s10.kql)."
+--- antes/scripts/eliminar_entorno.sh
++++ despues/scripts/eliminar_entorno.sh
+@@ -4,14 +4,22 @@
+ # Elimina el grupo de recursos del entorno (modelo de costos: desplegar, tomar
+ # evidencias, eliminar y volver a desplegar con infra/main.bicep).
+ #
++# SOLO LO EJECUTA UN HUMANO. Ningun agente de Claude Code ejecuta este script
++# (ni siquiera con --dry-run sin pedirlo): .claude/agents/devops.md prohibe al
++# agente ejecutar az group delete.
+ # ACCION DESTRUCTIVA: requiere confirmacion explicita de un integrante humano
+ # (CLAUDE.md, regla 5). Probar primero con --dry-run.
+ #
+ # Uso:
++#   export SUBSCRIPTION_ID_ESPERADA=<id de la suscripcion del proyecto>   # obligatorio para borrar
+ #   scripts/eliminar_entorno.sh --dry-run            # solo inventario, no borra nada
+ #   scripts/eliminar_entorno.sh                      # pide escribir el nombre del grupo
+ #   RG=otro-rg scripts/eliminar_entorno.sh --dry-run
+ #
++# SUBSCRIPTION_ID_ESPERADA: el script compara la suscripcion activa de la CLI con
++# este valor y se detiene si no coinciden (en --dry-run solo avisa si no esta
++# definida). El ID real va en infra/entorno.local.env (no versionado), nunca aqui.
++#
+ # Que queda DESPUES de eliminar el grupo (no lo borra este script):
+ #   - Key Vault: queda en estado soft-deleted 90 dias y, por la proteccion de
+ #     purga, NO se puede purgar; su nombre queda reservado. Por eso este script
+@@ -24,6 +32,7 @@
+ #     nombre en el mismo grupo y region, Azure lo recupera (con sus datos).
+ #
+ # Despues de eliminar, para volver a desplegar:
++#   set -a; source infra/entorno.local.env; set +a   (recarga CICLO_KV nuevo)
+ #   az group create -n "$RG" -l brazilsouth
+ #   (luego what-if y despliegue de infra/main.bicep, y s12_endurecer.sh)
+ # =============================================================================
+@@ -36,7 +45,7 @@
+ for arg in "$@"; do
+   case "$arg" in
+     --dry-run) DRY_RUN=si ;;
+-    -h|--help) sed -n '2,30p' "$0"; exit 0 ;;
++    -h|--help) sed -n '2,38p' "$0"; exit 0 ;;
+     *) echo "Argumento no reconocido: $arg" >&2; exit 2 ;;
+   esac
+ done
+@@ -45,6 +54,22 @@
+ SUB=$(az account show --query name -o tsv | tr -d '\r')
+ SUB_ID=$(az account show --query id -o tsv | tr -d '\r')
+ echo "Suscripcion: ${SUB} (${SUB_ID:0:4}...${SUB_ID: -4})"
++ESPERADA="${SUBSCRIPTION_ID_ESPERADA:-}"
++ESPERADA="${ESPERADA//$'\r'/}"
++if [[ -z "$ESPERADA" ]]; then
++  if [[ "$DRY_RUN" == "si" ]]; then
++    echo "AVISO: SUBSCRIPTION_ID_ESPERADA no esta definida; sin ella no se permite el borrado real."
++  else
++    echo "Defina SUBSCRIPTION_ID_ESPERADA (ID de la suscripcion del proyecto) antes de eliminar." >&2
++    exit 1
++  fi
++elif [[ "${SUB_ID,,}" != "${ESPERADA,,}" ]]; then
++  echo "La suscripcion activa (${SUB_ID:0:4}...${SUB_ID: -4}) no coincide con SUBSCRIPTION_ID_ESPERADA" >&2
++  echo "(${ESPERADA:0:4}...${ESPERADA: -4}). Use az account set --subscription <id>. Operacion cancelada." >&2
++  exit 1
++else
++  echo "Suscripcion activa = SUBSCRIPTION_ID_ESPERADA: OK"
++fi
+ if [[ "$(az group exists -n "$RG" | tr -d '\r')" != "true" ]]; then
+   echo "El grupo de recursos ${RG} no existe. Nada que eliminar."
+   exit 0
+@@ -98,6 +123,12 @@
+       echo "CICLO_KV=${NUEVO}" >> "$ENV_LOCAL"
+     fi
+     echo "CICLO_KV: ${ACTUAL} -> ${NUEVO} (${ENV_LOCAL})"
++    echo "IMPORTANTE: el archivo cambio, pero no la variable de esta ni de otras terminales."
++    if [[ -n "${CICLO_KV:-}" ]]; then
++      echo "En esta sesion CICLO_KV sigue exportada con el valor anterior (${CICLO_KV})."
++    fi
++    echo "Antes del proximo what-if o despliegue, vuelva a cargar el archivo:"
++    echo "  set -a; source infra/entorno.local.env; set +a"
+   else
+     echo "CICLO_KV tiene un valor no numerico (${ACTUAL}); actualizarlo a mano."
+   fi

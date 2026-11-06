@@ -1,0 +1,2 @@
+bash -n OK
+ShellCheck: no instalado en el equipo (PENDIENTE; referencia 0.10.0)

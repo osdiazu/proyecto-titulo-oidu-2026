@@ -17,8 +17,8 @@
     "Cobranza__DiasPreaviso": "PENDIENTE (definir con Finanzas)",
     "Cobranza__DiasMora1": "PENDIENTE (definir con Finanzas)",
     "Cobranza__DiasMora2": "PENDIENTE (definir con Finanzas)",
-    "Cobranza__MaxCorreosPorEjecucion": "90",
-    "Cobranza__PausaEntreCorreosMs": "2100",
+    "Cobranza__MaxCorreosPorEjecucion": "10",
+    "Cobranza__PausaEntreCorreosMs": "15000",
 
     "Cobranza__NombreEmpresa": "Embotelladora del Pacifico S.A.",
     "Cobranza__CanalesPagoTexto": "PENDIENTE (texto oficial entregado por Finanzas)",

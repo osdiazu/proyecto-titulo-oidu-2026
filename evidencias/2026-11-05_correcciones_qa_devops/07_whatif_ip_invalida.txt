@@ -1,0 +1,6 @@
+# B-08: what-if con IP_OPERADOR=999.1.1 (formato invalido); se espera error de validacion antes de crear recursos
+ERROR: InvalidTemplate - Deployment template validation failed: 'The template variable 'ipOperadorSinMascara' is not valid: The specified CIDR '999.1.1/32' is not valid.. Please see https://aka.ms/arm-functions for usage details.'.
+exit=1
+# IP_OPERADOR=1234567890123456789 (19 caracteres, supera @maxLength(18))
+ERROR: C:\Users\diazu\Documents\Proyecto de titulo - Final\Cobranza_Automatizada_Contexto_ClaudeCode\cobranza-automatizada\infra\main.bicepparam(26,20) : Error BCP332: The provided value (whose length will always be greater than or equal to 19) is too long to assign to a target for which the maximum allowable length is 18. [https://aka.ms/bicep/core-diagnostics#BCP332]
+exit=1

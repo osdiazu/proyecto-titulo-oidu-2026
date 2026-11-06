@@ -1,0 +1,807 @@
+# Fecha: 2026-11-05T21:58Z - IP_OPERADOR definido (valor ocultado), CICLO_KV=1
+Note: The result may contain false positive predictions (noise).
+You can help us improve the accuracy of the result by opening an issue here: https://aka.ms/WhatIfIssues
+
+Resource and property changes are indicated with this symbol:
+  + Create
+
+The deployment will update the following scope:
+
+Scope: /subscriptions/b492…0d49/resourceGroups/rg-cobranza-apt
+
+  + Microsoft.Communication/communicationServices/acs-cobranza-dev-yvlgzz [2023-04-01]
+
+      apiVersion:              "2023-04-01"
+      id:                      "/subscriptions/b492…0d49/resourceGroups/rg-cobranza-apt/providers/Microsoft.Communication/communicationServices/acs-cobranza-dev-yvlgzz"
+      location:                "global"
+      name:                    "acs-cobranza-dev-yvlgzz"
+      properties.dataLocation: "United States"
+      properties.linkedDomains: [
+        0: "/subscriptions/b492…0d49/resourceGroups/rg-cobranza-apt/providers/Microsoft.Communication/emailServices/ecs-cobranza-dev/domains/AzureManagedDomain"
+      ]
+      tags.ambiente:           "dev"
+      tags.cliente:            "Embotelladora del Pacifico S.A."
+      tags.proyecto:           "APT-Cobranza-Automatizada"
+      tags.responsable:        "Oscar Diaz Ulloa"
+      type:                    "Microsoft.Communication/communicationServices"
+
+  + Microsoft.Communication/emailServices/ecs-cobranza-dev [2023-04-01]
+
+      apiVersion:              "2023-04-01"
+      id:                      "/subscriptions/b492…0d49/resourceGroups/rg-cobranza-apt/providers/Microsoft.Communication/emailServices/ecs-cobranza-dev"
+      location:                "global"
+      name:                    "ecs-cobranza-dev"
+      properties.dataLocation: "United States"
+      tags.ambiente:           "dev"
+      tags.cliente:            "Embotelladora del Pacifico S.A."
+      tags.proyecto:           "APT-Cobranza-Automatizada"
+      tags.responsable:        "Oscar Diaz Ulloa"
+      type:                    "Microsoft.Communication/emailServices"
+
+  + Microsoft.Communication/emailServices/ecs-cobranza-dev/domains/AzureManagedDomain [2023-04-01]
+
+      apiVersion:                        "2023-04-01"
+      id:                                "/subscriptions/b492…0d49/resourceGroups/rg-cobranza-apt/providers/Microsoft.Communication/emailServices/ecs-cobranza-dev/domains/AzureManagedDomain"
+      location:                          "global"
+      name:                              "AzureManagedDomain"
+      properties.domainManagement:       "AzureManaged"
+      properties.userEngagementTracking: "Disabled"
+      tags.ambiente:                     "dev"
+      tags.cliente:                      "Embotelladora del Pacifico S.A."
+      tags.proyecto:                     "APT-Cobranza-Automatizada"
+      tags.responsable:                  "Oscar Diaz Ulloa"
+      type:                              "Microsoft.Communication/emailServices/domains"
+
+  + Microsoft.Insights/components/appi-cobranza-dev [2020-02-02]
+
+      apiVersion:                     "2020-02-02"
+      id:                             "/subscriptions/b492…0d49/resourceGroups/rg-cobranza-apt/providers/Microsoft.Insights/components/appi-cobranza-dev"
+      kind:                           "web"
+      location:                       "brazilsouth"
+      name:                           "appi-cobranza-dev"
+      properties.Application_Type:    "web"
+      properties.WorkspaceResourceId: "/subscriptions/b492…0d49/resourceGroups/rg-cobranza-apt/providers/Microsoft.OperationalInsights/workspaces/log-cobranza-dev"
+      tags.ambiente:                  "dev"
+      tags.cliente:                   "Embotelladora del Pacifico S.A."
+      tags.proyecto:                  "APT-Cobranza-Automatizada"
+      tags.responsable:               "Oscar Diaz Ulloa"
+      type:                           "Microsoft.Insights/components"
+
+  + Microsoft.KeyVault/vaults/kv-cobranza-dev-ahfg2w [2023-07-01]
+
+      apiVersion:                           "2023-07-01"
+      id:                                   "/subscriptions/b492…0d49/resourceGroups/rg-cobranza-apt/providers/Microsoft.KeyVault/vaults/kv-cobranza-dev-ahfg2w"
+      location:                             "brazilsouth"
+      name:                                 "kv-cobranza-dev-ahfg2w"
+      properties.enablePurgeProtection:     true
+      properties.enableRbacAuthorization:   true
+      properties.enableSoftDelete:          true
+      properties.networkAcls.bypass:        "AzureServices"
+      properties.networkAcls.defaultAction: "Deny"
+      properties.networkAcls.ipRules: [
+        0:
+
+          value: "<IP_OPERADOR>"
+
+      ]
+      properties.publicNetworkAccess:       "Enabled"
+      properties.sku.family:                "A"
+      properties.sku.name:                  "standard"
+      properties.softDeleteRetentionInDays: 90
+      properties.tenantId:                  "72fd…e250"
+      tags.ambiente:                        "dev"
+      tags.cliente:                         "Embotelladora del Pacifico S.A."
+      tags.proyecto:                        "APT-Cobranza-Automatizada"
+      tags.responsable:                     "Oscar Diaz Ulloa"
+      type:                                 "Microsoft.KeyVault/vaults"
+
+  + Microsoft.KeyVault/vaults/kv-cobranza-dev-ahfg2w/providers/Microsoft.Authorization/roleAssignments/1160…4624 [2022-04-01]
+
+      apiVersion:                  "2022-04-01"
+      id:                          "/subscriptions/b492…0d49/resourceGroups/rg-cobranza-apt/providers/Microsoft.KeyVault/vaults/kv-cobranza-dev-ahfg2w/providers/Microsoft.Authorization/roleAssignments/1160…4624"
+      name:                        "1160…4624"
+      properties.principalId:      "[reference('/subscriptions/b492…0d49/resourceGroups/rg-cobranza-apt/providers/Microsoft.Web/sites/func-jobs-cobranza-dev-yvlgzz', '2023-12-01', 'full').identity.principalId]"
+      properties.roleDefinitionId: "/subscriptions/b492…0d49/providers/Microsoft.Authorization/roleDefinitions/4633…69e6"
+      type:                        "Microsoft.Authorization/roleAssignments"
+
+  + Microsoft.KeyVault/vaults/kv-cobranza-dev-ahfg2w/providers/Microsoft.Authorization/roleAssignments/91fe…8644 [2022-04-01]
+
+      apiVersion:                  "2022-04-01"
+      id:                          "/subscriptions/b492…0d49/resourceGroups/rg-cobranza-apt/providers/Microsoft.KeyVault/vaults/kv-cobranza-dev-ahfg2w/providers/Microsoft.Authorization/roleAssignments/91fe…8644"
+      name:                        "91fe…8644"
+      properties.principalId:      "bf48…f2fe"
+      properties.roleDefinitionId: "/subscriptions/b492…0d49/providers/Microsoft.Authorization/roleDefinitions/b86a…5cd7"
+      type:                        "Microsoft.Authorization/roleAssignments"
+
+  + Microsoft.KeyVault/vaults/kv-cobranza-dev-ahfg2w/providers/Microsoft.Authorization/roleAssignments/f891…0869 [2022-04-01]
+
+      apiVersion:                  "2022-04-01"
+      id:                          "/subscriptions/b492…0d49/resourceGroups/rg-cobranza-apt/providers/Microsoft.KeyVault/vaults/kv-cobranza-dev-ahfg2w/providers/Microsoft.Authorization/roleAssignments/f891…0869"
+      name:                        "f891…0869"
+      properties.principalId:      "[reference('/subscriptions/b492…0d49/resourceGroups/rg-cobranza-apt/providers/Microsoft.Web/sites/app-api-cobranza-dev-yvlgzz', '2023-12-01', 'full').identity.principalId]"
+      properties.roleDefinitionId: "/subscriptions/b492…0d49/providers/Microsoft.Authorization/roleDefinitions/4633…69e6"
+      type:                        "Microsoft.Authorization/roleAssignments"
+
+  + Microsoft.KeyVault/vaults/kv-cobranza-dev-ahfg2w/secrets/acs-connection-string [2023-07-01]
+
+      apiVersion:       "2023-07-01"
+      id:               "/subscriptions/b492…0d49/resourceGroups/rg-cobranza-apt/providers/Microsoft.KeyVault/vaults/kv-cobranza-dev-ahfg2w/secrets/acs-connection-string"
+      name:             "acs-connection-string"
+      properties.value: "*******"
+      type:             "Microsoft.KeyVault/vaults/secrets"
+
+  + Microsoft.Network/networkSecurityGroups/nsg-app [2023-11-01]
+
+      apiVersion:       "2023-11-01"
+      id:               "/subscriptions/b492…0d49/resourceGroups/rg-cobranza-apt/providers/Microsoft.Network/networkSecurityGroups/nsg-app"
+      location:         "brazilsouth"
+      name:             "nsg-app"
+      properties.securityRules: [
+        0:
+
+          name:                                "Allow-VNet-Outbound-PE"
+          properties.access:                   "Allow"
+          properties.destinationAddressPrefix: "VirtualNetwork"
+          properties.destinationPortRanges: [
+            0: "443"
+            1: "1433"
+          ]
+          properties.direction:                "Outbound"
+          properties.priority:                 100
+          properties.protocol:                 "Tcp"
+          properties.sourceAddressPrefix:      "VirtualNetwork"
+          properties.sourcePortRange:          "*"
+
+      ]
+      tags.ambiente:    "dev"
+      tags.cliente:     "Embotelladora del Pacifico S.A."
+      tags.proyecto:    "APT-Cobranza-Automatizada"
+      tags.responsable: "Oscar Diaz Ulloa"
+      type:             "Microsoft.Network/networkSecurityGroups"
+
+  + Microsoft.Network/networkSecurityGroups/nsg-pe [2023-11-01]
+
+      apiVersion:       "2023-11-01"
+      id:               "/subscriptions/b492…0d49/resourceGroups/rg-cobranza-apt/providers/Microsoft.Network/networkSecurityGroups/nsg-pe"
+      location:         "brazilsouth"
+      name:             "nsg-pe"
+      properties.securityRules: [
+        0:
+
+          name:                                "Allow-App-To-KeyVault-Storage"
+          properties.access:                   "Allow"
+          properties.destinationAddressPrefix: "10.20.2.0/24"
+          properties.destinationPortRange:     "443"
+          properties.direction:                "Inbound"
+          properties.priority:                 110
+          properties.protocol:                 "Tcp"
+          properties.sourceAddressPrefix:      "10.20.1.0/24"
+          properties.sourcePortRange:          "*"
+
+        1:
+
+          name:                                "Allow-App-To-SQL"
+          properties.access:                   "Allow"
+          properties.destinationAddressPrefix: "10.20.2.0/24"
+          properties.destinationPortRange:     "1433"
+          properties.direction:                "Inbound"
+          properties.priority:                 100
+          properties.protocol:                 "Tcp"
+          properties.sourceAddressPrefix:      "10.20.1.0/24"
+          properties.sourcePortRange:          "*"
+
+        2:
+
+          name:                                "Deny-VNet-Inbound"
+          properties.access:                   "Deny"
+          properties.destinationAddressPrefix: "*"
+          properties.destinationPortRange:     "*"
+          properties.direction:                "Inbound"
+          properties.priority:                 4000
+          properties.protocol:                 "*"
+          properties.sourceAddressPrefix:      "VirtualNetwork"
+          properties.sourcePortRange:          "*"
+
+      ]
+      tags.ambiente:    "dev"
+      tags.cliente:     "Embotelladora del Pacifico S.A."
+      tags.proyecto:    "APT-Cobranza-Automatizada"
+      tags.responsable: "Oscar Diaz Ulloa"
+      type:             "Microsoft.Network/networkSecurityGroups"
+
+  + Microsoft.Network/privateDnsZones/privatelink.blob.core.windows.net [2020-06-01]
+
+      apiVersion:       "2020-06-01"
+      id:               "/subscriptions/b492…0d49/resourceGroups/rg-cobranza-apt/providers/Microsoft.Network/privateDnsZones/privatelink.blob.core.windows.net"
+      location:         "global"
+      name:             "privatelink.blob.core.windows.net"
+      tags.ambiente:    "dev"
+      tags.cliente:     "Embotelladora del Pacifico S.A."
+      tags.proyecto:    "APT-Cobranza-Automatizada"
+      tags.responsable: "Oscar Diaz Ulloa"
+      type:             "Microsoft.Network/privateDnsZones"
+
+  + Microsoft.Network/privateDnsZones/privatelink.blob.core.windows.net/virtualNetworkLinks/link-vnet-cobranza [2020-06-01]
+
+      apiVersion:                     "2020-06-01"
+      id:                             "/subscriptions/b492…0d49/resourceGroups/rg-cobranza-apt/providers/Microsoft.Network/privateDnsZones/privatelink.blob.core.windows.net/virtualNetworkLinks/link-vnet-cobranza"
+      location:                       "global"
+      name:                           "link-vnet-cobranza"
+      properties.registrationEnabled: false
+      properties.virtualNetwork.id:   "/subscriptions/b492…0d49/resourceGroups/rg-cobranza-apt/providers/Microsoft.Network/virtualNetworks/vnet-cobranza"
+      type:                           "Microsoft.Network/privateDnsZones/virtualNetworkLinks"
+
+  + Microsoft.Network/privateDnsZones/privatelink.database.windows.net [2020-06-01]
+
+      apiVersion:       "2020-06-01"
+      id:               "/subscriptions/b492…0d49/resourceGroups/rg-cobranza-apt/providers/Microsoft.Network/privateDnsZones/privatelink.database.windows.net"
+      location:         "global"
+      name:             "privatelink.database.windows.net"
+      tags.ambiente:    "dev"
+      tags.cliente:     "Embotelladora del Pacifico S.A."
+      tags.proyecto:    "APT-Cobranza-Automatizada"
+      tags.responsable: "Oscar Diaz Ulloa"
+      type:             "Microsoft.Network/privateDnsZones"
+
+  + Microsoft.Network/privateDnsZones/privatelink.database.windows.net/virtualNetworkLinks/link-vnet-cobranza [2020-06-01]
+
+      apiVersion:                     "2020-06-01"
+      id:                             "/subscriptions/b492…0d49/resourceGroups/rg-cobranza-apt/providers/Microsoft.Network/privateDnsZones/privatelink.database.windows.net/virtualNetworkLinks/link-vnet-cobranza"
+      location:                       "global"
+      name:                           "link-vnet-cobranza"
+      properties.registrationEnabled: false
+      properties.virtualNetwork.id:   "/subscriptions/b492…0d49/resourceGroups/rg-cobranza-apt/providers/Microsoft.Network/virtualNetworks/vnet-cobranza"
+      type:                           "Microsoft.Network/privateDnsZones/virtualNetworkLinks"
+
+  + Microsoft.Network/privateDnsZones/privatelink.queue.core.windows.net [2020-06-01]
+
+      apiVersion:       "2020-06-01"
+      id:               "/subscriptions/b492…0d49/resourceGroups/rg-cobranza-apt/providers/Microsoft.Network/privateDnsZones/privatelink.queue.core.windows.net"
+      location:         "global"
+      name:             "privatelink.queue.core.windows.net"
+      tags.ambiente:    "dev"
+      tags.cliente:     "Embotelladora del Pacifico S.A."
+      tags.proyecto:    "APT-Cobranza-Automatizada"
+      tags.responsable: "Oscar Diaz Ulloa"
+      type:             "Microsoft.Network/privateDnsZones"
+
+  + Microsoft.Network/privateDnsZones/privatelink.queue.core.windows.net/virtualNetworkLinks/link-vnet-cobranza [2020-06-01]
+
+      apiVersion:                     "2020-06-01"
+      id:                             "/subscriptions/b492…0d49/resourceGroups/rg-cobranza-apt/providers/Microsoft.Network/privateDnsZones/privatelink.queue.core.windows.net/virtualNetworkLinks/link-vnet-cobranza"
+      location:                       "global"
+      name:                           "link-vnet-cobranza"
+      properties.registrationEnabled: false
+      properties.virtualNetwork.id:   "/subscriptions/b492…0d49/resourceGroups/rg-cobranza-apt/providers/Microsoft.Network/virtualNetworks/vnet-cobranza"
+      type:                           "Microsoft.Network/privateDnsZones/virtualNetworkLinks"
+
+  + Microsoft.Network/privateDnsZones/privatelink.table.core.windows.net [2020-06-01]
+
+      apiVersion:       "2020-06-01"
+      id:               "/subscriptions/b492…0d49/resourceGroups/rg-cobranza-apt/providers/Microsoft.Network/privateDnsZones/privatelink.table.core.windows.net"
+      location:         "global"
+      name:             "privatelink.table.core.windows.net"
+      tags.ambiente:    "dev"
+      tags.cliente:     "Embotelladora del Pacifico S.A."
+      tags.proyecto:    "APT-Cobranza-Automatizada"
+      tags.responsable: "Oscar Diaz Ulloa"
+      type:             "Microsoft.Network/privateDnsZones"
+
+  + Microsoft.Network/privateDnsZones/privatelink.table.core.windows.net/virtualNetworkLinks/link-vnet-cobranza [2020-06-01]
+
+      apiVersion:                     "2020-06-01"
+      id:                             "/subscriptions/b492…0d49/resourceGroups/rg-cobranza-apt/providers/Microsoft.Network/privateDnsZones/privatelink.table.core.windows.net/virtualNetworkLinks/link-vnet-cobranza"
+      location:                       "global"
+      name:                           "link-vnet-cobranza"
+      properties.registrationEnabled: false
+      properties.virtualNetwork.id:   "/subscriptions/b492…0d49/resourceGroups/rg-cobranza-apt/providers/Microsoft.Network/virtualNetworks/vnet-cobranza"
+      type:                           "Microsoft.Network/privateDnsZones/virtualNetworkLinks"
+
+  + Microsoft.Network/privateDnsZones/privatelink.vaultcore.azure.net [2020-06-01]
+
+      apiVersion:       "2020-06-01"
+      id:               "/subscriptions/b492…0d49/resourceGroups/rg-cobranza-apt/providers/Microsoft.Network/privateDnsZones/privatelink.vaultcore.azure.net"
+      location:         "global"
+      name:             "privatelink.vaultcore.azure.net"
+      tags.ambiente:    "dev"
+      tags.cliente:     "Embotelladora del Pacifico S.A."
+      tags.proyecto:    "APT-Cobranza-Automatizada"
+      tags.responsable: "Oscar Diaz Ulloa"
+      type:             "Microsoft.Network/privateDnsZones"
+
+  + Microsoft.Network/privateDnsZones/privatelink.vaultcore.azure.net/virtualNetworkLinks/link-vnet-cobranza [2020-06-01]
+
+      apiVersion:                     "2020-06-01"
+      id:                             "/subscriptions/b492…0d49/resourceGroups/rg-cobranza-apt/providers/Microsoft.Network/privateDnsZones/privatelink.vaultcore.azure.net/virtualNetworkLinks/link-vnet-cobranza"
+      location:                       "global"
+      name:                           "link-vnet-cobranza"
+      properties.registrationEnabled: false
+      properties.virtualNetwork.id:   "/subscriptions/b492…0d49/resourceGroups/rg-cobranza-apt/providers/Microsoft.Network/virtualNetworks/vnet-cobranza"
+      type:                           "Microsoft.Network/privateDnsZones/virtualNetworkLinks"
+
+  + Microsoft.Network/privateEndpoints/pe-blob-cobranza-dev [2023-11-01]
+
+      apiVersion:                            "2023-11-01"
+      id:                                    "/subscriptions/b492…0d49/resourceGroups/rg-cobranza-apt/providers/Microsoft.Network/privateEndpoints/pe-blob-cobranza-dev"
+      location:                              "brazilsouth"
+      name:                                  "pe-blob-cobranza-dev"
+      properties.customNetworkInterfaceName: "nic-pe-blob-cobranza-dev"
+      properties.ipConfigurations: [
+        0:
+
+          name:                        "ipcfg-blob"
+          properties.groupId:          "blob"
+          properties.memberName:       "blob"
+          properties.privateIPAddress: "10.20.2.6"
+
+      ]
+      properties.privateLinkServiceConnections: [
+        0:
+
+          name:                            "plsc-blob"
+          properties.groupIds: [
+            0: "blob"
+          ]
+          properties.privateLinkServiceId: "/subscriptions/b492…0d49/resourceGroups/rg-cobranza-apt/providers/Microsoft.Storage/storageAccounts/stcobranzadevyvlgzznj"
+
+      ]
+      properties.subnet.id:                  "/subscriptions/b492…0d49/resourceGroups/rg-cobranza-apt/providers/Microsoft.Network/virtualNetworks/vnet-cobranza/subnets/snet-pe"
+      tags.ambiente:                         "dev"
+      tags.cliente:                          "Embotelladora del Pacifico S.A."
+      tags.proyecto:                         "APT-Cobranza-Automatizada"
+      tags.responsable:                      "Oscar Diaz Ulloa"
+      type:                                  "Microsoft.Network/privateEndpoints"
+
+  + Microsoft.Network/privateEndpoints/pe-blob-cobranza-dev/privateDnsZoneGroups/default [2023-11-01]
+
+      apiVersion:  "2023-11-01"
+      id:          "/subscriptions/b492…0d49/resourceGroups/rg-cobranza-apt/providers/Microsoft.Network/privateEndpoints/pe-blob-cobranza-dev/privateDnsZoneGroups/default"
+      name:        "default"
+      properties.privateDnsZoneConfigs: [
+        0:
+
+          name:                        "privatelink-blob-core-windows-net"
+          properties.privateDnsZoneId: "/subscriptions/b492…0d49/resourceGroups/rg-cobranza-apt/providers/Microsoft.Network/privateDnsZones/privatelink.blob.core.windows.net"
+
+      ]
+      type:        "Microsoft.Network/privateEndpoints/privateDnsZoneGroups"
+
+  + Microsoft.Network/privateEndpoints/pe-kv-cobranza-dev [2023-11-01]
+
+      apiVersion:                            "2023-11-01"
+      id:                                    "/subscriptions/b492…0d49/resourceGroups/rg-cobranza-apt/providers/Microsoft.Network/privateEndpoints/pe-kv-cobranza-dev"
+      location:                              "brazilsouth"
+      name:                                  "pe-kv-cobranza-dev"
+      properties.customNetworkInterfaceName: "nic-pe-kv-cobranza-dev"
+      properties.ipConfigurations: [
+        0:
+
+          name:                        "ipcfg-kv"
+          properties.groupId:          "vault"
+          properties.memberName:       "default"
+          properties.privateIPAddress: "10.20.2.5"
+
+      ]
+      properties.privateLinkServiceConnections: [
+        0:
+
+          name:                            "plsc-kv"
+          properties.groupIds: [
+            0: "vault"
+          ]
+          properties.privateLinkServiceId: "/subscriptions/b492…0d49/resourceGroups/rg-cobranza-apt/providers/Microsoft.KeyVault/vaults/kv-cobranza-dev-ahfg2w"
+
+      ]
+      properties.subnet.id:                  "/subscriptions/b492…0d49/resourceGroups/rg-cobranza-apt/providers/Microsoft.Network/virtualNetworks/vnet-cobranza/subnets/snet-pe"
+      tags.ambiente:                         "dev"
+      tags.cliente:                          "Embotelladora del Pacifico S.A."
+      tags.proyecto:                         "APT-Cobranza-Automatizada"
+      tags.responsable:                      "Oscar Diaz Ulloa"
+      type:                                  "Microsoft.Network/privateEndpoints"
+
+  + Microsoft.Network/privateEndpoints/pe-kv-cobranza-dev/privateDnsZoneGroups/default [2023-11-01]
+
+      apiVersion:  "2023-11-01"
+      id:          "/subscriptions/b492…0d49/resourceGroups/rg-cobranza-apt/providers/Microsoft.Network/privateEndpoints/pe-kv-cobranza-dev/privateDnsZoneGroups/default"
+      name:        "default"
+      properties.privateDnsZoneConfigs: [
+        0:
+
+          name:                        "privatelink-vaultcore-azure-net"
+          properties.privateDnsZoneId: "/subscriptions/b492…0d49/resourceGroups/rg-cobranza-apt/providers/Microsoft.Network/privateDnsZones/privatelink.vaultcore.azure.net"
+
+      ]
+      type:        "Microsoft.Network/privateEndpoints/privateDnsZoneGroups"
+
+  + Microsoft.Network/privateEndpoints/pe-queue-cobranza-dev [2023-11-01]
+
+      apiVersion:                            "2023-11-01"
+      id:                                    "/subscriptions/b492…0d49/resourceGroups/rg-cobranza-apt/providers/Microsoft.Network/privateEndpoints/pe-queue-cobranza-dev"
+      location:                              "brazilsouth"
+      name:                                  "pe-queue-cobranza-dev"
+      properties.customNetworkInterfaceName: "nic-pe-queue-cobranza-dev"
+      properties.ipConfigurations: [
+        0:
+
+          name:                        "ipcfg-queue"
+          properties.groupId:          "queue"
+          properties.memberName:       "queue"
+          properties.privateIPAddress: "10.20.2.7"
+
+      ]
+      properties.privateLinkServiceConnections: [
+        0:
+
+          name:                            "plsc-queue"
+          properties.groupIds: [
+            0: "queue"
+          ]
+          properties.privateLinkServiceId: "/subscriptions/b492…0d49/resourceGroups/rg-cobranza-apt/providers/Microsoft.Storage/storageAccounts/stcobranzadevyvlgzznj"
+
+      ]
+      properties.subnet.id:                  "/subscriptions/b492…0d49/resourceGroups/rg-cobranza-apt/providers/Microsoft.Network/virtualNetworks/vnet-cobranza/subnets/snet-pe"
+      tags.ambiente:                         "dev"
+      tags.cliente:                          "Embotelladora del Pacifico S.A."
+      tags.proyecto:                         "APT-Cobranza-Automatizada"
+      tags.responsable:                      "Oscar Diaz Ulloa"
+      type:                                  "Microsoft.Network/privateEndpoints"
+
+  + Microsoft.Network/privateEndpoints/pe-queue-cobranza-dev/privateDnsZoneGroups/default [2023-11-01]
+
+      apiVersion:  "2023-11-01"
+      id:          "/subscriptions/b492…0d49/resourceGroups/rg-cobranza-apt/providers/Microsoft.Network/privateEndpoints/pe-queue-cobranza-dev/privateDnsZoneGroups/default"
+      name:        "default"
+      properties.privateDnsZoneConfigs: [
+        0:
+
+          name:                        "privatelink-queue-core-windows-net"
+          properties.privateDnsZoneId: "/subscriptions/b492…0d49/resourceGroups/rg-cobranza-apt/providers/Microsoft.Network/privateDnsZones/privatelink.queue.core.windows.net"
+
+      ]
+      type:        "Microsoft.Network/privateEndpoints/privateDnsZoneGroups"
+
+  + Microsoft.Network/privateEndpoints/pe-sql-cobranza-dev [2023-11-01]
+
+      apiVersion:                            "2023-11-01"
+      id:                                    "/subscriptions/b492…0d49/resourceGroups/rg-cobranza-apt/providers/Microsoft.Network/privateEndpoints/pe-sql-cobranza-dev"
+      location:                              "brazilsouth"
+      name:                                  "pe-sql-cobranza-dev"
+      properties.customNetworkInterfaceName: "nic-pe-sql-cobranza-dev"
+      properties.ipConfigurations: [
+        0:
+
+          name:                        "ipcfg-sql"
+          properties.groupId:          "sqlServer"
+          properties.memberName:       "sqlServer"
+          properties.privateIPAddress: "10.20.2.4"
+
+      ]
+      properties.privateLinkServiceConnections: [
+        0:
+
+          name:                            "plsc-sql"
+          properties.groupIds: [
+            0: "sqlServer"
+          ]
+          properties.privateLinkServiceId: "/subscriptions/b492…0d49/resourceGroups/rg-cobranza-apt/providers/Microsoft.Sql/servers/sql-cobranza-dev-yvlgzz"
+
+      ]
+      properties.subnet.id:                  "/subscriptions/b492…0d49/resourceGroups/rg-cobranza-apt/providers/Microsoft.Network/virtualNetworks/vnet-cobranza/subnets/snet-pe"
+      tags.ambiente:                         "dev"
+      tags.cliente:                          "Embotelladora del Pacifico S.A."
+      tags.proyecto:                         "APT-Cobranza-Automatizada"
+      tags.responsable:                      "Oscar Diaz Ulloa"
+      type:                                  "Microsoft.Network/privateEndpoints"
+
+  + Microsoft.Network/privateEndpoints/pe-sql-cobranza-dev/privateDnsZoneGroups/default [2023-11-01]
+
+      apiVersion:  "2023-11-01"
+      id:          "/subscriptions/b492…0d49/resourceGroups/rg-cobranza-apt/providers/Microsoft.Network/privateEndpoints/pe-sql-cobranza-dev/privateDnsZoneGroups/default"
+      name:        "default"
+      properties.privateDnsZoneConfigs: [
+        0:
+
+          name:                        "privatelink-database-windows-net"
+          properties.privateDnsZoneId: "/subscriptions/b492…0d49/resourceGroups/rg-cobranza-apt/providers/Microsoft.Network/privateDnsZones/privatelink.database.windows.net"
+
+      ]
+      type:        "Microsoft.Network/privateEndpoints/privateDnsZoneGroups"
+
+  + Microsoft.Network/privateEndpoints/pe-table-cobranza-dev [2023-11-01]
+
+      apiVersion:                            "2023-11-01"
+      id:                                    "/subscriptions/b492…0d49/resourceGroups/rg-cobranza-apt/providers/Microsoft.Network/privateEndpoints/pe-table-cobranza-dev"
+      location:                              "brazilsouth"
+      name:                                  "pe-table-cobranza-dev"
+      properties.customNetworkInterfaceName: "nic-pe-table-cobranza-dev"
+      properties.ipConfigurations: [
+        0:
+
+          name:                        "ipcfg-table"
+          properties.groupId:          "table"
+          properties.memberName:       "table"
+          properties.privateIPAddress: "10.20.2.8"
+
+      ]
+      properties.privateLinkServiceConnections: [
+        0:
+
+          name:                            "plsc-table"
+          properties.groupIds: [
+            0: "table"
+          ]
+          properties.privateLinkServiceId: "/subscriptions/b492…0d49/resourceGroups/rg-cobranza-apt/providers/Microsoft.Storage/storageAccounts/stcobranzadevyvlgzznj"
+
+      ]
+      properties.subnet.id:                  "/subscriptions/b492…0d49/resourceGroups/rg-cobranza-apt/providers/Microsoft.Network/virtualNetworks/vnet-cobranza/subnets/snet-pe"
+      tags.ambiente:                         "dev"
+      tags.cliente:                          "Embotelladora del Pacifico S.A."
+      tags.proyecto:                         "APT-Cobranza-Automatizada"
+      tags.responsable:                      "Oscar Diaz Ulloa"
+      type:                                  "Microsoft.Network/privateEndpoints"
+
+  + Microsoft.Network/privateEndpoints/pe-table-cobranza-dev/privateDnsZoneGroups/default [2023-11-01]
+
+      apiVersion:  "2023-11-01"
+      id:          "/subscriptions/b492…0d49/resourceGroups/rg-cobranza-apt/providers/Microsoft.Network/privateEndpoints/pe-table-cobranza-dev/privateDnsZoneGroups/default"
+      name:        "default"
+      properties.privateDnsZoneConfigs: [
+        0:
+
+          name:                        "privatelink-table-core-windows-net"
+          properties.privateDnsZoneId: "/subscriptions/b492…0d49/resourceGroups/rg-cobranza-apt/providers/Microsoft.Network/privateDnsZones/privatelink.table.core.windows.net"
+
+      ]
+      type:        "Microsoft.Network/privateEndpoints/privateDnsZoneGroups"
+
+  + Microsoft.Network/virtualNetworks/vnet-cobranza [2023-11-01]
+
+      apiVersion:               "2023-11-01"
+      id:                       "/subscriptions/b492…0d49/resourceGroups/rg-cobranza-apt/providers/Microsoft.Network/virtualNetworks/vnet-cobranza"
+      location:                 "brazilsouth"
+      name:                     "vnet-cobranza"
+      properties.addressSpace.addressPrefixes: [
+        0: "10.20.0.0/16"
+      ]
+      properties.subnets: [
+        0:
+
+          name:                               "snet-app"
+          properties.addressPrefix:           "10.20.1.0/24"
+          properties.delegations: [
+            0:
+
+              name:                   "delegacion-appservice"
+              properties.serviceName: "Microsoft.Web/serverFarms"
+
+          ]
+          properties.networkSecurityGroup.id: "/subscriptions/b492…0d49/resourceGroups/rg-cobranza-apt/providers/Microsoft.Network/networkSecurityGroups/nsg-app"
+
+        1:
+
+          name:                                      "snet-pe"
+          properties.addressPrefix:                  "10.20.2.0/24"
+          properties.networkSecurityGroup.id:        "/subscriptions/b492…0d49/resourceGroups/rg-cobranza-apt/providers/Microsoft.Network/networkSecurityGroups/nsg-pe"
+          properties.privateEndpointNetworkPolicies: "Enabled"
+
+      ]
+      tags.ambiente:            "dev"
+      tags.cliente:             "Embotelladora del Pacifico S.A."
+      tags.proyecto:            "APT-Cobranza-Automatizada"
+      tags.responsable:         "Oscar Diaz Ulloa"
+      type:                     "Microsoft.Network/virtualNetworks"
+
+  + Microsoft.OperationalInsights/workspaces/log-cobranza-dev [2023-09-01]
+
+      apiVersion:                 "2023-09-01"
+      id:                         "/subscriptions/b492…0d49/resourceGroups/rg-cobranza-apt/providers/Microsoft.OperationalInsights/workspaces/log-cobranza-dev"
+      location:                   "brazilsouth"
+      name:                       "log-cobranza-dev"
+      properties.retentionInDays: 30
+      properties.sku.name:        "PerGB2018"
+      tags.ambiente:              "dev"
+      tags.cliente:               "Embotelladora del Pacifico S.A."
+      tags.proyecto:              "APT-Cobranza-Automatizada"
+      tags.responsable:           "Oscar Diaz Ulloa"
+      type:                       "Microsoft.OperationalInsights/workspaces"
+
+  + Microsoft.Sql/servers/sql-cobranza-dev-yvlgzz [2021-11-01]
+
+      apiVersion:                                          "2021-11-01"
+      id:                                                  "/subscriptions/b492…0d49/resourceGroups/rg-cobranza-apt/providers/Microsoft.Sql/servers/sql-cobranza-dev-yvlgzz"
+      location:                                            "brazilsouth"
+      name:                                                "sql-cobranza-dev-yvlgzz"
+      properties.administrators.administratorType:         "ActiveDirectory"
+      properties.administrators.azureADOnlyAuthentication: true
+      properties.administrators.login:                     "*******"
+      properties.administrators.principalType:             "Group"
+      properties.administrators.sid:                       "7074…e6be"
+      properties.administrators.tenantId:                  "72fd…e250"
+      properties.minimalTlsVersion:                        "1.2"
+      properties.publicNetworkAccess:                      "Enabled"
+      tags.ambiente:                                       "dev"
+      tags.cliente:                                        "Embotelladora del Pacifico S.A."
+      tags.proyecto:                                       "APT-Cobranza-Automatizada"
+      tags.responsable:                                    "Oscar Diaz Ulloa"
+      type:                                                "Microsoft.Sql/servers"
+
+  + Microsoft.Sql/servers/sql-cobranza-dev-yvlgzz/auditingSettings/default [2021-11-01]
+
+      apiVersion:                             "2021-11-01"
+      id:                                     "/subscriptions/b492…0d49/resourceGroups/rg-cobranza-apt/providers/Microsoft.Sql/servers/sql-cobranza-dev-yvlgzz/auditingSettings/default"
+      name:                                   "default"
+      properties.auditActionsAndGroups: [
+        0: "SUCCESSFUL_DATABASE_AUTHENTICATION_GROUP"
+        1: "FAILED_DATABASE_AUTHENTICATION_GROUP"
+        2: "BATCH_COMPLETED_GROUP"
+        3: "DATABASE_PERMISSION_CHANGE_GROUP"
+        4: "DATABASE_PRINCIPAL_CHANGE_GROUP"
+        5: "DATABASE_ROLE_MEMBER_CHANGE_GROUP"
+        6: "SCHEMA_OBJECT_CHANGE_GROUP"
+      ]
+      properties.isAzureMonitorTargetEnabled: true
+      properties.state:                       "Enabled"
+      type:                                   "Microsoft.Sql/servers/auditingSettings"
+
+  + Microsoft.Sql/servers/sql-cobranza-dev-yvlgzz/databases/sqldb-cobranza [2021-11-01]
+
+      apiVersion:                                  "2021-11-01"
+      id:                                          "/subscriptions/b492…0d49/resourceGroups/rg-cobranza-apt/providers/Microsoft.Sql/servers/sql-cobranza-dev-yvlgzz/databases/sqldb-cobranza"
+      location:                                    "brazilsouth"
+      name:                                        "sqldb-cobranza"
+      properties.collation:                        "Modern_Spanish_CI_AS"
+      properties.requestedBackupStorageRedundancy: "Zone"
+      sku.name:                                    "S0"
+      tags.ambiente:                               "dev"
+      tags.cliente:                                "Embotelladora del Pacifico S.A."
+      tags.proyecto:                               "APT-Cobranza-Automatizada"
+      tags.responsable:                            "Oscar Diaz Ulloa"
+      type:                                        "Microsoft.Sql/servers/databases"
+
+  + Microsoft.Sql/servers/sql-cobranza-dev-yvlgzz/databases/sqldb-cobranza/backupLongTermRetentionPolicies/default [2021-11-01]
+
+      apiVersion:                  "2021-11-01"
+      id:                          "/subscriptions/b492…0d49/resourceGroups/rg-cobranza-apt/providers/Microsoft.Sql/servers/sql-cobranza-dev-yvlgzz/databases/sqldb-cobranza/backupLongTermRetentionPolicies/default"
+      name:                        "default"
+      properties.monthlyRetention: "P12M"
+      properties.weeklyRetention:  "P8W"
+      type:                        "Microsoft.Sql/servers/databases/backupLongTermRetentionPolicies"
+
+  + Microsoft.Sql/servers/sql-cobranza-dev-yvlgzz/databases/sqldb-cobranza/backupShortTermRetentionPolicies/default [2021-11-01]
+
+      apiVersion:               "2021-11-01"
+      id:                       "/subscriptions/b492…0d49/resourceGroups/rg-cobranza-apt/providers/Microsoft.Sql/servers/sql-cobranza-dev-yvlgzz/databases/sqldb-cobranza/backupShortTermRetentionPolicies/default"
+      name:                     "default"
+      properties.retentionDays: 35
+      type:                     "Microsoft.Sql/servers/databases/backupShortTermRetentionPolicies"
+
+  + Microsoft.Sql/servers/sql-cobranza-dev-yvlgzz/databases/sqldb-cobranza/providers/Microsoft.Insights/diagnosticSettings/diag-sqldb [2021-05-01-preview]
+
+      apiVersion:             "2021-05-01-preview"
+      id:                     "/subscriptions/b492…0d49/resourceGroups/rg-cobranza-apt/providers/Microsoft.Sql/servers/sql-cobranza-dev-yvlgzz/databases/sqldb-cobranza/providers/Microsoft.Insights/diagnosticSettings/diag-sqldb"
+      name:                   "diag-sqldb"
+      properties.logs: [
+        0:
+
+          category: "SQLSecurityAuditEvents"
+          enabled:  true
+
+        1:
+
+          category: "Errors"
+          enabled:  true
+
+      ]
+      properties.workspaceId: "/subscriptions/b492…0d49/resourceGroups/rg-cobranza-apt/providers/Microsoft.OperationalInsights/workspaces/log-cobranza-dev"
+      type:                   "Microsoft.Insights/diagnosticSettings"
+
+  + Microsoft.Sql/servers/sql-cobranza-dev-yvlgzz/firewallRules/operador-temporal [2021-11-01]
+
+      apiVersion:                "2021-11-01"
+      id:                        "/subscriptions/b492…0d49/resourceGroups/rg-cobranza-apt/providers/Microsoft.Sql/servers/sql-cobranza-dev-yvlgzz/firewallRules/operador-temporal"
+      name:                      "operador-temporal"
+      properties.endIpAddress:   "<IP_OPERADOR>"
+      properties.startIpAddress: "<IP_OPERADOR>"
+      type:                      "Microsoft.Sql/servers/firewallRules"
+
+  + Microsoft.Storage/storageAccounts/stcobranzadevyvlgzznj [2023-05-01]
+
+      apiVersion:                           "2023-05-01"
+      id:                                   "/subscriptions/b492…0d49/resourceGroups/rg-cobranza-apt/providers/Microsoft.Storage/storageAccounts/stcobranzadevyvlgzznj"
+      kind:                                 "StorageV2"
+      location:                             "brazilsouth"
+      name:                                 "stcobranzadevyvlgzznj"
+      properties.allowBlobPublicAccess:     false
+      properties.allowSharedKeyAccess:      false
+      properties.minimumTlsVersion:         "TLS1_2"
+      properties.networkAcls.bypass:        "AzureServices"
+      properties.networkAcls.defaultAction: "Deny"
+      properties.publicNetworkAccess:       "Disabled"
+      properties.supportsHttpsTrafficOnly:  true
+      sku.name:                             "Standard_ZRS"
+      tags.ambiente:                        "dev"
+      tags.cliente:                         "Embotelladora del Pacifico S.A."
+      tags.proyecto:                        "APT-Cobranza-Automatizada"
+      tags.responsable:                     "Oscar Diaz Ulloa"
+      type:                                 "Microsoft.Storage/storageAccounts"
+
+  + Microsoft.Storage/storageAccounts/stcobranzadevyvlgzznj/providers/Microsoft.Authorization/roleAssignments/6ad7…1e2b [2022-04-01]
+
+      apiVersion:                  "2022-04-01"
+      id:                          "/subscriptions/b492…0d49/resourceGroups/rg-cobranza-apt/providers/Microsoft.Storage/storageAccounts/stcobranzadevyvlgzznj/providers/Microsoft.Authorization/roleAssignments/6ad7…1e2b"
+      name:                        "6ad7…1e2b"
+      properties.principalId:      "[reference('/subscriptions/b492…0d49/resourceGroups/rg-cobranza-apt/providers/Microsoft.Web/sites/func-jobs-cobranza-dev-yvlgzz', '2023-12-01', 'full').identity.principalId]"
+      properties.roleDefinitionId: "/subscriptions/b492…0d49/providers/Microsoft.Authorization/roleDefinitions/0a9a…aaa3"
+      type:                        "Microsoft.Authorization/roleAssignments"
+
+  + Microsoft.Storage/storageAccounts/stcobranzadevyvlgzznj/providers/Microsoft.Authorization/roleAssignments/82f3…d42c [2022-04-01]
+
+      apiVersion:                  "2022-04-01"
+      id:                          "/subscriptions/b492…0d49/resourceGroups/rg-cobranza-apt/providers/Microsoft.Storage/storageAccounts/stcobranzadevyvlgzznj/providers/Microsoft.Authorization/roleAssignments/82f3…d42c"
+      name:                        "82f3…d42c"
+      properties.principalId:      "[reference('/subscriptions/b492…0d49/resourceGroups/rg-cobranza-apt/providers/Microsoft.Web/sites/func-jobs-cobranza-dev-yvlgzz', '2023-12-01', 'full').identity.principalId]"
+      properties.roleDefinitionId: "/subscriptions/b492…0d49/providers/Microsoft.Authorization/roleDefinitions/974c…fb88"
+      type:                        "Microsoft.Authorization/roleAssignments"
+
+  + Microsoft.Storage/storageAccounts/stcobranzadevyvlgzznj/providers/Microsoft.Authorization/roleAssignments/a7b8…bc72 [2022-04-01]
+
+      apiVersion:                  "2022-04-01"
+      id:                          "/subscriptions/b492…0d49/resourceGroups/rg-cobranza-apt/providers/Microsoft.Storage/storageAccounts/stcobranzadevyvlgzznj/providers/Microsoft.Authorization/roleAssignments/a7b8…bc72"
+      name:                        "a7b8…bc72"
+      properties.principalId:      "[reference('/subscriptions/b492…0d49/resourceGroups/rg-cobranza-apt/providers/Microsoft.Web/sites/func-jobs-cobranza-dev-yvlgzz', '2023-12-01', 'full').identity.principalId]"
+      properties.roleDefinitionId: "/subscriptions/b492…0d49/providers/Microsoft.Authorization/roleDefinitions/b7e6…955b"
+      type:                        "Microsoft.Authorization/roleAssignments"
+
+  + Microsoft.Web/serverfarms/asp-cobranza-dev [2023-12-01]
+
+      apiVersion:          "2023-12-01"
+      id:                  "/subscriptions/b492…0d49/resourceGroups/rg-cobranza-apt/providers/Microsoft.Web/serverfarms/asp-cobranza-dev"
+      kind:                "linux"
+      location:            "brazilsouth"
+      name:                "asp-cobranza-dev"
+      properties.reserved: true
+      sku.name:            "B1"
+      tags.ambiente:       "dev"
+      tags.cliente:        "Embotelladora del Pacifico S.A."
+      tags.proyecto:       "APT-Cobranza-Automatizada"
+      tags.responsable:    "Oscar Diaz Ulloa"
+      type:                "Microsoft.Web/serverfarms"
+
+  + Microsoft.Web/sites/app-api-cobranza-dev-yvlgzz [2023-12-01]
+
+      apiVersion:                        "2023-12-01"
+      id:                                "/subscriptions/b492…0d49/resourceGroups/rg-cobranza-apt/providers/Microsoft.Web/sites/app-api-cobranza-dev-yvlgzz"
+      identity:                          "*******"
+      kind:                              "app,linux"
+      location:                          "brazilsouth"
+      name:                              "app-api-cobranza-dev-yvlgzz"
+      properties.httpsOnly:              true
+      properties.serverFarmId:           "/subscriptions/b492…0d49/resourceGroups/rg-cobranza-apt/providers/Microsoft.Web/serverfarms/asp-cobranza-dev"
+      properties.siteConfig:             "*******"
+      properties.virtualNetworkSubnetId: "/subscriptions/b492…0d49/resourceGroups/rg-cobranza-apt/providers/Microsoft.Network/virtualNetworks/vnet-cobranza/subnets/snet-app"
+      tags.ambiente:                     "dev"
+      tags.cliente:                      "Embotelladora del Pacifico S.A."
+      tags.proyecto:                     "APT-Cobranza-Automatizada"
+      tags.responsable:                  "Oscar Diaz Ulloa"
+      type:                              "Microsoft.Web/sites"
+
+  + Microsoft.Web/sites/func-jobs-cobranza-dev-yvlgzz [2023-12-01]
+
+      apiVersion:                        "2023-12-01"
+      id:                                "/subscriptions/b492…0d49/resourceGroups/rg-cobranza-apt/providers/Microsoft.Web/sites/func-jobs-cobranza-dev-yvlgzz"
+      identity:                          "*******"
+      kind:                              "functionapp,linux"
+      location:                          "brazilsouth"
+      name:                              "func-jobs-cobranza-dev-yvlgzz"
+      properties.httpsOnly:              true
+      properties.serverFarmId:           "/subscriptions/b492…0d49/resourceGroups/rg-cobranza-apt/providers/Microsoft.Web/serverfarms/asp-cobranza-dev"
+      properties.siteConfig:             "*******"
+      properties.virtualNetworkSubnetId: "/subscriptions/b492…0d49/resourceGroups/rg-cobranza-apt/providers/Microsoft.Network/virtualNetworks/vnet-cobranza/subnets/snet-app"
+      tags.ambiente:                     "dev"
+      tags.cliente:                      "Embotelladora del Pacifico S.A."
+      tags.proyecto:                     "APT-Cobranza-Automatizada"
+      tags.responsable:                  "Oscar Diaz Ulloa"
+      type:                              "Microsoft.Web/sites"
+
+Resource changes: 47 to create.
+# exit=0

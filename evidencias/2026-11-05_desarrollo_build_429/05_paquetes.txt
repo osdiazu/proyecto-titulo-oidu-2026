@@ -1,0 +1,33 @@
+# 2026-11-05T19:49:37-03:00 dotnet list Cobranza.slnx package
+  Determinando los proyectos que se van a restaurar...
+  Todos los proyectos están actualizados para la restauración.
+El proyecto "Cobranza.Api" tiene las referencias de paquete siguientes
+   [net10.0]: 
+   Paquete de nivel superior                       Solicitado   Resuelto
+   > Microsoft.ApplicationInsights.AspNetCore      2.22.0       2.22.0  
+   > Microsoft.Data.SqlClient                      6.0.1        6.0.1   
+   > System.Security.Cryptography.Pkcs             9.0.21       9.0.21  
+
+El proyecto "Cobranza.Comun" tiene las referencias de paquete siguientes
+   [net10.0]: No se encontró ningún paquete para este marco.
+El proyecto "Cobranza.Functions" tiene las referencias de paquete siguientes
+   [net10.0]: 
+   Paquete de nivel superior                                   Solicitado   Resuelto
+   > Azure.Communication.Email                                 1.0.1        1.0.1   
+   > Microsoft.ApplicationInsights.WorkerService               2.22.0       2.22.0  
+   > Microsoft.Azure.Functions.Worker                          2.50.0       2.50.0  
+   > Microsoft.Azure.Functions.Worker.ApplicationInsights      2.0.0        2.0.0   
+   > Microsoft.Azure.Functions.Worker.Extensions.Timer         4.3.1        4.3.1   
+   > Microsoft.Azure.Functions.Worker.Sdk                      2.0.5        2.0.5   
+   > Microsoft.Data.SqlClient                                  6.0.1        6.0.1   
+   > Microsoft.Extensions.Options.DataAnnotations              10.0.0       10.0.0  
+   > System.Security.Cryptography.Pkcs                         9.0.21       9.0.21  
+
+El proyecto "Cobranza.Functions.Tests" tiene las referencias de paquete siguientes
+   [net10.0]: 
+   Paquete de nivel superior        Solicitado   Resuelto
+   > Microsoft.NET.Test.Sdk         18.11.0      18.11.0 
+   > xunit                          2.9.3        2.9.3   
+   > xunit.runner.visualstudio      3.1.5        3.1.5   
+
+# exit: 0

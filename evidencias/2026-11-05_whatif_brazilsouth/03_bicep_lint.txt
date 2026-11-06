@@ -1,0 +1,8 @@
+# Fecha: 2026-11-05T22:02Z - Bicep CLI 0.48.1
+# az bicep lint --file infra/main.bicep
+
+exit=0
+# az bicep lint --file infra/main.bicepparam (variables exportadas en linea)
+
+exit=0
+(salida vacia con exit=0: sin errores ni advertencias)

@@ -1,0 +1,33 @@
+# Conteo de declaraciones y recursos (JSON compilado de infra/main.bicep, Bicep 0.48.1)
+ 1. Microsoft.Network/networkSecurityGroups  x1
+ 2. Microsoft.Network/networkSecurityGroups  x1
+ 3. Microsoft.Network/virtualNetworks  x1
+ 4. Microsoft.OperationalInsights/workspaces  x1
+ 5. Microsoft.Insights/components  x1
+ 6. Microsoft.KeyVault/vaults  x1
+ 7. Microsoft.Sql/servers  x1
+ 8. Microsoft.Sql/servers/firewallRules  x1  (condicional: ipOperador)
+ 9. Microsoft.Sql/servers/auditingSettings  x1
+10. Microsoft.Sql/servers/databases  x1
+11. Microsoft.Sql/servers/databases/backupShortTermRetentionPolicies  x1
+12. Microsoft.Sql/servers/databases/backupLongTermRetentionPolicies  x1
+13. Microsoft.Insights/diagnosticSettings  x1
+14. Microsoft.Storage/storageAccounts  x1
+15. Microsoft.Communication/emailServices  x1
+16. Microsoft.Communication/emailServices/domains  x1
+17. Microsoft.Communication/communicationServices  x1
+18. Microsoft.KeyVault/vaults/secrets  x1
+19. Microsoft.Web/serverfarms  x1
+20. Microsoft.Web/sites  x1
+21. Microsoft.Web/sites  x1
+22. Microsoft.Network/privateDnsZones  x5
+23. Microsoft.Network/privateDnsZones/virtualNetworkLinks  x5
+24. Microsoft.Network/privateEndpoints  x5
+25. Microsoft.Network/privateEndpoints/privateDnsZoneGroups  x5
+26. Microsoft.Authorization/roleAssignments  x1
+27. Microsoft.Authorization/roleAssignments  x1
+28. Microsoft.Authorization/roleAssignments  x1
+29. Microsoft.Authorization/roleAssignments  x3
+Total: 29 declaraciones / 47 recursos
+Referencia S10 documentada: 28 / 46. Diferencia: +1 / +1 = raKvOperador (operadorObjectId, Key Vault Secrets Officer), no incluido en C1-C6.
+What-if: 46 Create con IP_OPERADOR vacio (la regla operador-temporal no se crea); 47 Create con IP_OPERADOR definido.

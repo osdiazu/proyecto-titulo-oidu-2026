@@ -23,12 +23,16 @@ builder.Services
     .ValidateOnStart();
 
 builder.Services.AddSingleton<RepositorioCobranza>();
+builder.Services.AddSingleton<IRepositorioNotificaciones>(sp => sp.GetRequiredService<RepositorioCobranza>());
+builder.Services.AddSingleton(TimeProvider.System);
 builder.Services.AddSingleton<IOrigenRegularizados, OrigenRegularizadosSql>();
 builder.Services.AddSingleton<PlantillaCorreo>();
 builder.Services.AddSingleton(sp =>
 {
     var o = sp.GetRequiredService<IOptions<OpcionesCobranza>>().Value;
-    return new EmailClient(o.AcsConnectionString);
+    // El 429 (limite de ACS) no se reintenta dentro de la ejecucion: lo trata el job (M-05).
+    return new EmailClient(o.AcsConnectionString,
+        new EmailClientOptions { RetryPolicy = new PoliticaReintentoSinLimite() });
 });
 
 builder.Build().Run();

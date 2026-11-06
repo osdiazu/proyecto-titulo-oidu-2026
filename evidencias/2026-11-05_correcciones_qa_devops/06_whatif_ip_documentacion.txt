@@ -1,0 +1,75 @@
+# B-08: what-if con IP_OPERADOR=203.0.113.10/24 (direccion de documentacion RFC 5737, NO es la IP del operador); se espera /32 y regla operador-temporal
+# Comando: az deployment group what-if -g rg-cobranza-apt --template-file infra/main.bicep --parameters infra/main.bicepparam
+Note: The result may contain false positive predictions (noise).
+You can help us improve the accuracy of the result by opening an issue here: https://aka.ms/WhatIfIssues
+
+Resource and property changes are indicated with this symbol:
+  + Create
+
+The deployment will update the following scope:
+
+Scope: /subscriptions/b492…0d49/resourceGroups/rg-cobranza-apt
+
+  + Microsoft.Communication/communicationServices/acs-cobranza-dev-yvlgzz
+  + Microsoft.Communication/emailServices/ecs-cobranza-dev
+  + Microsoft.Communication/emailServices/ecs-cobranza-dev/domains/AzureManagedDomain
+  + Microsoft.Insights/components/appi-cobranza-dev
+  + Microsoft.KeyVault/vaults/kv-cobranza-dev-ahfg2w
+  + Microsoft.KeyVault/vaults/kv-cobranza-dev-ahfg2w/providers/Microsoft.Authorization/roleAssignments/116005e2-1192-5064-bea1-7909ca904624
+  + Microsoft.KeyVault/vaults/kv-cobranza-dev-ahfg2w/providers/Microsoft.Authorization/roleAssignments/91feebc8-d5b8-5d5e-8506-c1caaba68644
+  + Microsoft.KeyVault/vaults/kv-cobranza-dev-ahfg2w/providers/Microsoft.Authorization/roleAssignments/f8914996-cc1e-5e8a-a72c-2f68702c0869
+  + Microsoft.KeyVault/vaults/kv-cobranza-dev-ahfg2w/providers/Microsoft.Insights/diagnosticSettings/diag-kv
+  + Microsoft.KeyVault/vaults/kv-cobranza-dev-ahfg2w/secrets/acs-connection-string
+  + Microsoft.Network/networkSecurityGroups/nsg-app
+  + Microsoft.Network/networkSecurityGroups/nsg-pe
+  + Microsoft.Network/privateDnsZones/privatelink.blob.core.windows.net
+  + Microsoft.Network/privateDnsZones/privatelink.blob.core.windows.net/virtualNetworkLinks/link-vnet-cobranza
+  + Microsoft.Network/privateDnsZones/privatelink.database.windows.net
+  + Microsoft.Network/privateDnsZones/privatelink.database.windows.net/virtualNetworkLinks/link-vnet-cobranza
+  + Microsoft.Network/privateDnsZones/privatelink.queue.core.windows.net
+  + Microsoft.Network/privateDnsZones/privatelink.queue.core.windows.net/virtualNetworkLinks/link-vnet-cobranza
+  + Microsoft.Network/privateDnsZones/privatelink.table.core.windows.net
+  + Microsoft.Network/privateDnsZones/privatelink.table.core.windows.net/virtualNetworkLinks/link-vnet-cobranza
+  + Microsoft.Network/privateDnsZones/privatelink.vaultcore.azure.net
+  + Microsoft.Network/privateDnsZones/privatelink.vaultcore.azure.net/virtualNetworkLinks/link-vnet-cobranza
+  + Microsoft.Network/privateEndpoints/pe-blob-cobranza-dev
+  + Microsoft.Network/privateEndpoints/pe-blob-cobranza-dev/privateDnsZoneGroups/default
+  + Microsoft.Network/privateEndpoints/pe-kv-cobranza-dev
+  + Microsoft.Network/privateEndpoints/pe-kv-cobranza-dev/privateDnsZoneGroups/default
+  + Microsoft.Network/privateEndpoints/pe-queue-cobranza-dev
+  + Microsoft.Network/privateEndpoints/pe-queue-cobranza-dev/privateDnsZoneGroups/default
+  + Microsoft.Network/privateEndpoints/pe-sql-cobranza-dev
+  + Microsoft.Network/privateEndpoints/pe-sql-cobranza-dev/privateDnsZoneGroups/default
+  + Microsoft.Network/privateEndpoints/pe-table-cobranza-dev
+  + Microsoft.Network/privateEndpoints/pe-table-cobranza-dev/privateDnsZoneGroups/default
+  + Microsoft.Network/virtualNetworks/vnet-cobranza
+  + Microsoft.OperationalInsights/workspaces/log-cobranza-dev
+  + Microsoft.Sql/servers/sql-cobranza-dev-yvlgzz
+  + Microsoft.Sql/servers/sql-cobranza-dev-yvlgzz/auditingSettings/default
+  + Microsoft.Sql/servers/sql-cobranza-dev-yvlgzz/databases/master/providers/Microsoft.Insights/diagnosticSettings/diag-auditoria-sql
+  + Microsoft.Sql/servers/sql-cobranza-dev-yvlgzz/databases/sqldb-cobranza
+  + Microsoft.Sql/servers/sql-cobranza-dev-yvlgzz/databases/sqldb-cobranza/backupLongTermRetentionPolicies/default
+  + Microsoft.Sql/servers/sql-cobranza-dev-yvlgzz/databases/sqldb-cobranza/backupShortTermRetentionPolicies/default
+  + Microsoft.Sql/servers/sql-cobranza-dev-yvlgzz/databases/sqldb-cobranza/providers/Microsoft.Insights/diagnosticSettings/diag-sqldb
+  + Microsoft.Sql/servers/sql-cobranza-dev-yvlgzz/firewallRules/operador-temporal
+  + Microsoft.Storage/storageAccounts/stcobranzadevyvlgzz
+  + Microsoft.Storage/storageAccounts/stcobranzadevyvlgzz/providers/Microsoft.Authorization/roleAssignments/86275e4f-fe74-5ade-b2d7-c22a445f0fa4
+  + Microsoft.Storage/storageAccounts/stcobranzadevyvlgzz/providers/Microsoft.Authorization/roleAssignments/8f1fd6e1-3871-5b28-9471-02d5edf6d03c
+  + Microsoft.Storage/storageAccounts/stcobranzadevyvlgzz/providers/Microsoft.Authorization/roleAssignments/cf318848-0132-5a23-b3ba-407f4e5371dc
+  + Microsoft.Web/serverfarms/asp-cobranza-dev
+  + Microsoft.Web/sites/app-api-cobranza-dev-yvlgzz
+  + Microsoft.Web/sites/func-jobs-cobranza-dev-yvlgzz
+
+Resource changes: 49 to create.
+exit=0
+
+# Detalle de la regla y de las ipRules (FullResourcePayloads, filtrado)
+      properties.networkAcls.ipRules: [
+          value: "203.0.113.10"
+      properties.publicNetworkAccess:       "Enabled"
+      properties.publicNetworkAccess:                      "Enabled"
+      properties.endIpAddress:   "203.0.113.10"
+      properties.startIpAddress: "203.0.113.10"
+      properties.publicNetworkAccess:       "Disabled"
+Resource changes: 49 to create.
+exit=0

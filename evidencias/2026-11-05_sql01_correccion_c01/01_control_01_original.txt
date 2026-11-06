@@ -1,0 +1,60 @@
+Analisis estatico ScriptDom (Microsoft.SqlServer.TransactSql.ScriptDom, TSql160Parser) - 2026-11-05 19:47:42 -0300
+CONTROL: 01 original S6-S8 + 02..11 en orden de despliegue
+[01_original_S6S8.sql] sintaxis: OK
+[02_identidades_y_permisos.sql] sintaxis: OK
+[03_origen_simulado.sql] sintaxis: OK
+[04_jobs_bitacoras.sql] sintaxis: OK
+[04_jobs_bitacoras.sql] info: cob.LogNotificacion ya existe; su CREATE TABLE (con guarda) se omite.
+[04_jobs_bitacoras.sql] info: se agrega cob.LogNotificacion.EstadoEnvio
+[04_jobs_bitacoras.sql] info: se agrega cob.LogNotificacion.Intentos
+[04_jobs_bitacoras.sql] info: se agrega cob.LogNotificacion.FechaRegistro
+[04_jobs_bitacoras.sql] info: se agrega cob.LogNotificacion.FechaActualizacion
+[04_jobs_bitacoras.sql] info: cob.LogSincronizacion ya existe; su CREATE TABLE (con guarda) se omite.
+[04_jobs_bitacoras.sql] info: se agrega cob.LogSincronizacion.ClientesLeidos
+[04_jobs_bitacoras.sql] info: se agrega cob.LogSincronizacion.ClientesActualizados
+[04_jobs_bitacoras.sql] info: se agrega cob.LogSincronizacion.Estado
+[04_jobs_bitacoras.sql] HALLAZGO linea 178: INSERT cob.LogNotificacion: columna inexistente ClienteId
+[04_jobs_bitacoras.sql] HALLAZGO linea 178: INSERT cob.LogNotificacion: falta columna NOT NULL sin DEFAULT ResultadoEnvio
+[04_jobs_bitacoras.sql] HALLAZGO linea 194: INSERT cob.LogSincronizacion: falta columna NOT NULL sin DEFAULT Resultado
+[05_automatizacion_desbloqueo.sql] sintaxis: OK
+[05_automatizacion_desbloqueo.sql] HALLAZGO linea 167: INSERT cob.EstadoMorosidad.OrigenCambio = 'SincronizacionAutomatica' no admitido por CHECK {JobSincronizacion|JobVencimiento|UsuarioFinanzas}
+[06_consultas_api.sql] sintaxis: OK
+[11_procedimientos_operacion.sql] sintaxis: OK
+[11_procedimientos_operacion.sql] HALLAZGO linea 54: INSERT cob.EstadoMorosidad.OrigenCambio = 'Manual' no admitido por CHECK {JobSincronizacion|JobVencimiento|UsuarioFinanzas}
+[00_verificar_esquema.sql] sintaxis: OK
+[07_pruebas_desbloqueo.sql] sintaxis: OK
+[07_pruebas_desbloqueo.sql] HALLAZGO linea 37: INSERT cob.Cliente.Segmento = 'Tradicional' no admitido por CHECK {Supermercado|Minimarket|Hotel|Restaurante|Almacen|Distribuidor}
+[07_pruebas_desbloqueo.sql] HALLAZGO linea 40: INSERT cob.Cliente.Segmento = 'Digital' no admitido por CHECK {Supermercado|Minimarket|Hotel|Restaurante|Almacen|Distribuidor}
+[07_pruebas_desbloqueo.sql] HALLAZGO linea 43: INSERT cob.Cliente.Segmento = 'Tradicional' no admitido por CHECK {Supermercado|Minimarket|Hotel|Restaurante|Almacen|Distribuidor}
+[07_pruebas_desbloqueo.sql] HALLAZGO linea 46: INSERT cob.Cliente.Segmento = 'Digital' no admitido por CHECK {Supermercado|Minimarket|Hotel|Restaurante|Almacen|Distribuidor}
+[07_pruebas_desbloqueo.sql] HALLAZGO linea 49: INSERT cob.Cliente.Segmento = 'Tradicional' no admitido por CHECK {Supermercado|Minimarket|Hotel|Restaurante|Almacen|Distribuidor}
+[07_pruebas_desbloqueo.sql] HALLAZGO linea 53: INSERT cob.EstadoMorosidad.OrigenCambio = 'Manual' no admitido por CHECK {JobSincronizacion|JobVencimiento|UsuarioFinanzas}
+[07_pruebas_desbloqueo.sql] HALLAZGO linea 54: INSERT cob.EstadoMorosidad.OrigenCambio = 'Manual' no admitido por CHECK {JobSincronizacion|JobVencimiento|UsuarioFinanzas}
+[07_pruebas_desbloqueo.sql] HALLAZGO linea 55: INSERT cob.EstadoMorosidad.OrigenCambio = 'Manual' no admitido por CHECK {JobSincronizacion|JobVencimiento|UsuarioFinanzas}
+[07_pruebas_desbloqueo.sql] HALLAZGO linea 56: INSERT cob.EstadoMorosidad.OrigenCambio = 'Manual' no admitido por CHECK {JobSincronizacion|JobVencimiento|UsuarioFinanzas}
+[07_pruebas_desbloqueo.sql] HALLAZGO linea 57: INSERT cob.EstadoMorosidad.OrigenCambio = 'Manual' no admitido por CHECK {JobSincronizacion|JobVencimiento|UsuarioFinanzas}
+[08_datos_prueba.sql] sintaxis: OK
+[08_datos_prueba.sql] HALLAZGO linea 47: INSERT cob.Cliente.Segmento = 'Tradicional' no admitido por CHECK {Supermercado|Minimarket|Hotel|Restaurante|Almacen|Distribuidor}
+[08_datos_prueba.sql] HALLAZGO linea 50: INSERT cob.Cliente.Segmento = 'Digital' no admitido por CHECK {Supermercado|Minimarket|Hotel|Restaurante|Almacen|Distribuidor}
+[08_datos_prueba.sql] HALLAZGO linea 53: INSERT cob.Cliente.Segmento = 'Tradicional' no admitido por CHECK {Supermercado|Minimarket|Hotel|Restaurante|Almacen|Distribuidor}
+[08_datos_prueba.sql] HALLAZGO linea 56: INSERT cob.Cliente.Segmento = 'Tradicional' no admitido por CHECK {Supermercado|Minimarket|Hotel|Restaurante|Almacen|Distribuidor}
+[08_datos_prueba.sql] HALLAZGO linea 59: INSERT cob.Cliente.Segmento = 'Digital' no admitido por CHECK {Supermercado|Minimarket|Hotel|Restaurante|Almacen|Distribuidor}
+[08_datos_prueba.sql] HALLAZGO linea 64: INSERT cob.EstadoMorosidad.OrigenCambio = 'Manual' no admitido por CHECK {JobSincronizacion|JobVencimiento|UsuarioFinanzas}
+[08_datos_prueba.sql] HALLAZGO linea 65: INSERT cob.EstadoMorosidad.OrigenCambio = 'Manual' no admitido por CHECK {JobSincronizacion|JobVencimiento|UsuarioFinanzas}
+[08_datos_prueba.sql] HALLAZGO linea 66: INSERT cob.EstadoMorosidad.OrigenCambio = 'Manual' no admitido por CHECK {JobSincronizacion|JobVencimiento|UsuarioFinanzas}
+[08_datos_prueba.sql] HALLAZGO linea 67: INSERT cob.EstadoMorosidad.OrigenCambio = 'Manual' no admitido por CHECK {JobSincronizacion|JobVencimiento|UsuarioFinanzas}
+[08_datos_prueba.sql] HALLAZGO linea 68: INSERT cob.EstadoMorosidad.OrigenCambio = 'Manual' no admitido por CHECK {JobSincronizacion|JobVencimiento|UsuarioFinanzas}
+[09_verificacion_e2e.sql] sintaxis: OK
+[10_marcador_rpo.sql] sintaxis: OK
+TOTAL errores de sintaxis=0, hallazgos de columnas/CHECK=25
+  cob.Cliente: ClienteId(auto), Rut*, RazonSocial*, Segmento*{Supermercado|Minimarket|Hotel|Restaurante|Almacen|Distribuidor}, Email*, Telefono, TipoConvenio*, EstadoActual{AlDia|Moroso|Suspendido|Regularizado}, FechaRegistro
+  cob.EstadoMorosidad: EstadoId(auto), ClienteId*, FechaCambio, EstadoAnterior*, EstadoNuevo*{AlDia|Moroso|Suspendido|Regularizado}, OrigenCambio*{JobSincronizacion|JobVencimiento|UsuarioFinanzas}
+  cob.Factura: FacturaId(auto), ClienteId*, NumeroFactura*, MontoTotal*, FechaEmision*, PlazoDias*, FechaVencimiento(auto), Estado{Pendiente|Vencida|Pagada|Anulada}
+  cob.LogCambioPedido: LogCambioPedidoId(auto), PedidoId*, ClienteId*, EstadoAnterior*, EstadoNuevo*, OrigenCambio*, FechaCambio*
+  cob.LogNotificacion: LogNotificacionId(auto), FacturaId*, TipoAviso*{PreVencimiento|Vencimiento|PostVencimiento}, Destinatario*, FechaEnvio, IdOperacionAcs, ResultadoEnvio*{Aceptado|Entregado|Fallido|Limitado}, Detalle, EstadoEnvio, Intentos, FechaRegistro, FechaActualizacion
+  cob.LogSincronizacion: LogSincronizacionId(auto), FechaInicio*, FechaFin, RegistrosLeidos, ClientesRegularizados, PedidosLiberados, Resultado*{Exito|Error}, Detalle, ClientesLeidos, ClientesActualizados, Estado
+  cob.Pedido: PedidoId(auto), ClienteId*, NumeroPedido*, FechaCreacion, Estado{Retenido|Liberado|Despachado}, FechaLiberacion
+  cob.UsuarioInterno: UsuarioId(auto), EntraObjectId*, Nombre*, Rol*{Finanzas|Ventas|Admin}, Activo
+  ops.MarcadorRpo: MarcadorId(auto), FechaUtc, Simulacro*
+  origen_sim.ClienteRegularizacion: Rut*, Regularizado, FechaRegularizacion, FechaActualizacion
+codigo de salida: 1

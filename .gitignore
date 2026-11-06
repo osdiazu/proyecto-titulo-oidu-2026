@@ -11,6 +11,16 @@ local.settings.json
 # Variables locales
 .env
 *.env
+# Parametros locales del despliegue (Object IDs, IP del operador): nunca versionar
+infra/entorno.local.env
+# Plantilla sin valores: si se versiona
+!infra/entorno.ejemplo.env
+# Parametros compilados por "bicep build-params" (contienen Object IDs)
+infra/*.parameters.json
+# Salidas generadas por "bicep build" / "bicep build-params" sin --outfile
+# (build-params escribe infra/main.json con los Object ID reales). Usar --outfile
+# hacia una carpeta temporal fuera del repositorio (ver cabecera de infra/main.bicepparam).
+infra/**/*.json
 
 
 # Configuración local de Claude Code

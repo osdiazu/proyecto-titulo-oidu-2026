@@ -1,0 +1,12 @@
+# M-04: validacion de OpcionesCobranza (src/Cobranza.Functions/Modelos/OpcionesCobranza.cs) con los valores DEMO
+# Metodo: copia de la clase en un proyecto de consola temporal fuera del repositorio (borrado al terminar);
+# Validator.TryValidateObject(validateAllProperties: true) + regla DiasMora2 > DiasMora1, igual que Program.cs (ValidateDataAnnotations + Validate + ValidateOnStart).
+# RemitenteCorreo y AcsConnectionString con valores de ejemplo (en Azure los fija la plantilla).
+# Atributos: [Required] en los tres textos, [EmailAddress] en CorreoContacto; sin restricciones de longitud.
+Valores DEMO de main.bicepparam (M-04, D12): VALIDO
+Control: textos vacios (estado anterior): INVALIDO
+  - CanalesPagoTexto: The CanalesPagoTexto field is required.
+  - TelefonoContacto: The TelefonoContacto field is required.
+  - CorreoContacto: The CorreoContacto field is required.
+exit=0
+# Limite: no prueba el arranque real del worker en Azure (NO VERIFICADO); el build de la solucion sigue con NU1902/NU1903 (evidencias/desarrollo/).

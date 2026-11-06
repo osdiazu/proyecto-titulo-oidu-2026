@@ -1,0 +1,6 @@
+# Fecha: 2026-11-05T21:59Z - Simulacion de redespliegue: CICLO_KV=2 (solo nombres que cambian)
+rg-cobranza-apt/providers/Microsoft.KeyVault/vaults/kv-cobranza-dev-d6fh4x
+rg-cobranza-apt/providers/Microsoft.KeyVault/vaults/kv-cobranza-dev-d6fh4x/providers/Microsoft.Authorization/roleAssignments/2686…4b26
+rg-cobranza-apt/providers/Microsoft.KeyVault/vaults/kv-cobranza-dev-d6fh4x/providers/Microsoft.Authorization/roleAssignments/4d07…f077
+rg-cobranza-apt/providers/Microsoft.KeyVault/vaults/kv-cobranza-dev-d6fh4x/providers/Microsoft.Authorization/roleAssignments/b6d9…858b
+rg-cobranza-apt/providers/Microsoft.KeyVault/vaults/kv-cobranza-dev-d6fh4x/secrets/acs-connection-string

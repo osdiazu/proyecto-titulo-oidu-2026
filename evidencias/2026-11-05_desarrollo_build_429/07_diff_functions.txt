@@ -1,0 +1,216 @@
+diff --git a/src/Cobranza.Functions/Cobranza.Functions.csproj b/src/Cobranza.Functions/Cobranza.Functions.csproj
+index e76513f..6551f76 100644
+--- a/src/Cobranza.Functions/Cobranza.Functions.csproj
++++ b/src/Cobranza.Functions/Cobranza.Functions.csproj
+@@ -16,13 +16,20 @@
+   </PropertyGroup>
+ 
+   <ItemGroup>
+-    <PackageReference Include="Microsoft.Azure.Functions.Worker" Version="2.0.0" />
+-    <PackageReference Include="Microsoft.Azure.Functions.Worker.Sdk" Version="2.0.0" />
++    <PackageReference Include="Microsoft.Azure.Functions.Worker" Version="2.50.0" />
++    <PackageReference Include="Microsoft.Azure.Functions.Worker.Sdk" Version="2.0.5" />
+     <PackageReference Include="Microsoft.Azure.Functions.Worker.Extensions.Timer" Version="4.3.1" />
+     <PackageReference Include="Microsoft.Azure.Functions.Worker.ApplicationInsights" Version="2.0.0" />
+     <PackageReference Include="Microsoft.ApplicationInsights.WorkerService" Version="2.22.0" />
+     <PackageReference Include="Microsoft.Data.SqlClient" Version="6.0.1" />
++    <!-- ValidateDataAnnotations() usado en Program.cs (no viene incluido en Worker 2.50.0). -->
++    <PackageReference Include="Microsoft.Extensions.Options.DataAnnotations" Version="10.0.0" />
+     <PackageReference Include="Azure.Communication.Email" Version="1.0.1" />
++    <!-- Fija la dependencia transitiva de Microsoft.Data.SqlClient 6.0.1 (que trae 9.0.0)
++         en la version parcheada minima: GHSA-846f-f764-76mx (CVE-2026-84008) y
++         GHSA-2fmv-rv2c-59x7 (CVE-2026-70162). Retirar al actualizar SqlClient a una
++         version que ya dependa de 9.0.21 o superior. -->
++    <PackageReference Include="System.Security.Cryptography.Pkcs" Version="9.0.21" />
+   </ItemGroup>
+ 
+   <ItemGroup>
+diff --git a/src/Cobranza.Functions/Funciones/NotificacionesFunction.cs b/src/Cobranza.Functions/Funciones/NotificacionesFunction.cs
+index 9e6090a..b561445 100644
+--- a/src/Cobranza.Functions/Funciones/NotificacionesFunction.cs
++++ b/src/Cobranza.Functions/Funciones/NotificacionesFunction.cs
+@@ -11,28 +11,42 @@ namespace Cobranza.Functions.Funciones;
+ /// <summary>
+ /// Job de notificaciones (RF-01, RF-05). Obtiene los avisos que corresponden hoy, envia cada
+ /// correo con Azure Communication Services y registra el resultado en cob.LogNotificacion.
+-/// Control de cuota: maximo de envios por ejecucion y pausa entre envios (limites iniciales de
+-/// ACS con dominio administrado: 30 por minuto y 100 por hora). La programacion horaria permite
+-/// que los avisos no enviados en una ejecucion se envien en la siguiente.
++/// Control de cuota (hallazgo H1, dominio administrado: 5 por minuto y 10 por hora): maximo de
++/// envios por ejecucion y pausa entre envios, ambos desde configuracion (Cobranza__*).
++/// Un rechazo por limite (HTTP 429) no se registra como intento fallido: corta la ejecucion y
++/// los avisos no enviados quedan pendientes para la siguiente ejecucion programada.
+ /// </summary>
+ public sealed class NotificacionesFunction(
+-    RepositorioCobranza repo,
++    IRepositorioNotificaciones repo,
+     EmailClient email,
+     PlantillaCorreo plantilla,
+     IOptions<OpcionesCobranza> opciones,
+-    ILogger<NotificacionesFunction> log)
++    ILogger<NotificacionesFunction> log,
++    TimeProvider reloj)
+ {
++    /// <summary>Evento de log para consultar los cortes por limite en Application Insights.</summary>
++    public static readonly EventId EventoLimiteAcs = new(4290, "LimiteAcs429");
++
+     private readonly OpcionesCobranza _o = opciones.Value;
+ 
+     [Function("EnviarNotificacionesCobranza")]
+     public async Task RunAsync([TimerTrigger("%CRON_NOTIFICACIONES%")] TimerInfo timer, CancellationToken ct)
++        => await ProcesarAsync(ct);
++
++    public async Task<ResultadoNotificaciones> ProcesarAsync(CancellationToken ct)
+     {
+         var avisos = await repo.ObtenerAvisosPendientesAsync(_o.MaxCorreosPorEjecucion, ct);
+-        int aceptados = 0, fallidos = 0;
++        int aceptados = 0, fallidos = 0, procesados = 0;
++        bool cortadoPorLimite = false;
++        TimeSpan? retryAfter = null;
+ 
+         foreach (var a in avisos)
+         {
+             ct.ThrowIfCancellationRequested();
++
++            if (procesados > 0 && _o.PausaEntreCorreosMs > 0)
++                await Task.Delay(TimeSpan.FromMilliseconds(_o.PausaEntreCorreosMs), reloj, ct);
++
+             var correo = plantilla.Construir(a);
+             var mensaje = new EmailMessage(
+                 senderAddress: _o.RemitenteCorreo,
+@@ -44,26 +58,50 @@ public sealed class NotificacionesFunction(
+                 // WaitUntil.Started: ACS acepta el mensaje y devuelve el Id de operacion.
+                 // El estado final de entrega se mide con los registros de ACS en Log Analytics.
+                 var op = await email.SendAsync(WaitUntil.Started, mensaje, ct);
++                procesados++;
+                 await repo.RegistrarNotificacionAsync(a, "Aceptado", op.Id, null, ct);
+                 aceptados++;
+             }
++            catch (RequestFailedException ex) when (LimiteAcs.EsRechazoPorLimite(ex))
++            {
++                // Limite de ACS: no es un fallo del aviso. No se llama a sp_RegistrarNotificacion
++                // (no suma Intentos, no lo acerca a la exclusion de 3 intentos) y se corta el lote.
++                cortadoPorLimite = true;
++                retryAfter = LimiteAcs.ObtenerRetryAfter(ex, reloj.GetUtcNow());
++                log.LogWarning(EventoLimiteAcs, ex,
++                    "ACS rechazo el envio por limite (HTTP {Status}, codigo {ErrorCode}) en factura {FacturaId} aviso {Tipo}. " +
++                    "Se corta la ejecucion sin registrar intento; quedan {Diferidos} avisos para la siguiente ejecucion. " +
++                    "Retry-After: {RetryAfterSegundos} s.",
++                    ex.Status, ex.ErrorCode, a.FacturaId, a.TipoAviso, avisos.Count - procesados,
++                    retryAfter?.TotalSeconds);
++                break;
++            }
+             catch (RequestFailedException ex)
+             {
++                procesados++;
+                 fallidos++;
+                 log.LogWarning(ex, "Envio fallido factura {FacturaId} aviso {Tipo} (HTTP {Status}).", a.FacturaId, a.TipoAviso, ex.Status);
+                 await repo.RegistrarNotificacionAsync(a, "Fallido", null, $"HTTP {ex.Status} {ex.ErrorCode}: {ex.Message}", ct);
+-                if (ex.Status == 429)
+-                {
+-                    log.LogWarning("ACS informo limite de envio (429). Se detiene la ejecucion; continua en la siguiente.");
+-                    break;
+-                }
+             }
+-
+-            if (_o.PausaEntreCorreosMs > 0)
+-                await Task.Delay(_o.PausaEntreCorreosMs, ct);
+         }
+ 
+-        log.LogInformation("Notificaciones: pendientes={Pendientes}, aceptados={Aceptados}, fallidos={Fallidos}",
+-            avisos.Count, aceptados, fallidos);
++        var resultado = new ResultadoNotificaciones(
++            avisos.Count, aceptados, fallidos, avisos.Count - procesados, cortadoPorLimite, retryAfter);
++
++        log.LogInformation(
++            "Notificaciones: pendientes={Pendientes}, aceptados={Aceptados}, fallidos={Fallidos}, diferidos={Diferidos}, cortePorLimite={Corte}",
++            resultado.Pendientes, resultado.Aceptados, resultado.Fallidos, resultado.Diferidos, resultado.CortadoPorLimite);
++
++        return resultado;
+     }
+ }
++
++/// <summary>Resumen de una ejecucion del job de notificaciones.</summary>
++/// <param name="Diferidos">Avisos obtenidos que no se intentaron por corte de limite (incluye el rechazado con 429).</param>
++public sealed record ResultadoNotificaciones(
++    int Pendientes,
++    int Aceptados,
++    int Fallidos,
++    int Diferidos,
++    bool CortadoPorLimite,
++    TimeSpan? RetryAfter);
+diff --git a/src/Cobranza.Functions/Modelos/OpcionesCobranza.cs b/src/Cobranza.Functions/Modelos/OpcionesCobranza.cs
+index 19d2eea..9343710 100644
+--- a/src/Cobranza.Functions/Modelos/OpcionesCobranza.cs
++++ b/src/Cobranza.Functions/Modelos/OpcionesCobranza.cs
+@@ -25,11 +25,17 @@ public sealed class OpcionesCobranza
+     [Range(1, 180)] public int DiasMora1 { get; set; }
+     [Range(2, 365)] public int DiasMora2 { get; set; }
+ 
+-    /// <summary>Limite de envios por ejecucion (limite inicial ACS dominio administrado: 100/h).</summary>
++    /// <summary>
++    /// Limite de envios por ejecucion. Sin valor por defecto (0 no pasa la validacion).
++    /// ACS con dominio administrado: 10 por hora (hallazgo H1). Valor DEMO D12: 10.
++    /// </summary>
+     [Range(1, 1000)] public int MaxCorreosPorEjecucion { get; set; }
+ 
+-    /// <summary>Pausa entre envios (2100 ms mantiene el ritmo bajo 30 correos por minuto).</summary>
+-    [Range(0, 60000)] public int PausaEntreCorreosMs { get; set; }
++    /// <summary>
++    /// Pausa entre envios en ms. Sin valor por defecto: si falta el ajuste, el valor 0 no pasa la
++    /// validacion y el job no inicia (evita superar 5 por minuto, hallazgo H1). Valor DEMO D12: 15000.
++    /// </summary>
++    [Range(1, 60000)] public int PausaEntreCorreosMs { get; set; }
+ 
+     [Required] public string NombreEmpresa { get; set; } = "";
+     [Required] public string CanalesPagoTexto { get; set; } = "";
+diff --git a/src/Cobranza.Functions/Program.cs b/src/Cobranza.Functions/Program.cs
+index d95c405..a6f5b8d 100644
+--- a/src/Cobranza.Functions/Program.cs
++++ b/src/Cobranza.Functions/Program.cs
+@@ -23,12 +23,16 @@ builder.Services
+     .ValidateOnStart();
+ 
+ builder.Services.AddSingleton<RepositorioCobranza>();
++builder.Services.AddSingleton<IRepositorioNotificaciones>(sp => sp.GetRequiredService<RepositorioCobranza>());
++builder.Services.AddSingleton(TimeProvider.System);
+ builder.Services.AddSingleton<IOrigenRegularizados, OrigenRegularizadosSql>();
+ builder.Services.AddSingleton<PlantillaCorreo>();
+ builder.Services.AddSingleton(sp =>
+ {
+     var o = sp.GetRequiredService<IOptions<OpcionesCobranza>>().Value;
+-    return new EmailClient(o.AcsConnectionString);
++    // El 429 (limite de ACS) no se reintenta dentro de la ejecucion: lo trata el job (M-05).
++    return new EmailClient(o.AcsConnectionString,
++        new EmailClientOptions { RetryPolicy = new PoliticaReintentoSinLimite() });
+ });
+ 
+ builder.Build().Run();
+diff --git a/src/Cobranza.Functions/Servicios/RepositorioCobranza.cs b/src/Cobranza.Functions/Servicios/RepositorioCobranza.cs
+index 3707c62..972f8d3 100644
+--- a/src/Cobranza.Functions/Servicios/RepositorioCobranza.cs
++++ b/src/Cobranza.Functions/Servicios/RepositorioCobranza.cs
+@@ -9,7 +9,7 @@ namespace Cobranza.Functions.Servicios;
+ /// Acceso a la base del proyecto. Toda escritura se hace mediante procedimientos almacenados
+ /// (decision de S6-S8: escritura solo via procedimientos).
+ /// </summary>
+-public sealed class RepositorioCobranza(IOptions<OpcionesCobranza> opciones)
++public sealed class RepositorioCobranza(IOptions<OpcionesCobranza> opciones) : IRepositorioNotificaciones
+ {
+     private readonly OpcionesCobranza _o = opciones.Value;
+ 
+diff --git a/src/Cobranza.Functions/local.settings.example.json b/src/Cobranza.Functions/local.settings.example.json
+index 05a6189..f3edf9b 100644
+--- a/src/Cobranza.Functions/local.settings.example.json
++++ b/src/Cobranza.Functions/local.settings.example.json
+@@ -17,8 +17,8 @@
+     "Cobranza__DiasPreaviso": "PENDIENTE (definir con Finanzas)",
+     "Cobranza__DiasMora1": "PENDIENTE (definir con Finanzas)",
+     "Cobranza__DiasMora2": "PENDIENTE (definir con Finanzas)",
+-    "Cobranza__MaxCorreosPorEjecucion": "90",
+-    "Cobranza__PausaEntreCorreosMs": "2100",
++    "Cobranza__MaxCorreosPorEjecucion": "10",
++    "Cobranza__PausaEntreCorreosMs": "15000",
+ 
+     "Cobranza__NombreEmpresa": "Embotelladora del Pacifico S.A.",
+     "Cobranza__CanalesPagoTexto": "PENDIENTE (texto oficial entregado por Finanzas)",

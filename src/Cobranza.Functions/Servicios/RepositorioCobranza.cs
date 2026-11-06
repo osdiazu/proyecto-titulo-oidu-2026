@@ -9,7 +9,7 @@ namespace Cobranza.Functions.Servicios;
 /// Acceso a la base del proyecto. Toda escritura se hace mediante procedimientos almacenados
 /// (decision de S6-S8: escritura solo via procedimientos).
 /// </summary>
-public sealed class RepositorioCobranza(IOptions<OpcionesCobranza> opciones)
+public sealed class RepositorioCobranza(IOptions<OpcionesCobranza> opciones) : IRepositorioNotificaciones
 {
     private readonly OpcionesCobranza _o = opciones.Value;
 

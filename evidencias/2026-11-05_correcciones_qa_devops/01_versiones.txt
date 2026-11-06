@@ -1,0 +1,19 @@
+# Versiones de herramientas (05-11-2026)
+{
+  "azure-cli": "2.63.0",
+  "azure-cli-core": "2.63.0",
+  "azure-cli-telemetry": "1.1.0",
+  "extensions": {
+    "azure-devops": "1.0.4",
+    "containerapp": "1.1.0b3",
+    "front-door": "1.2.0",
+    "vm-repair": "2.2.0"
+  }
+}
+## az bicep version
+Bicep CLI version 0.48.1 (cec7951cf6)
+
+## dotnet --version
+10.0.303
+## bash
+GNU bash, version 5.2.37(1)-release (x86_64-pc-msys)

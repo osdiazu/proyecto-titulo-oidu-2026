@@ -1,0 +1,37 @@
+# 2026-11-05T19:49:19-03:00 dotnet test Cobranza.slnx --no-build --logger console;verbosity=normal
+Serie de pruebas para C:\Users\diazu\Documents\Proyecto de titulo - Final\Cobranza_Automatizada_Contexto_ClaudeCode\cobranza-automatizada\tests\Cobranza.Functions.Tests\bin\Debug\net10.0\Cobranza.Functions.Tests.dll (.NETCoreApp,Version=v10.0)
+1 archivos de prueba en total coincidieron con el patrón especificado.
+[xUnit.net 00:00:00.00] xUnit.net VSTest Adapter v3.1.5+1b188a7b0a (64-bit .NET 10.0.11)
+[xUnit.net 00:00:00.40]   Discovering: Cobranza.Functions.Tests
+[xUnit.net 00:00:00.46]   Discovered:  Cobranza.Functions.Tests
+[xUnit.net 00:00:00.49]   Starting:    Cobranza.Functions.Tests
+  Correctas Cobranza.Functions.Tests.LimiteAcsTests.Politica_NoReintenta429 [137 ms]
+  Correctas Cobranza.Functions.Tests.LimiteAcsTests.RetryAfter_ComoFechaHttp [3 ms]
+  Correctas Cobranza.Functions.Tests.LimiteAcsTests.RetryAfter_EnSegundos [< 1 ms]
+  Correctas Cobranza.Functions.Tests.LimiteAcsTests.OtrosStatus_NoSonLimite(status: 400) [< 1 ms]
+  Correctas Cobranza.Functions.Tests.LimiteAcsTests.OtrosStatus_NoSonLimite(status: 503) [< 1 ms]
+  Correctas Cobranza.Functions.Tests.LimiteAcsTests.OtrosStatus_NoSonLimite(status: 500) [< 1 ms]
+  Correctas Cobranza.Functions.Tests.LimiteAcsTests.RetryAfter_Ausente_EsNull [< 1 ms]
+  Correctas Cobranza.Functions.Tests.NotificacionesFunctionTests.Rechazo429_NoRegistraIntento_YCortaElLote [143 ms]
+  Correctas Cobranza.Functions.Tests.NotificacionesFunctionTests.OtrosErrores_RegistranFallido_YContinuan(status: 503, codigo: "ServiceUnavailable") [3 ms]
+  Correctas Cobranza.Functions.Tests.NotificacionesFunctionTests.OtrosErrores_RegistranFallido_YContinuan(status: 500, codigo: "InternalServerError") [1 ms]
+  Correctas Cobranza.Functions.Tests.NotificacionesFunctionTests.OtrosErrores_RegistranFallido_YContinuan(status: 400, codigo: "BadRequest") [< 1 ms]
+  Correctas Cobranza.Functions.Tests.LimiteAcsTests.Opciones_ValoresDemoD12_Validan [9 ms]
+  Correctas Cobranza.Functions.Tests.LimiteAcsTests.Opciones_SinLoteOPausa_NoValidan(max: 10, pausa: 0, propiedad: "PausaEntreCorreosMs") [2 ms]
+  Correctas Cobranza.Functions.Tests.LimiteAcsTests.Opciones_SinLoteOPausa_NoValidan(max: 0, pausa: 15000, propiedad: "MaxCorreosPorEjecucion") [< 1 ms]
+  Correctas Cobranza.Functions.Tests.NotificacionesFunctionTests.CodigoTooManyRequests_SinStatus429_SeTrataComoLimite [3 ms]
+  Correctas Cobranza.Functions.Tests.LimiteAcsTests.RetryAfter_EnMilisegundos_TienePrioridad [< 1 ms]
+[xUnit.net 00:00:00.71]   Finished:    Cobranza.Functions.Tests
+  Correctas Cobranza.Functions.Tests.NotificacionesFunctionTests.Aceptado_RegistraIdOperacion [3 ms]
+  Correctas Cobranza.Functions.Tests.LimiteAcsTests.Politica_ConservaReintentosDe503 [3 ms]
+  Correctas Cobranza.Functions.Tests.LimiteAcsTests.Status429_EsLimite [< 1 ms]
+  Correctas Cobranza.Functions.Tests.NotificacionesFunctionTests.Rechazo429_EnPrimerEnvio_NoRegistraNada [2 ms]
+  Correctas Cobranza.Functions.Tests.NotificacionesFunctionTests.Rechazo429_SeRegistraEnLogConEventoYRetryAfter [11 ms]
+  Correctas Cobranza.Functions.Tests.NotificacionesFunctionTests.TodosLosEnviosFallidos_CadaUnoSeRegistraComoFallido [2 ms]
+  Correctas Cobranza.Functions.Tests.NotificacionesFunctionTests.UsaMaximoYPausaDeConfiguracion [6 ms]
+
+La serie de pruebas se ejecutó correctamente.
+Pruebas totales: 23
+     Correcto: 23
+ Tiempo total: 1,5635 Segundos
+# exit: 0
