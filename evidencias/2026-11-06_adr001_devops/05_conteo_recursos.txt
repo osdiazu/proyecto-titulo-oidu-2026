@@ -1,0 +1,4 @@
+# Conteo de declaraciones y recursos en el ARM compilado
+declaraciones (sin existing): 37
+con copy (bucles): [('Microsoft.Network/privateDnsZones', "[length(variables('privados'))]"), ('Microsoft.Network/privateDnsZones/virtualNetworkLinks', "[length(variables('privados'))]"), ('Microsoft.Network/privateEndpoints', "[length(variables('privados'))]"), ('Microsoft.Network/privateEndpoints/privateDnsZoneGroups', "[length(variables('privados'))]"), ('Microsoft.Authorization/roleAssignments', "[length(createArray(variables('rolQueueContributor'), variables('rolTableContributor')))]")]
+condicionales: ['Microsoft.Sql/servers/firewallRules']

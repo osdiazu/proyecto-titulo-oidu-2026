@@ -68,7 +68,14 @@ az rest --method get \
   --url "$(az functionapp show -g "$RG" -n "$FUNC_APP" --query id -o tsv)/config/configreferences/appsettings/Cobranza__AcsConnectionString?api-version=2023-12-01" \
   --query "properties.status" -o tsv || echo "Revisar manualmente en el portal: Configuracion > Referencias de Key Vault"
 
-echo "== 3. Publicacion (paquete generado con: dotnet publish -c Release -o publish && cd publish && zip -r ../functions.zip .)"
-az functionapp deployment source config-zip -g "$RG" -n "$FUNC_APP" --src "$PAQUETE"
+# 06-11-2026 (ADR-001): OMITIR_PUBLICACION=si salta este paso. Lo usa scripts/desplegar.sh,
+# que publica antes (paso 6) con la ventana SCM abierta por s12_endurecer.sh.
+if [[ "${OMITIR_PUBLICACION:-no}" == "si" ]]; then
+  echo "== 3. Publicacion omitida (OMITIR_PUBLICACION=si)"
+else
+  echo "== 3. Publicacion (paquete generado con: dotnet publish -c Release -o publish && cd publish && zip -r ../functions.zip .)"
+  echo "   Requiere el SCM abierto a la IP del operador: IP_PUBLICACION_SCM=<ip> scripts/s12_endurecer.sh (y repetirlo sin la variable al terminar)."
+  az functionapp deployment source config-zip -g "$RG" -n "$FUNC_APP" --src "$PAQUETE"
+fi
 
 echo "Listo. Revisar ejecuciones en Application Insights (consultas en docs/consultas_kql_s10.kql)."

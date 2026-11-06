@@ -1,0 +1,39 @@
+### R1 curl simulado: 401 a todo, 429 desde el intento 14 de login (RED-14 y RED-11 cuentan); cookie af correcta
+Pruebas de red 2026-11-06T12:43Z - origen declarado: operador
+RED-01 API directa /salud (esperado con API cerrada: 403; abierta: 200)  -> 401
+RED-02  Endpoint protegido sin credenciales                                esperado 401        obtenido 401            CUMPLE
+RED-03 Function App desde internet (esperado 403)                       -> 401
+RED-04 HTTP sin cifrar a la API (esperado 301 a HTTPS)                   -> 401
+RED-05 TLS 1.1 contra la API (esperado: fallo de negociacion)
+401   NEGOCIO TLS 1.1 (NO CUMPLE)
+RED-06 Key Vault desde internet (esperado 403 ForbiddenByConnection o similar)
+ERROR: ForbiddenByConnection (simulado)
+RED-07 a RED-10: WAF no desplegado (PENDIENTE D11)
+RED-14  Login sin token CSRF                                               esperado 400        obtenido 401            NO CUMPLE
+        Set-Cookie: __Host-cobranza-af=<oculto>; path=/; secure; samesite=strict; httponly
+RED-12a Cookie __Host-cobranza-af: Secure, HttpOnly, SameSite=Strict, __Host- esperado ok         obtenido ok             CUMPLE
+RED-11  Login con credenciales invalidas                                   esperado 401        obtenido 401            CUMPLE
+RED-13a X-Api-Key con formato invalido                                     esperado 401        obtenido 401            CUMPLE
+RED-13b X-Api-Key con formato valido inexistente                           esperado 401        obtenido 401            CUMPLE
+RED-12b  Cookie de sesion: NO EJECUTADA (PROBAR_SESION=si, solo un integrante humano)
+        Esperando 61 s para iniciar RED-15 con la ventana del limitador limpia...
+        codigos: 401 401 401 401 401 401 401 401 401 401 401 429 
+RED-15  Mas de 10 intentos de login por minuto (ultimo intento)            esperado 429        obtenido 429            CUMPLE
+        Esperando 61 s para RED-16...
+        codigos: 429 429 429 429 429 429 429 429 429 429 429 429 
+RED-16a X-Forwarded-For rotado por el cliente no evade el limitador        esperado 429        obtenido 429            CUMPLE
+RED-16b  IpOrigen en cob.LogAcceso: verificacion MANUAL de un miembro de grp-cobranza-sql-admin.
+         Consultar cob.vw_LogAccesoEvidencia para UsuarioIngresado = 'red16.inexistente':
+         esperado: ninguna fila con IP 203.0.113.0 (la red de documentacion RFC 5737); la IP
+         enmascarada debe ser la del operador (<IP_OPERADOR> en la evidencia).
+RED-17   Ejecutar desde otra red con ORIGEN_PRUEBA=externa (esperado 403).
+Fin.
+codigo de salida=0
+
+### R2 ORIGEN_PRUEBA=externa (curl simulado devuelve 401/200: debe marcar NO CUMPLE)
+Pruebas de red 2026-11-06T12:44Z - origen declarado: externa
+RED-01 API directa /salud (con transicion vigente o API cerrada: 403)    -> 401
+RED-17  Transicion 5.11: Web App desde IP distinta de ipOperador (/)       esperado 403        obtenido 401            NO CUMPLE
+RED-17b Transicion 5.11: endpoint anonimo desde IP externa                 esperado 403        obtenido                NO CUMPLE
+Fin (origen externo). Ejecutar el resto desde la IP del operador.
+codigo de salida=0

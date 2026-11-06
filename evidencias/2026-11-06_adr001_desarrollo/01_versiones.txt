@@ -1,0 +1,49 @@
+# dotnet --info (06-11-2026)
+SDK DE .NET:
+ Version:           10.0.303
+ Commit:            e730f1db75
+ Workload version:  10.0.300-manifests.330ea142
+ MSBuild version:   18.6.14+e730f1db7
+
+Entorno de tiempo de ejecución:
+ OS Name:     Windows
+ OS Version:  10.0.26200
+ OS Platform: Windows
+ RID:         win-x64
+ Base Path:   C:\Program Files\dotnet\sdk\10.0.303\
+
+Cargas de trabajo de .NET instaladas:
+No hay cargas de trabajo instaladas para mostrar.
+Configurado para usar workload sets al instalar nuevos manifiestos.
+No hay conjuntos de cargas de trabajo instalados. Ejecute "dotnet workload restore" para instalar un conjunto de carga de trabajo.
+
+Host:
+  Version:      10.0.11
+  Architecture: x64
+  Commit:       e2f47b0110
+
+.NET SDKs installed:
+  10.0.303 [C:\Program Files\dotnet\sdk]
+
+.NET runtimes installed:
+  Microsoft.AspNetCore.App 10.0.11 [C:\Program Files\dotnet\shared\Microsoft.AspNetCore.App]
+  Microsoft.NETCore.App 3.1.8 [C:\Program Files\dotnet\shared\Microsoft.NETCore.App]
+  Microsoft.NETCore.App 8.0.33 [C:\Program Files\dotnet\shared\Microsoft.NETCore.App]
+  Microsoft.NETCore.App 10.0.11 [C:\Program Files\dotnet\shared\Microsoft.NETCore.App]
+  Microsoft.WindowsDesktop.App 3.1.8 [C:\Program Files\dotnet\shared\Microsoft.WindowsDesktop.App]
+  Microsoft.WindowsDesktop.App 10.0.11 [C:\Program Files\dotnet\shared\Microsoft.WindowsDesktop.App]
+
+Other architectures found:
+  None
+
+Environment variables:
+  Not set
+
+global.json file:
+  Not found
+
+Learn more:
+  https://aka.ms/dotnet/info
+
+Download .NET:
+  https://aka.ms/dotnet/download

@@ -10,6 +10,15 @@
 // requisitos del 05-11-2026 (region brazilsouth, operadorObjectId, ajustes
 // Cobranza__*, redespliegue repetible). Detalle: evidencias/2026-11-05_whatif_brazilsouth/CAMBIOS.md
 //
+// ADR-001 (06-11-2026, autenticacion propia sin Easy Auth): se retira Easy Auth
+// (MICROSOFT_PROVIDER_AUTHENTICATION_SECRET) y raKvApi; raKvFunc pasa a alcance del
+// secreto acs-connection-string; condicion ABAC en Blob Data Owner de la Function App;
+// Data Protection de la API (contenedor dataprotection-keys y clave RSA
+// dataprotection-cobranza-api); ajustes DataProtection__*, Seguridad__SaltosProxyConfiables
+// y ASPNETCORE_FORWARDEDHEADERS_ENABLED=false; regla de transicion 5.11 (Web App con
+// entrada Deny); SCM sin herencia y en Deny; TDE explicito (B-01).
+// Detalle: evidencias/2026-11-06_adr001_devops/CAMBIOS.md
+//
 // Ambito: grupo de recursos (az deployment group ... --mode Incremental).
 // Volver a desplegar esta plantilla restablece los ajustes de aplicacion y
 // la configuracion del sitio: reaplicar scripts/s12_endurecer.sh despues.
@@ -50,6 +59,11 @@ param operadorObjectId string
 @description('IP publica IPv4 del operador (con o sin mascara; la mascara se ignora y se usa /32). Abre temporalmente Azure SQL (regla operador-temporal) y Key Vault a esa IP. Vacio = cerrado. El formato se valida con parseCidr: un valor invalido hace fallar la validacion o el what-if, antes de crear recursos.')
 @maxLength(18)
 param ipOperador string = ''
+
+@description('Saltos de proxy confiables para los encabezados reenviados de la API (ADR-001 5.4.1): 1 sin WAF (topologia actual); 2 solo con WAF D11 y la Web App sin acceso publico. Lo determina la topologia, no es una preferencia.')
+@minValue(1)
+@maxValue(2)
+param saltosProxyConfiables int = 1
 
 @description('Ciclo del Key Vault. Con proteccion de purga, un vault eliminado conserva su nombre reservado 90 dias; cambiar este valor tras eliminar el grupo de recursos genera un nombre nuevo. Lo incrementa scripts/eliminar_entorno.sh.')
 @minLength(1)
@@ -148,6 +162,18 @@ var unicoKv = uniqueString(resourceGroup().id, 'keyvault', cicloKeyVault)
 // la direccion de red, que para /32 es la propia IP. Solo se evalua si ipOperador tiene valor.
 var ipOperadorSinMascara = empty(ipOperador) ? '' : parseCidr('${split(ipOperador, '/')[0]}/32').network
 var accesoOperador = !empty(ipOperadorSinMascara)
+// ADR-001 5.11: regla de permiso de la Web App durante la transicion (nombre registrado: SEG-H11).
+var reglasTransicionApi = accesoOperador
+  ? [
+      {
+        name: 'operador-transicion'
+        action: 'Allow'
+        ipAddress: '${ipOperadorSinMascara}/32'
+        priority: 100
+        description: 'ADR-001 5.11: IP del operador durante la ventana (ipOperador)'
+      }
+    ]
+  : []
 var etiquetas = {
   proyecto: 'APT-Cobranza-Automatizada'
   cliente: 'Embotelladora del Pacifico S.A.'
@@ -455,6 +481,15 @@ resource sqlDb 'Microsoft.Sql/servers/databases@2021-11-01' = {
   }
 }
 
+// B-01 (ADR-001 4.3): TDE declarado explicitamente (activo por defecto en Azure SQL).
+resource sqlTde 'Microsoft.Sql/servers/databases/transparentDataEncryption@2021-11-01' = {
+  parent: sqlDb
+  name: 'current'
+  properties: {
+    state: 'Enabled'
+  }
+}
+
 resource sqlPitr 'Microsoft.Sql/servers/databases/backupShortTermRetentionPolicies@2021-11-01' = {
   parent: sqlDb
   name: 'default'
@@ -517,6 +552,44 @@ resource storage 'Microsoft.Storage/storageAccounts@2023-05-01' = {
     networkAcls: {
       defaultAction: 'Deny'
       bypass: 'AzureServices'
+    }
+  }
+}
+
+var nombreContenedorDp = 'dataprotection-keys'
+var dataProtectionBlobUri = '${storage.properties.primaryEndpoints.blob}${nombreContenedorDp}/keys.xml'
+
+// ADR-001 5.5: contenedor dedicado al anillo de claves de Data Protection de la API.
+// Se crea por el plano de control (funciona sin clave compartida ni acceso publico).
+resource blobService 'Microsoft.Storage/storageAccounts/blobServices@2023-05-01' = {
+  parent: storage
+  name: 'default'
+}
+
+resource dpContainer 'Microsoft.Storage/storageAccounts/blobServices/containers@2023-05-01' = {
+  parent: blobService
+  name: nombreContenedorDp
+  properties: {
+    publicAccess: 'None'
+  }
+}
+
+// ADR-001 5.5: clave RSA que protege el anillo (ProtectKeysWithAzureKeyVault). ARM crea la
+// clave solo si no existe; un redespliegue no genera versiones nuevas. La API usa el
+// identificador sin version (DataProtection__KeyIdentifier).
+resource dpKey 'Microsoft.KeyVault/vaults/keys@2023-07-01' = {
+  parent: keyVault
+  name: 'dataprotection-cobranza-api'
+  properties: {
+    kty: 'RSA'
+    keySize: 2048
+    keyOps: [
+      'wrapKey'
+      'unwrapKey'
+    ]
+    attributes: {
+      enabled: true
+      exportable: false
     }
   }
 }
@@ -606,6 +679,18 @@ resource apiApp 'Microsoft.Web/sites@2023-12-01' = {
       http20Enabled: true
       vnetRouteAllEnabled: true
       healthCheckPath: '/salud'
+      // ADR-001 5.11 (regla de transicion, A-01): entrada por defecto Deny mientras la
+      // transicion este vigente. Unica regla de permiso: 'operador-transicion' (SEG-H11),
+      // con la IP de ipOperador /32; ipOperador vacio = sin reglas de permiso.
+      // Sonda /salud: si la restriccion la afecta queda PENDIENTE de verificar en Azure
+      // (ADR 5.11 regla 3); con una sola instancia B1 la sonda no reemplaza instancias.
+      ipSecurityRestrictionsDefaultAction: 'Deny'
+      ipSecurityRestrictions: reglasTransicionApi
+      // SCM (Kudu): no hereda las reglas del sitio principal y queda en Deny sin reglas de
+      // permiso. La publicacion abre temporalmente 'operador-publicacion' con
+      // scripts/s12_endurecer.sh (IP_PUBLICACION_SCM), decision de seguridad (ADR 5.11 regla 3).
+      scmIpSecurityRestrictionsUseMain: false
+      scmIpSecurityRestrictionsDefaultAction: 'Deny'
       appSettings: [
         {
           name: 'APPLICATIONINSIGHTS_CONNECTION_STRING'
@@ -617,12 +702,28 @@ resource apiApp 'Microsoft.Web/sites@2023-12-01' = {
           value: sqlConnection
         }
         {
-          // Easy Auth (S11): el secreto lo crea scripts/s11_registro_entra_id.sh. Se declara aqui
-          // para que un redespliegue de main no lo elimine; hasta que exista, la referencia
-          // figura como no resuelta en el portal.
-          name: 'MICROSOFT_PROVIDER_AUTHENTICATION_SECRET'
-          value: '@Microsoft.KeyVault(VaultName=${keyVault.name};SecretName=easyauth-client-secret)'
+          // ADR-001 5.5: anillo de claves de Data Protection en Blob Storage (identidad del sistema).
+          name: 'DataProtection__BlobUri'
+          value: dataProtectionBlobUri
         }
+        {
+          // ADR-001 5.5: clave RSA de Key Vault que cifra el anillo. Identificador SIN version.
+          name: 'DataProtection__KeyIdentifier'
+          value: dpKey.properties.keyUri
+        }
+        {
+          // ADR-001 5.4.1 regla 3: ForwardLimit (1 sin WAF; 2 con WAF D11).
+          name: 'Seguridad__SaltosProxyConfiables'
+          value: string(saltosProxyConfiables)
+        }
+        {
+          // ADR-001 5.4.1 regla 1: una sola instancia del middleware, configurada en Program.cs.
+          // Con 'true' la API no arranca (validacion del desarrollador).
+          name: 'ASPNETCORE_FORWARDEDHEADERS_ENABLED'
+          value: 'false'
+        }
+        // Los demas Seguridad__* (valores DEMO de ADR 5.4) estan en src/Cobranza.Api/appsettings.json;
+        // no se repiten aqui para no tener dos fuentes del mismo valor.
       ]
     }
   }
@@ -646,6 +747,11 @@ resource funcApp 'Microsoft.Web/sites@2023-12-01' = {
       minTlsVersion: '1.2'
       ftpsState: 'Disabled'
       vnetRouteAllEnabled: true
+      // Los jobs no reciben HTTP: entrada Deny y SCM sin herencia en Deny (igual que
+      // s12_endurecer.sh), para que un redespliegue de main no deje la Function App abierta.
+      ipSecurityRestrictionsDefaultAction: 'Deny'
+      scmIpSecurityRestrictionsUseMain: false
+      scmIpSecurityRestrictionsDefaultAction: 'Deny'
       appSettings: [
         {
           name: 'FUNCTIONS_EXTENSION_VERSION'
@@ -857,23 +963,19 @@ resource dnsGroups 'Microsoft.Network/privateEndpoints/privateDnsZoneGroups@2023
 // ---------------------------------------------------------------------
 var rolKvSecretsUser = '4633458b-17de-408a-b874-0445c86b69e6'
 var rolKvSecretsOfficer = 'b86a8fe4-44ce-4948-aee5-eccb2c155cd7'
+var rolKvCryptoUser = '12338af0-0e69-4776-bea7-57ae8d297424'
 var rolBlobOwner = 'b7e6dc6d-f1e8-4753-8033-0f276bb0955b'
+var rolBlobContributor = 'ba92f5b4-2d11-453d-a403-e96b0029c9fe'
 var rolQueueContributor = '974c5e8b-45b9-4653-ba55-5f855dd0fb88'
 var rolTableContributor = '0a9a7e1f-b9d0-4cc4-a60d-0319b160aaa3'
 
-resource raKvApi 'Microsoft.Authorization/roleAssignments@2022-04-01' = {
-  name: guid(keyVault.id, apiApp.id, rolKvSecretsUser)
-  scope: keyVault
-  properties: {
-    roleDefinitionId: subscriptionResourceId('Microsoft.Authorization/roleDefinitions', rolKvSecretsUser)
-    principalId: apiApp.identity.principalId
-    principalType: 'ServicePrincipal'
-  }
-}
+// ADR-001 5.5.1: la API no tiene ningun rol de secretos en Key Vault (se retiro raKvApi).
 
+// ADR-001 5.5.1: la Function App solo lee el secreto acs-connection-string
+// (referencia de Cobranza__AcsConnectionString), no todo el vault.
 resource raKvFunc 'Microsoft.Authorization/roleAssignments@2022-04-01' = {
-  name: guid(keyVault.id, funcApp.id, rolKvSecretsUser)
-  scope: keyVault
+  name: guid(secretAcs.id, funcApp.id, rolKvSecretsUser)
+  scope: secretAcs
   properties: {
     roleDefinitionId: subscriptionResourceId('Microsoft.Authorization/roleDefinitions', rolKvSecretsUser)
     principalId: funcApp.identity.principalId
@@ -881,7 +983,9 @@ resource raKvFunc 'Microsoft.Authorization/roleAssignments@2022-04-01' = {
   }
 }
 
-// Operador humano: gestiona secretos (p. ej. easyauth-client-secret en S11).
+// Operador humano: crea, deshabilita y elimina los secretos de claves de API
+// (apikey-<consumidor>-<prefijo>, ADR-001 5.9) con scripts/s11_alta_clave_api.sh y
+// s11_revocar_clave_api.sh.
 resource raKvOperador 'Microsoft.Authorization/roleAssignments@2022-04-01' = {
   name: guid(keyVault.id, operadorObjectId, rolKvSecretsOfficer)
   scope: keyVault
@@ -892,8 +996,62 @@ resource raKvOperador 'Microsoft.Authorization/roleAssignments@2022-04-01' = {
   }
 }
 
+// ADR-001 5.5.1: API con Key Vault Crypto User solo sobre la clave de Data Protection
+// (Get, Wrap Key, Unwrap Key).
+resource raKvCryptoApi 'Microsoft.Authorization/roleAssignments@2022-04-01' = {
+  name: guid(dpKey.id, apiApp.id, rolKvCryptoUser)
+  scope: dpKey
+  properties: {
+    roleDefinitionId: subscriptionResourceId('Microsoft.Authorization/roleDefinitions', rolKvCryptoUser)
+    principalId: apiApp.identity.principalId
+    principalType: 'ServicePrincipal'
+  }
+}
+
+// ADR-001 5.5.1: API con Storage Blob Data Contributor solo sobre el contenedor dataprotection-keys.
+resource raBlobApi 'Microsoft.Authorization/roleAssignments@2022-04-01' = {
+  name: guid(dpContainer.id, apiApp.id, rolBlobContributor)
+  scope: dpContainer
+  properties: {
+    roleDefinitionId: subscriptionResourceId('Microsoft.Authorization/roleDefinitions', rolBlobContributor)
+    principalId: apiApp.identity.principalId
+    principalType: 'ServicePrincipal'
+  }
+}
+
+// ADR-001 5.5.1: Storage Blob Data Owner (minimo para AzureWebJobsStorage) sobre la cuenta,
+// con condicion ABAC v2.0: las acciones de datos de blob listadas solo se permiten si el
+// contenedor NO es dataprotection-keys. Las acciones de administracion del rol (p. ej.
+// eliminar el contenedor) no admiten condiciones: riesgo residual aceptado (ADR 5.5.1).
+// No se supone que funcione hasta la prueba negativa SEG-DP-03 en Azure.
+var accionesBlobRestringidas = [
+  'Microsoft.Storage/storageAccounts/blobServices/containers/blobs/read'
+  'Microsoft.Storage/storageAccounts/blobServices/containers/blobs/write'
+  'Microsoft.Storage/storageAccounts/blobServices/containers/blobs/delete'
+  'Microsoft.Storage/storageAccounts/blobServices/containers/blobs/add/action'
+  'Microsoft.Storage/storageAccounts/blobServices/containers/blobs/move/action'
+  'Microsoft.Storage/storageAccounts/blobServices/containers/blobs/deleteBlobVersion/action'
+  'Microsoft.Storage/storageAccounts/blobServices/containers/blobs/permanentDelete/action'
+  'Microsoft.Storage/storageAccounts/blobServices/containers/blobs/tags/read'
+  'Microsoft.Storage/storageAccounts/blobServices/containers/blobs/tags/write'
+]
+var condicionSinDataProtection = '((${join(map(accionesBlobRestringidas, a => '!(ActionMatches{\'${a}\'})'), ' AND ')}) OR (@Resource[Microsoft.Storage/storageAccounts/blobServices/containers:name] StringNotEquals \'${nombreContenedorDp}\'))'
+
+resource raBlobFunc 'Microsoft.Authorization/roleAssignments@2022-04-01' = {
+  name: guid(storage.id, funcApp.id, rolBlobOwner)
+  scope: storage
+  properties: {
+    roleDefinitionId: subscriptionResourceId('Microsoft.Authorization/roleDefinitions', rolBlobOwner)
+    principalId: funcApp.identity.principalId
+    principalType: 'ServicePrincipal'
+    description: 'AzureWebJobsStorage; sin acceso a datos del contenedor dataprotection-keys (ADR-001 5.5.1)'
+    conditionVersion: '2.0'
+    condition: condicionSinDataProtection
+  }
+}
+
+// Cola y tabla sin cambio en ADR-001 (B-09: revisar si Queue es necesario solo con temporizadores).
 resource raStorageFunc 'Microsoft.Authorization/roleAssignments@2022-04-01' = [for rol in [
-  rolBlobOwner
   rolQueueContributor
   rolTableContributor
 ]: {
@@ -928,6 +1086,11 @@ output remitenteCorreo string = remitente
 output usuarioFunctionApp string = funcApp.name
 output usuarioApi string = apiApp.name
 output accesoOperadorAbierto bool = accesoOperador
+// ADR-001 5.5: valores de DataProtection__* (para verificacion; no son secretos)
+output dataProtectionBlobUri string = dataProtectionBlobUri
+output dataProtectionKeyId string = dpKey.properties.keyUri
+output dataProtectionContainer string = nombreContenedorDp
+output saltosProxyConfiables int = saltosProxyConfiables
 // C4: IP fijas de los Private Endpoints
 output ipPeSql string = privados[0].ip
 output ipPeKeyVault string = privados[1].ip

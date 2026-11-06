@@ -1,0 +1,27 @@
+CONTROL NEGATIVO - 2026-11-06 09:48:59 -0300
+Copias en un directorio temporal con 5 errores introducidos a proposito:
+ 1) 13: @MinutosBloqueo -> @MinutoBloqueo en todas las llamadas
+ 2) 12: evento 'Logout' -> 'Salida' en sp_RegistrarLogout
+ 3) 12: GRANT de sp_ValidarClaveApi reemplazado por GRANT de sp_ListarEventosAccesoDesde (lee LogAcceso)
+ 4) 12: THROW 50076 -> 50090
+ 5) 13: EXEC cob.sp_RevocarClaveApi sin @Prefijo
+[12_autenticacion.sql] HALLAZGO linea 381: INSERT cob.LogAcceso.Evento = 'Salida' no admitido por CHECK {LoginExitoso|LoginFallido|CuentaBloqueada|Logout|CambioClave|AltaUsuario|RestablecimientoClave|DesbloqueoManual|CambioEstadoUsuario|CambioRolUsuario|AltaClaveApi|RevocacionClaveApi|PurgaLogAcceso|InvalidacionSesiones}
+[12_autenticacion.sql] HALLAZGO linea 867: GRANT sobre cob.sp_ListarEventosAccesoDesde, que lee cob.LogAcceso (ADR-001 5.1)
+[12_autenticacion.sql] THROW: 50060,50061,50062,50063,50064,50065,50066,50067,50068,50069,50070,50071,50072,50073,50074,50075,50090  FUERA DE RANGO 50060-50079: 50090
+[13_pruebas_autenticacion.sql] HALLAZGO linea 123: EXEC cob.sp_RegistrarLoginFallido: parametro inexistente @MinutoBloqueo
+[13_pruebas_autenticacion.sql] HALLAZGO linea 123: EXEC cob.sp_RegistrarLoginFallido: falta parametro obligatorio @MinutosBloqueo
+[13_pruebas_autenticacion.sql] HALLAZGO linea 129: EXEC cob.sp_RegistrarLoginFallido: parametro inexistente @MinutoBloqueo
+[13_pruebas_autenticacion.sql] HALLAZGO linea 129: EXEC cob.sp_RegistrarLoginFallido: falta parametro obligatorio @MinutosBloqueo
+[13_pruebas_autenticacion.sql] HALLAZGO linea 143: EXEC cob.sp_RegistrarLoginFallido: parametro inexistente @MinutoBloqueo
+[13_pruebas_autenticacion.sql] HALLAZGO linea 143: EXEC cob.sp_RegistrarLoginFallido: falta parametro obligatorio @MinutosBloqueo
+[13_pruebas_autenticacion.sql] HALLAZGO linea 154: EXEC cob.sp_RegistrarLoginFallido: parametro inexistente @MinutoBloqueo
+[13_pruebas_autenticacion.sql] HALLAZGO linea 154: EXEC cob.sp_RegistrarLoginFallido: falta parametro obligatorio @MinutosBloqueo
+[13_pruebas_autenticacion.sql] HALLAZGO linea 189: EXEC cob.sp_RegistrarLoginFallido: parametro inexistente @MinutoBloqueo
+[13_pruebas_autenticacion.sql] HALLAZGO linea 189: EXEC cob.sp_RegistrarLoginFallido: falta parametro obligatorio @MinutosBloqueo
+[13_pruebas_autenticacion.sql] HALLAZGO linea 201: EXEC cob.sp_RegistrarLoginFallido: parametro inexistente @MinutoBloqueo
+[13_pruebas_autenticacion.sql] HALLAZGO linea 201: EXEC cob.sp_RegistrarLoginFallido: falta parametro obligatorio @MinutosBloqueo
+[13_pruebas_autenticacion.sql] HALLAZGO linea 310: EXEC cob.sp_RevocarClaveApi: falta parametro obligatorio @Prefijo
+[13_pruebas_autenticacion.sql] HALLAZGO linea 443: EXEC cob.sp_RegistrarLoginFallido: parametro inexistente @MinutoBloqueo
+[13_pruebas_autenticacion.sql] HALLAZGO linea 443: EXEC cob.sp_RegistrarLoginFallido: falta parametro obligatorio @MinutosBloqueo
+TOTAL errores de sintaxis=0, hallazgos=18
+codigo de salida: 1

@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Cobranza Automatizada - Iniciar sesión</title>
+  <link rel="stylesheet" href="panel.css">
+</head>
+<body>
+  <header>
+    <h1>Cobranza Automatizada</h1>
+    <p class="sub">Embotelladora del Pacífico S.A. - uso interno</p>
+  </header>
+
+  <main>
+    <section aria-labelledby="t-login">
+      <h2 id="t-login">Iniciar sesión</h2>
+      <form id="form-login" autocomplete="off">
+        <label for="usuario">Usuario</label>
+        <input id="usuario" name="usuario" autocomplete="username" maxlength="50" required>
+        <label for="clave">Contraseña</label>
+        <input id="clave" name="clave" type="password" autocomplete="current-password" maxlength="128" required>
+        <button type="submit">Ingresar</button>
+      </form>
+    </section>
+    <p id="error" class="error" role="alert" hidden></p>
+  </main>
+  <script src="login.js"></script>
+</body>
+</html>

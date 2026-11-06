@@ -1,5 +1,6 @@
-// Panel interno - Proyecto APT Cobranza Automatizada (Evidencia S11)
-// La sesion la gestiona la autenticacion de App Service (Entra ID); las llamadas usan la cookie de sesion.
+// Panel interno - Proyecto APT Cobranza Automatizada (Evidencia S11, ADR-001)
+// Autenticacion propia: cookie de sesion __Host-cobranza-sesion. Sin sesion (401) se redirige a
+// /login.html. Los POST envian el token antifalsificacion en el encabezado X-CSRF-TOKEN.
 "use strict";
 const clp = new Intl.NumberFormat("es-CL", { style: "currency", currency: "CLP", maximumFractionDigits: 0 });
 const fechaCl = v => v ? new Date(v.endsWith("Z") ? v : v + "Z").toLocaleString("es-CL", { timeZone: "America/Santiago" }) : "-";
@@ -9,11 +10,28 @@ function mostrarError(msg) { const e = $("error"); e.textContent = msg; e.hidden
 
 async function obtener(url) {
   const r = await fetch(url, { credentials: "same-origin", headers: { "Accept": "application/json", "X-Requested-With": "XMLHttpRequest" } });
-  if (r.status === 401) { location.href = "/.auth/login/aad?post_login_redirect_uri=/"; return null; }
+  if (r.status === 401) { location.href = "/login.html"; return null; }
   if (r.status === 403) return null;
   if (r.status === 404) return undefined;
   if (!r.ok) throw new Error("Error " + r.status + " al consultar " + url);
   return r.json();
+}
+
+// El token se pide justo antes de cada POST: queda asociado al usuario de la sesion actual.
+async function tokenCsrf() {
+  const r = await fetch("/api/v1/auth/antiforgery", { credentials: "same-origin", headers: { "Accept": "application/json" } });
+  if (r.status === 401) { location.href = "/login.html"; return null; }
+  if (!r.ok) throw new Error("Error " + r.status + " al obtener el token antifalsificación");
+  return (await r.json()).token;
+}
+
+async function enviar(url, cuerpo) {
+  const token = await tokenCsrf();
+  if (token === null) return null;
+  const headers = { "Accept": "application/json", "X-CSRF-TOKEN": token };
+  if (cuerpo !== undefined) headers["Content-Type"] = "application/json";
+  return fetch(url, { method: "POST", credentials: "same-origin", headers,
+                      body: cuerpo === undefined ? undefined : JSON.stringify(cuerpo) });
 }
 
 function fila(tbody, valores) {
@@ -30,10 +48,39 @@ function kpi(cont, titulo, valor) {
 
 async function cargarUsuario() {
   const yo = await obtener("/api/v1/yo");
-  if (!yo) return [];
+  if (!yo) return null;
   $("usuario").textContent = "Sesión: " + (yo.nombre || "usuario") + " | Roles: " + (yo.roles.join(", ") || "sin roles asignados");
-  return yo.roles;
+  $("btn-logout").hidden = false;
+  $("btn-mostrar-cambio").hidden = false;
+  return yo;
 }
+
+$("btn-logout").addEventListener("click", async () => {
+  try {
+    const r = await enviar("/api/v1/auth/logout");
+    if (r === null) return;
+    if (r.status !== 204 && r.status !== 401) throw new Error("Error " + r.status + " al cerrar la sesión");
+    location.href = "/login.html";
+  } catch (e) { mostrarError(e.message); }
+});
+
+$("btn-mostrar-cambio").addEventListener("click", () => { $("cambio-clave").hidden = false; });
+
+$("form-cambio").addEventListener("submit", async ev => {
+  ev.preventDefault();
+  const actual = $("clave-actual"), nueva = $("clave-nueva"), repetida = $("clave-repetida");
+  const res = $("resultado-cambio"); res.hidden = false;
+  if (nueva.value !== repetida.value) { res.textContent = "Las contraseñas nuevas no coinciden."; return; }
+  try {
+    const r = await enviar("/api/v1/auth/cambiar-clave", { claveActual: actual.value, claveNueva: nueva.value });
+    actual.value = ""; nueva.value = ""; repetida.value = "";
+    if (r === null) return;
+    if (r.status === 204) { res.textContent = "Contraseña actualizada."; location.reload(); return; }
+    let msg = "Error " + r.status + " al cambiar la contraseña";
+    try { const j = await r.json(); msg = j.mensaje || j.detail || msg; } catch (_) { /* sin cuerpo JSON */ }
+    res.textContent = msg;
+  } catch (e) { actual.value = ""; nueva.value = ""; repetida.value = ""; res.textContent = e.message; }
+});
 
 async function cargarCartera() {
   const k = await obtener("/api/v1/cartera/indicadores");
@@ -80,6 +127,16 @@ $("form-rut").addEventListener("submit", async ev => {
 });
 
 (async () => {
-  try { await cargarUsuario(); await cargarCartera(); await cargarSincronizaciones(); }
+  try {
+    const yo = await cargarUsuario();
+    if (!yo) return;
+    if (yo.debeCambiarClave) {
+      // Con contrasena temporal solo se permite cambiarla o cerrar la sesion (AUT-06).
+      $("cambio-clave").hidden = false; $("aviso-cambio").hidden = false; $("btn-mostrar-cambio").hidden = true;
+      return;
+    }
+    $("consulta").hidden = false;
+    await cargarCartera(); await cargarSincronizaciones();
+  }
   catch (e) { mostrarError(e.message); }
 })();

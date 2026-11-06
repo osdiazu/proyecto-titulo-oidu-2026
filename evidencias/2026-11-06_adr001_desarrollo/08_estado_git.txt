@@ -1,0 +1,104 @@
+# git status --short (06-11-2026; incluye cambios de otros agentes en scripts/, sql/, infra/)
+ M Cobranza.slnx
+ M docs/seguridad/politica_credenciales_y_accesos.md
+ M pruebas/carga_api_k6.js
+ M scripts/s12_endurecer.sh
+ M scripts/s12_pruebas_red.sh
+ M scripts/s12_verificar_seguridad.sh
+ M sql/00_verificar_esquema.sql
+ M sql/01_esquema_cobranza.sql
+ M sql/02_identidades_y_permisos.sql
+ M sql/04_jobs_bitacoras.sql
+ M src/Cobranza.Api/Cobranza.Api.csproj
+ M src/Cobranza.Api/Datos/RepositorioConsultas.cs
+ M src/Cobranza.Api/Program.cs
+ D src/Cobranza.Api/Seguridad/EasyAuthHandler.cs
+ M src/Cobranza.Api/appsettings.json
+ M src/Cobranza.Api/wwwroot/index.html
+ M src/Cobranza.Api/wwwroot/panel.js
+ M src/Cobranza.Functions/Funciones/NotificacionesFunction.cs
+ M src/Cobranza.Functions/Servicios/IRepositorioNotificaciones.cs
+ M tests/Cobranza.Functions.Tests/Dobles.cs
+ M tests/Cobranza.Functions.Tests/NotificacionesFunctionTests.cs
+?? docs/seguridad/plantilla_claves_api.md
+?? docs/seguridad/plantilla_entrega_credenciales.md
+?? docs/seguridad/plantilla_levantamiento_transicion.md
+?? docs/seguridad/plantilla_prueba_negativa_abac.md
+?? docs/seguridad/plantilla_revision_post_restauracion.md
+?? docs/seguridad/plantilla_ventana_operador.md
+?? evidencias/2026-11-06_adr001_desarrollo/01_versiones.txt
+?? evidencias/2026-11-06_adr001_desarrollo/02_restore.txt
+?? evidencias/2026-11-06_adr001_desarrollo/03_build.txt
+?? evidencias/2026-11-06_adr001_desarrollo/04_test.txt
+?? evidencias/2026-11-06_adr001_desarrollo/05_paquetes_vulnerables.txt
+?? evidencias/2026-11-06_adr001_desarrollo/06_paquetes.txt
+?? evidencias/2026-11-06_adr001_desarrollo/07_sintaxis_scripts.txt
+?? evidencias/2026-11-06_adr001_desarrollo/08_estado_git.txt
+?? evidencias/2026-11-06_adr001_seguridad/01_versiones.txt
+?? evidencias/2026-11-06_adr001_seguridad/02_bash_n.txt
+?? evidencias/2026-11-06_adr001_seguridad/03_prueba_seco_endurecer.txt
+?? evidencias/2026-11-06_adr001_seguridad/04_prueba_seco_verificar.txt
+?? evidencias/2026-11-06_adr001_seguridad/05_prueba_seco_pruebas_red.txt
+?? evidencias/2026-11-06_adr001_seguridad/06_busqueda_cadenas.txt
+?? evidencias/2026-11-06_adr001_seguridad/07_diff.txt
+?? evidencias/2026-11-06_adr001_seguridad/CAMBIOS.md
+?? evidencias/2026-11-06_adr001_seguridad/herramienta/prueba_en_seco.sh
+?? evidencias/2026-11-06_adr001_sql/01_validacion_estatica.txt
+?? evidencias/2026-11-06_adr001_sql/02_control_negativo.txt
+?? evidencias/2026-11-06_adr001_sql/CAMBIOS.md
+?? evidencias/2026-11-06_adr001_sql/herramienta/Program.cs
+?? evidencias/2026-11-06_adr001_sql/herramienta/tsqlparse.csproj
+?? pruebas/consumidor_ventas_demo.sh
+?? sql/12_autenticacion.sql
+?? sql/13_pruebas_autenticacion.sql
+?? src/Cobranza.Api/Datos/RepositorioUsuarios.cs
+?? src/Cobranza.Api/Seguridad/ClaveApiHandler.cs
+?? src/Cobranza.Api/Seguridad/ConfiguracionSeguridad.cs
+?? src/Cobranza.Api/Seguridad/EndpointsAutenticacion.cs
+?? src/Cobranza.Api/Seguridad/OpcionesSeguridad.cs
+?? src/Cobranza.Api/Seguridad/Roles.cs
+?? src/Cobranza.Api/Seguridad/ServicioAutenticacion.cs
+?? src/Cobranza.Api/Seguridad/TelemetriaSinDatosSensibles.cs
+?? src/Cobranza.Api/wwwroot/login.html
+?? src/Cobranza.Api/wwwroot/login.js
+?? src/Cobranza.Comun/ClaveApiFormato.cs
+?? src/Cobranza.Herramientas/Cobranza.Herramientas.csproj
+?? src/Cobranza.Herramientas/Comandos.cs
+?? src/Cobranza.Herramientas/Program.cs
+?? src/Cobranza.Herramientas/README.md
+?? src/Cobranza.Herramientas/TerminalSistema.cs
+?? tests/Cobranza.Api.Tests/AutenticacionTests.cs
+?? tests/Cobranza.Api.Tests/AutorizacionYClaveApiTests.cs
+?? tests/Cobranza.Api.Tests/Cobranza.Api.Tests.csproj
+?? tests/Cobranza.Api.Tests/DesviacionesSqlTests.cs
+?? tests/Cobranza.Api.Tests/Dobles.cs
+?? tests/Cobranza.Api.Tests/FabricaApi.cs
+?? tests/Cobranza.Api.Tests/SeguridadHttpTests.cs
+?? tests/Cobranza.Api.Tests/UnitariasTests.cs
+
+# git diff --stat (solo src, tests, pruebas, Cobranza.slnx)
+warning: in the working copy of 'pruebas/carga_api_k6.js', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'src/Cobranza.Api/Cobranza.Api.csproj', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'src/Cobranza.Api/Datos/RepositorioConsultas.cs', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'src/Cobranza.Api/Program.cs', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'src/Cobranza.Api/appsettings.json', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'src/Cobranza.Api/wwwroot/index.html', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'src/Cobranza.Api/wwwroot/panel.js', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'src/Cobranza.Functions/Funciones/NotificacionesFunction.cs', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'src/Cobranza.Functions/Servicios/IRepositorioNotificaciones.cs', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'tests/Cobranza.Functions.Tests/Dobles.cs', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'tests/Cobranza.Functions.Tests/NotificacionesFunctionTests.cs', LF will be replaced by CRLF the next time Git touches it
+ Cobranza.slnx                                      |  5 +-
+ pruebas/carga_api_k6.js                            | 26 ++++---
+ src/Cobranza.Api/Cobranza.Api.csproj               | 19 +++--
+ src/Cobranza.Api/Datos/RepositorioConsultas.cs     | 12 +++-
+ src/Cobranza.Api/Program.cs                        | 59 ++++++++-------
+ src/Cobranza.Api/Seguridad/EasyAuthHandler.cs      | 84 ----------------------
+ src/Cobranza.Api/appsettings.json                  | 20 ++++++
+ src/Cobranza.Api/wwwroot/index.html                | 19 ++++-
+ src/Cobranza.Api/wwwroot/panel.js                  | 69 ++++++++++++++++--
+ .../Funciones/NotificacionesFunction.cs            | 42 ++++++++---
+ .../Servicios/IRepositorioNotificaciones.cs        |  5 +-
+ tests/Cobranza.Functions.Tests/Dobles.cs           |  4 ++
+ .../NotificacionesFunctionTests.cs                 | 49 ++++++++++---
+ 13 files changed, 262 insertions(+), 151 deletions(-)

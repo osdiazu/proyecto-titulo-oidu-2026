@@ -1,8 +1,11 @@
 <Solution>
   <Project Path="src/Cobranza.Comun/Cobranza.Comun.csproj" />
   <Project Path="src/Cobranza.Functions/Cobranza.Functions.csproj" />
-  <Folder Name="/src/" />
+  <Folder Name="/src/">
+    <Project Path="src/Cobranza.Herramientas/Cobranza.Herramientas.csproj" />
+  </Folder>
   <Folder Name="/tests/">
+    <Project Path="tests/Cobranza.Api.Tests/Cobranza.Api.Tests.csproj" />
     <Project Path="tests/Cobranza.Functions.Tests/Cobranza.Functions.Tests.csproj" />
   </Folder>
   <Project Path="src/Cobranza.Api/Cobranza.Api.csproj" />

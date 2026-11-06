@@ -1,0 +1,9 @@
+# dotnet restore Cobranza.slnx --force
+  Determinando los proyectos que se van a restaurar...
+  Se ha restaurado C:\Users\<usuario>\Documents\Proyecto de titulo - Final\Cobranza_Automatizada_Contexto_ClaudeCode\cobranza-automatizada\src\Cobranza.Comun\Cobranza.Comun.csproj (en 120 ms).
+  Se ha restaurado C:\Users\<usuario>\Documents\Proyecto de titulo - Final\Cobranza_Automatizada_Contexto_ClaudeCode\cobranza-automatizada\src\Cobranza.Herramientas\Cobranza.Herramientas.csproj (en 127 ms).
+  Se ha restaurado C:\Users\<usuario>\Documents\Proyecto de titulo - Final\Cobranza_Automatizada_Contexto_ClaudeCode\cobranza-automatizada\src\Cobranza.Api\Cobranza.Api.csproj (en 261 ms).
+  Se ha restaurado C:\Users\<usuario>\Documents\Proyecto de titulo - Final\Cobranza_Automatizada_Contexto_ClaudeCode\cobranza-automatizada\src\Cobranza.Functions\Cobranza.Functions.csproj (en 271 ms).
+  Se ha restaurado C:\Users\<usuario>\Documents\Proyecto de titulo - Final\Cobranza_Automatizada_Contexto_ClaudeCode\cobranza-automatizada\tests\Cobranza.Functions.Tests\Cobranza.Functions.Tests.csproj (en 273 ms).
+  Se ha restaurado C:\Users\<usuario>\Documents\Proyecto de titulo - Final\Cobranza_Automatizada_Contexto_ClaudeCode\cobranza-automatizada\tests\Cobranza.Api.Tests\Cobranza.Api.Tests.csproj (en 275 ms).
+exit=0

@@ -20,8 +20,18 @@ public sealed record SincronizacionDto(
     long LogSincronizacionId, DateTime FechaInicioUtc, DateTime? FechaFinUtc, string? Estado,
     int? ClientesLeidos, int? ClientesActualizados, int? PedidosLiberados, string? Detalle);
 
+/// <summary>Consultas de negocio de la API. Interfaz para probar la API sin base de datos.</summary>
+public interface IRepositorioConsultas
+{
+    Task<EstadoClienteDto?> EstadoClienteAsync(string rut, CancellationToken ct);
+    Task<IReadOnlyList<PedidoDto>> PedidosClienteAsync(string rut, string? estado, CancellationToken ct);
+    Task<IndicadoresCarteraDto> IndicadoresAsync(CancellationToken ct);
+    Task<IReadOnlyList<SincronizacionDto>> SincronizacionesAsync(int top, CancellationToken ct);
+    Task<bool> SaludAsync(CancellationToken ct);
+}
+
 /// <summary>Consultas de solo lectura; la identidad del App Service solo tiene EXECUTE (06_consultas_api.sql).</summary>
-public sealed class RepositorioConsultas(IConfiguration config)
+public sealed class RepositorioConsultas(IConfiguration config) : IRepositorioConsultas
 {
     private readonly string _cs = config.GetConnectionString("Cobranza")
         ?? throw new InvalidOperationException("Falta ConnectionStrings:Cobranza.");

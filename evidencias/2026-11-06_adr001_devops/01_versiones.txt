@@ -1,0 +1,10 @@
+# Versiones (06-11-2026)
+2.63.0
+Bicep CLI version 0.48.1 (cec7951cf6)
+
+10.0.303
+GNU bash, version 5.2.37(1)-release (x86_64-pc-msys)
+sqlcmd: no instalado
+shellcheck: no instalado
+zip: no instalado (desplegar.sh usa python zipfile)
+Python 3.14.7

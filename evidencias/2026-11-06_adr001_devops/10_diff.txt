@@ -1,0 +1,562 @@
+# git diff (archivos versionados que modifico devops) y git status de los nuevos
+diff --git a/README.md b/README.md
+index 350238a..8f809b2 100644
+--- a/README.md
++++ b/README.md
+@@ -1,16 +1,25 @@
+ # Proyecto APT Cobranza Automatizada - Embotelladora del Pacífico S.A.
+ 
+ Repositorio de la plataforma: Azure Functions y API en .NET 10, scripts de Azure SQL,
+-plantillas Bicep y scripts de operación. El entorno base (main.bicep y scripts 01/02)
+-corresponde a la evidencia S6-S8 y debe agregarse a este repositorio en `infra/` y `sql/`.
++plantillas Bicep y scripts de operación.
++
++Estado al 06-11-2026: nada está desplegado en Azure (solo el grupo de recursos vacío
++`rg-cobranza-apt` y el grupo Entra `grp-cobranza-sql-admin`). La autenticación de la API es
++propia (usuario y contraseña con cookie para el panel, clave de API para Ventas), sin Easy Auth
++ni roles de aplicación de Entra ID: ver `docs/adr/ADR-001-autenticacion-propia-sin-entra-usuarios.md`.
++Región: `brazilsouth`.
+ 
+ ## Estructura
+ 
+ | Ruta | Contenido | Evidencia |
+ | --- | --- | --- |
++| `infra/main.bicep`, `infra/main.bicepparam` | Entorno base (reconstrucción S10) con los cambios de ADR-001: Data Protection, RBAC mínimo, condición ABAC, regla de transición 5.11, TDE explícito | S10 / ADR-001 |
++| `infra/entorno.ejemplo.env` | Nombres de las variables de entorno (sin valores); copia local `infra/entorno.local.env` no versionada | — |
++| `infra/modulos/seguridad_perimetral.bicep` | Private Endpoint de la API, WAF, auditoría, diagnósticos y alertas | S12 |
+ | `sql/00_verificar_esquema.sql` | Compara el esquema esperado con la base desplegada (solo lectura) | S10 |
++| `sql/01_esquema_cobranza.sql`, `sql/02_identidades_y_permisos.sql` | Esquema `cob` y usuarios de las identidades administradas | S6-S8 / S10 |
+ | `sql/03_origen_simulado.sql` | Fuente simulada de solo lectura `origen_sim` | S10 |
+-| `sql/04_jobs_bitacoras.sql` | Bitácoras, alertas de vencimiento v2, registro de envíos | S10 |
++| `sql/04_jobs_bitacoras.sql` | Bitácoras, alertas de vencimiento v2, registro de envíos (`Limitado`) | S10 |
+ | `sql/05_automatizacion_desbloqueo.sql` | Sincronización, trigger y liberación v2; bitácora de pedidos | S11 |
+ | `sql/06_consultas_api.sql` | Procedimientos de lectura de la API | S11 |
+ | `sql/07_pruebas_desbloqueo.sql` | Pruebas unitarias T-SQL (no dejan datos) | S11 |
+@@ -18,23 +27,54 @@ corresponde a la evidencia S6-S8 y debe agregarse a este repositorio en `infra/`
+ | `sql/09_verificacion_e2e.sql` | Reporte de estado para las pruebas E2E | S14 |
+ | `sql/10_marcador_rpo.sql` | Marcadores para medir el RPO en el simulacro | S14 |
+ | `sql/11_procedimientos_operacion.sql` | Procedimientos administrativos de TI | S15 |
+-| `src/Cobranza.Comun` | Utilidad de RUT compartida | S10 |
++| `sql/12_autenticacion.sql` | `cob.ClaveApi`, `cob.LogAcceso`, procedimientos de autenticación y administrativos | ADR-001 |
++| `sql/13_pruebas_autenticacion.sql` | Pruebas T-SQL de autenticación (no dejan datos) | ADR-001 |
++| `src/Cobranza.Comun` | Utilidades compartidas (RUT, formato de clave de API) | S10 |
+ | `src/Cobranza.Functions` | Jobs de sincronización y notificaciones | S10 |
+-| `src/Cobranza.Api` | API interna y panel web | S11 |
+-| `infra/modulos/autenticacion_api.bicep` | Easy Auth v2 con Entra ID | S11 / S12 |
+-| `infra/modulos/seguridad_perimetral.bicep` | Private Endpoint de la API, WAF, auditoría, diagnósticos y alertas | S12 |
+-| `scripts/` | Configuración, endurecimiento, verificación, simulacro | S10 a S14 |
+-| `pruebas/carga_api_k6.js` | Prueba de carga de la API | S14 |
++| `src/Cobranza.Api` | API interna y panel web (autenticación propia) | S11 / ADR-001 |
++| `src/Cobranza.Herramientas` | `hash-clave` y `nueva-clave-api` (solo las ejecuta un humano, SEG-H01) | ADR-001 |
++| `tests/` | Pruebas unitarias de API y Functions | — |
++| `scripts/desplegar.sh` | Guía ejecutable del despliegue completo (10 pasos con confirmación) | ADR-001 |
++| `scripts/desplegar_sql.sh` | Scripts SQL en orden ADR-001 (08 solo con `--demo`) | ADR-001 |
++| `scripts/comun_operacion.sh` | Funciones compartidas (se carga con `source`) | ADR-001 |
++| `scripts/s10_configurar_jobs.sh` | Ajustes y publicación de la Function App | S10 |
++| `scripts/s11_configurar_api.sh` | Ajustes de la API sin Easy Auth (no publica) | S11 / ADR-001 |
++| `scripts/s11_alta_usuario.sh`, `s11_restablecer_clave.sh`, `s11_baja_usuario.sh` | Usuarios del panel (SEG-H01: solo un humano) | ADR-001 |
++| `scripts/s11_alta_clave_api.sh`, `s11_revocar_clave_api.sh` | Claves de API (SEG-H01: solo un humano) | ADR-001 |
++| `scripts/s12_*` | Endurecimiento, verificación y pruebas de red (responsable: `seguridad`) | S12 / ADR-001 |
++| `scripts/s14_simulacro_pitr.sh`, `s14_revision_post_restauracion.sh` | Simulacro PITR y revisión obligatoria posterior a la restauración | S14 / ADR-001 |
++| `scripts/s15_purgar_log_acceso.sh` | Purga mensual de `cob.LogAcceso` (90 días) | ADR-001 |
++| `scripts/eliminar_entorno.sh` | Eliminación del grupo de recursos (solo un humano) | — |
++| `pruebas/carga_api_k6.js`, `pruebas/consumidor_ventas_demo.sh` | Prueba de carga y consumidor DEMO `ventas-demo` | S14 / ADR-001 |
+ | `docs/*.kql` | Consultas de Log Analytics | S10 / S14 |
+ 
+-## Orden de despliegue
++Retirados el 06-11-2026 por ADR-001 (siguen en el historial de git): `scripts/s11_registro_entra_id.sh`
++e `infra/modulos/autenticacion_api.bicep` (Easy Auth).
++
++## Procedimiento de despliegue
++
++Requisitos en la estación del operador: Azure CLI, Bicep CLI 0.48.1 (`az bicep install --version v0.48.1`),
++.NET SDK 10, go-sqlcmd (`winget install sqlcmd`), Python 3 (empaquetado zip) y Git Bash.
++El operador debe ser miembro de `grp-cobranza-sql-admin` (sesión `az login`).
++
++Toda acción en Azure requiere aprobación humana explícita (CLAUDE.md regla 5). Siempre `--mode Incremental`.
+ 
+-1. `dotnet build Cobranza.slnx -c Release` (no se compiló en el entorno de redacción).
+-2. SQL en modo SQLCMD: 00 (sin hallazgos) -> 03, 04, 05 (`UsuarioFunctionApp`) -> 06 (`UsuarioApi`) -> 07 -> 11.
+-3. `scripts/s10_configurar_jobs.sh` (publica la Function App).
+-4. `scripts/s11_registro_entra_id.sh`, `scripts/s11_configurar_api.sh`, `infra/modulos/autenticacion_api.bicep`.
+-5. `infra/modulos/seguridad_perimetral.bicep` y `scripts/s12_endurecer.sh`; verificar con `scripts/s12_verificar_seguridad.sh` y `scripts/s12_pruebas_red.sh`.
+-6. Pruebas S14: `sql/08`, `sql/09`, `sql/10`, `scripts/s14_simulacro_pitr.sh`, `pruebas/carga_api_k6.js`.
++1. Compilar y probar: `dotnet build Cobranza.slnx -c Release` y `dotnet test Cobranza.slnx`.
++2. Variables: copiar `infra/entorno.ejemplo.env` a `infra/entorno.local.env`, completar y cargar:
++   `set -a; source infra/entorno.local.env; set +a`.
++3. Ejecutar `scripts/desplegar.sh [--demo]` (pide confirmación en cada paso):
++   1. Variables, herramientas y suscripción (`SUBSCRIPTION_ID_ESPERADA`).
++   2. `az group create` si el grupo no existe.
++   3. `bicep build`, `lint`, `build-params` (a carpeta temporal) y `what-if`.
++   4. `az deployment group create` con `IP_OPERADOR` (abre la ventana del operador: SQL, Key Vault y la regla `operador-transicion` de la Web App).
++   5. `scripts/desplegar_sql.sh`: 01, 02, 03, 04, 05, 06, 12, 11, 00, 07 (10/10), 13 y 08 solo con `--demo`.
++   6. Publicación: `dotnet publish` + `az functionapp deploy` y, solo con `APROBACION_QA=<informe qa>` (ADR-001 5.11), `az webapp deploy`. El SCM se abre con `IP_PUBLICACION_SCM` mediante `s12_endurecer.sh` y se cierra al terminar.
++   7. `scripts/s10_configurar_jobs.sh` (sin publicar) y `scripts/s11_configurar_api.sh`.
++   8. `scripts/s12_endurecer.sh` (obligatorio después de cada despliegue de `main`, regla 7).
++   9. Verificación de `https://<api>/salud`.
++   10. Cierre de la ventana: despliegue con `IP_OPERADOR` vacío y `s12_endurecer.sh` otra vez; verificar con `scripts/s12_verificar_seguridad.sh`.
++4. Altas de usuarios y claves de API (ADR-001 5.9): las ejecuta un integrante humano, en su propia terminal y fuera de Claude Code, con la ventana abierta (`s11_alta_usuario.sh`, `s11_alta_clave_api.sh`, etc.). Registrar la ventana con `docs/seguridad/plantilla_ventana_operador.md`.
++5. Pruebas S14: `sql/09`, `sql/10`, `scripts/s14_simulacro_pitr.sh` seguido de `scripts/s14_revision_post_restauracion.sh`, `pruebas/carga_api_k6.js`.
+ 
+-Validación realizada al redactar: plantillas Bicep compiladas y revisadas (linter) con Bicep CLI 0.48.1 sin errores ni advertencias;
+-sintaxis de scripts bash (`bash -n`) y JavaScript (`node --check`). El código .NET y los scripts SQL no se compilaron ni ejecutaron.
++Regla de transición (ADR-001 5.11): mientras no exista un informe de `qa` APROBADO de la implementación,
++la API no se publica y la Web App queda con entrada por defecto `Deny` (solo la IP del operador durante la ventana).
+diff --git a/infra/main.bicep b/infra/main.bicep
+index 47d6bd9..0f6c09c 100644
+--- a/infra/main.bicep
++++ b/infra/main.bicep
+@@ -10,6 +10,15 @@
+ // requisitos del 05-11-2026 (region brazilsouth, operadorObjectId, ajustes
+ // Cobranza__*, redespliegue repetible). Detalle: evidencias/2026-11-05_whatif_brazilsouth/CAMBIOS.md
+ //
++// ADR-001 (06-11-2026, autenticacion propia sin Easy Auth): se retira Easy Auth
++// (MICROSOFT_PROVIDER_AUTHENTICATION_SECRET) y raKvApi; raKvFunc pasa a alcance del
++// secreto acs-connection-string; condicion ABAC en Blob Data Owner de la Function App;
++// Data Protection de la API (contenedor dataprotection-keys y clave RSA
++// dataprotection-cobranza-api); ajustes DataProtection__*, Seguridad__SaltosProxyConfiables
++// y ASPNETCORE_FORWARDEDHEADERS_ENABLED=false; regla de transicion 5.11 (Web App con
++// entrada Deny); SCM sin herencia y en Deny; TDE explicito (B-01).
++// Detalle: evidencias/2026-11-06_adr001_devops/CAMBIOS.md
++//
+ // Ambito: grupo de recursos (az deployment group ... --mode Incremental).
+ // Volver a desplegar esta plantilla restablece los ajustes de aplicacion y
+ // la configuracion del sitio: reaplicar scripts/s12_endurecer.sh despues.
+@@ -51,6 +60,11 @@ param operadorObjectId string
+ @maxLength(18)
+ param ipOperador string = ''
+ 
++@description('Saltos de proxy confiables para los encabezados reenviados de la API (ADR-001 5.4.1): 1 sin WAF (topologia actual); 2 solo con WAF D11 y la Web App sin acceso publico. Lo determina la topologia, no es una preferencia.')
++@minValue(1)
++@maxValue(2)
++param saltosProxyConfiables int = 1
++
+ @description('Ciclo del Key Vault. Con proteccion de purga, un vault eliminado conserva su nombre reservado 90 dias; cambiar este valor tras eliminar el grupo de recursos genera un nombre nuevo. Lo incrementa scripts/eliminar_entorno.sh.')
+ @minLength(1)
+ @maxLength(4)
+@@ -148,6 +162,18 @@ var unicoKv = uniqueString(resourceGroup().id, 'keyvault', cicloKeyVault)
+ // la direccion de red, que para /32 es la propia IP. Solo se evalua si ipOperador tiene valor.
+ var ipOperadorSinMascara = empty(ipOperador) ? '' : parseCidr('${split(ipOperador, '/')[0]}/32').network
+ var accesoOperador = !empty(ipOperadorSinMascara)
++// ADR-001 5.11: regla de permiso de la Web App durante la transicion (nombre registrado: SEG-H11).
++var reglasTransicionApi = accesoOperador
++  ? [
++      {
++        name: 'operador-transicion'
++        action: 'Allow'
++        ipAddress: '${ipOperadorSinMascara}/32'
++        priority: 100
++        description: 'ADR-001 5.11: IP del operador durante la ventana (ipOperador)'
++      }
++    ]
++  : []
+ var etiquetas = {
+   proyecto: 'APT-Cobranza-Automatizada'
+   cliente: 'Embotelladora del Pacifico S.A.'
+@@ -455,6 +481,15 @@ resource sqlDb 'Microsoft.Sql/servers/databases@2021-11-01' = {
+   }
+ }
+ 
++// B-01 (ADR-001 4.3): TDE declarado explicitamente (activo por defecto en Azure SQL).
++resource sqlTde 'Microsoft.Sql/servers/databases/transparentDataEncryption@2021-11-01' = {
++  parent: sqlDb
++  name: 'current'
++  properties: {
++    state: 'Enabled'
++  }
++}
++
+ resource sqlPitr 'Microsoft.Sql/servers/databases/backupShortTermRetentionPolicies@2021-11-01' = {
+   parent: sqlDb
+   name: 'default'
+@@ -521,6 +556,44 @@ resource storage 'Microsoft.Storage/storageAccounts@2023-05-01' = {
+   }
+ }
+ 
++var nombreContenedorDp = 'dataprotection-keys'
++var dataProtectionBlobUri = '${storage.properties.primaryEndpoints.blob}${nombreContenedorDp}/keys.xml'
++
++// ADR-001 5.5: contenedor dedicado al anillo de claves de Data Protection de la API.
++// Se crea por el plano de control (funciona sin clave compartida ni acceso publico).
++resource blobService 'Microsoft.Storage/storageAccounts/blobServices@2023-05-01' = {
++  parent: storage
++  name: 'default'
++}
++
++resource dpContainer 'Microsoft.Storage/storageAccounts/blobServices/containers@2023-05-01' = {
++  parent: blobService
++  name: nombreContenedorDp
++  properties: {
++    publicAccess: 'None'
++  }
++}
++
++// ADR-001 5.5: clave RSA que protege el anillo (ProtectKeysWithAzureKeyVault). ARM crea la
++// clave solo si no existe; un redespliegue no genera versiones nuevas. La API usa el
++// identificador sin version (DataProtection__KeyIdentifier).
++resource dpKey 'Microsoft.KeyVault/vaults/keys@2023-07-01' = {
++  parent: keyVault
++  name: 'dataprotection-cobranza-api'
++  properties: {
++    kty: 'RSA'
++    keySize: 2048
++    keyOps: [
++      'wrapKey'
++      'unwrapKey'
++    ]
++    attributes: {
++      enabled: true
++      exportable: false
++    }
++  }
++}
++
+ // ---------------------------------------------------------------------
+ // 6. Correo: Azure Communication Services (Email, dominio administrado)
+ // ---------------------------------------------------------------------
+@@ -606,6 +679,18 @@ resource apiApp 'Microsoft.Web/sites@2023-12-01' = {
+       http20Enabled: true
+       vnetRouteAllEnabled: true
+       healthCheckPath: '/salud'
++      // ADR-001 5.11 (regla de transicion, A-01): entrada por defecto Deny mientras la
++      // transicion este vigente. Unica regla de permiso: 'operador-transicion' (SEG-H11),
++      // con la IP de ipOperador /32; ipOperador vacio = sin reglas de permiso.
++      // Sonda /salud: si la restriccion la afecta queda PENDIENTE de verificar en Azure
++      // (ADR 5.11 regla 3); con una sola instancia B1 la sonda no reemplaza instancias.
++      ipSecurityRestrictionsDefaultAction: 'Deny'
++      ipSecurityRestrictions: reglasTransicionApi
++      // SCM (Kudu): no hereda las reglas del sitio principal y queda en Deny sin reglas de
++      // permiso. La publicacion abre temporalmente 'operador-publicacion' con
++      // scripts/s12_endurecer.sh (IP_PUBLICACION_SCM), decision de seguridad (ADR 5.11 regla 3).
++      scmIpSecurityRestrictionsUseMain: false
++      scmIpSecurityRestrictionsDefaultAction: 'Deny'
+       appSettings: [
+         {
+           name: 'APPLICATIONINSIGHTS_CONNECTION_STRING'
+@@ -617,12 +702,28 @@ resource apiApp 'Microsoft.Web/sites@2023-12-01' = {
+           value: sqlConnection
+         }
+         {
+-          // Easy Auth (S11): el secreto lo crea scripts/s11_registro_entra_id.sh. Se declara aqui
+-          // para que un redespliegue de main no lo elimine; hasta que exista, la referencia
+-          // figura como no resuelta en el portal.
+-          name: 'MICROSOFT_PROVIDER_AUTHENTICATION_SECRET'
+-          value: '@Microsoft.KeyVault(VaultName=${keyVault.name};SecretName=easyauth-client-secret)'
++          // ADR-001 5.5: anillo de claves de Data Protection en Blob Storage (identidad del sistema).
++          name: 'DataProtection__BlobUri'
++          value: dataProtectionBlobUri
++        }
++        {
++          // ADR-001 5.5: clave RSA de Key Vault que cifra el anillo. Identificador SIN version.
++          name: 'DataProtection__KeyIdentifier'
++          value: dpKey.properties.keyUri
++        }
++        {
++          // ADR-001 5.4.1 regla 3: ForwardLimit (1 sin WAF; 2 con WAF D11).
++          name: 'Seguridad__SaltosProxyConfiables'
++          value: string(saltosProxyConfiables)
+         }
++        {
++          // ADR-001 5.4.1 regla 1: una sola instancia del middleware, configurada en Program.cs.
++          // Con 'true' la API no arranca (validacion del desarrollador).
++          name: 'ASPNETCORE_FORWARDEDHEADERS_ENABLED'
++          value: 'false'
++        }
++        // Los demas Seguridad__* (valores DEMO de ADR 5.4) estan en src/Cobranza.Api/appsettings.json;
++        // no se repiten aqui para no tener dos fuentes del mismo valor.
+       ]
+     }
+   }
+@@ -646,6 +747,11 @@ resource funcApp 'Microsoft.Web/sites@2023-12-01' = {
+       minTlsVersion: '1.2'
+       ftpsState: 'Disabled'
+       vnetRouteAllEnabled: true
++      // Los jobs no reciben HTTP: entrada Deny y SCM sin herencia en Deny (igual que
++      // s12_endurecer.sh), para que un redespliegue de main no deje la Function App abierta.
++      ipSecurityRestrictionsDefaultAction: 'Deny'
++      scmIpSecurityRestrictionsUseMain: false
++      scmIpSecurityRestrictionsDefaultAction: 'Deny'
+       appSettings: [
+         {
+           name: 'FUNCTIONS_EXTENSION_VERSION'
+@@ -857,23 +963,19 @@ resource dnsGroups 'Microsoft.Network/privateEndpoints/privateDnsZoneGroups@2023
+ // ---------------------------------------------------------------------
+ var rolKvSecretsUser = '4633...69e6'
+ var rolKvSecretsOfficer = 'b86a...5cd7'
++var rolKvCryptoUser = '1233...7424'
+ var rolBlobOwner = 'b7e6...955b'
++var rolBlobContributor = 'ba92...c9fe'
+ var rolQueueContributor = '974c...fb88'
+ var rolTableContributor = '0a9a...aaa3'
+ 
+-resource raKvApi 'Microsoft.Authorization/roleAssignments@2022-04-01' = {
+-  name: guid(keyVault.id, apiApp.id, rolKvSecretsUser)
+-  scope: keyVault
+-  properties: {
+-    roleDefinitionId: subscriptionResourceId('Microsoft.Authorization/roleDefinitions', rolKvSecretsUser)
+-    principalId: apiApp.identity.principalId
+-    principalType: 'ServicePrincipal'
+-  }
+-}
++// ADR-001 5.5.1: la API no tiene ningun rol de secretos en Key Vault (se retiro raKvApi).
+ 
++// ADR-001 5.5.1: la Function App solo lee el secreto acs-connection-string
++// (referencia de Cobranza__AcsConnectionString), no todo el vault.
+ resource raKvFunc 'Microsoft.Authorization/roleAssignments@2022-04-01' = {
+-  name: guid(keyVault.id, funcApp.id, rolKvSecretsUser)
+-  scope: keyVault
++  name: guid(secretAcs.id, funcApp.id, rolKvSecretsUser)
++  scope: secretAcs
+   properties: {
+     roleDefinitionId: subscriptionResourceId('Microsoft.Authorization/roleDefinitions', rolKvSecretsUser)
+     principalId: funcApp.identity.principalId
+@@ -881,7 +983,9 @@ resource raKvFunc 'Microsoft.Authorization/roleAssignments@2022-04-01' = {
+   }
+ }
+ 
+-// Operador humano: gestiona secretos (p. ej. easyauth-client-secret en S11).
++// Operador humano: crea, deshabilita y elimina los secretos de claves de API
++// (apikey-<consumidor>-<prefijo>, ADR-001 5.9) con scripts/s11_alta_clave_api.sh y
++// s11_revocar_clave_api.sh.
+ resource raKvOperador 'Microsoft.Authorization/roleAssignments@2022-04-01' = {
+   name: guid(keyVault.id, operadorObjectId, rolKvSecretsOfficer)
+   scope: keyVault
+@@ -892,8 +996,62 @@ resource raKvOperador 'Microsoft.Authorization/roleAssignments@2022-04-01' = {
+   }
+ }
+ 
++// ADR-001 5.5.1: API con Key Vault Crypto User solo sobre la clave de Data Protection
++// (Get, Wrap Key, Unwrap Key).
++resource raKvCryptoApi 'Microsoft.Authorization/roleAssignments@2022-04-01' = {
++  name: guid(dpKey.id, apiApp.id, rolKvCryptoUser)
++  scope: dpKey
++  properties: {
++    roleDefinitionId: subscriptionResourceId('Microsoft.Authorization/roleDefinitions', rolKvCryptoUser)
++    principalId: apiApp.identity.principalId
++    principalType: 'ServicePrincipal'
++  }
++}
++
++// ADR-001 5.5.1: API con Storage Blob Data Contributor solo sobre el contenedor dataprotection-keys.
++resource raBlobApi 'Microsoft.Authorization/roleAssignments@2022-04-01' = {
++  name: guid(dpContainer.id, apiApp.id, rolBlobContributor)
++  scope: dpContainer
++  properties: {
++    roleDefinitionId: subscriptionResourceId('Microsoft.Authorization/roleDefinitions', rolBlobContributor)
++    principalId: apiApp.identity.principalId
++    principalType: 'ServicePrincipal'
++  }
++}
++
++// ADR-001 5.5.1: Storage Blob Data Owner (minimo para AzureWebJobsStorage) sobre la cuenta,
++// con condicion ABAC v2.0: las acciones de datos de blob listadas solo se permiten si el
++// contenedor NO es dataprotection-keys. Las acciones de administracion del rol (p. ej.
++// eliminar el contenedor) no admiten condiciones: riesgo residual aceptado (ADR 5.5.1).
++// No se supone que funcione hasta la prueba negativa SEG-DP-03 en Azure.
++var accionesBlobRestringidas = [
++  'Microsoft.Storage/storageAccounts/blobServices/containers/blobs/read'
++  'Microsoft.Storage/storageAccounts/blobServices/containers/blobs/write'
++  'Microsoft.Storage/storageAccounts/blobServices/containers/blobs/delete'
++  'Microsoft.Storage/storageAccounts/blobServices/containers/blobs/add/action'
++  'Microsoft.Storage/storageAccounts/blobServices/containers/blobs/move/action'
++  'Microsoft.Storage/storageAccounts/blobServices/containers/blobs/deleteBlobVersion/action'
++  'Microsoft.Storage/storageAccounts/blobServices/containers/blobs/permanentDelete/action'
++  'Microsoft.Storage/storageAccounts/blobServices/containers/blobs/tags/read'
++  'Microsoft.Storage/storageAccounts/blobServices/containers/blobs/tags/write'
++]
++var condicionSinDataProtection = '((${join(map(accionesBlobRestringidas, a => '!(ActionMatches{\'${a}\'})'), ' AND ')}) OR (@Resource[Microsoft.Storage/storageAccounts/blobServices/containers:name] StringNotEquals \'${nombreContenedorDp}\'))'
++
++resource raBlobFunc 'Microsoft.Authorization/roleAssignments@2022-04-01' = {
++  name: guid(storage.id, funcApp.id, rolBlobOwner)
++  scope: storage
++  properties: {
++    roleDefinitionId: subscriptionResourceId('Microsoft.Authorization/roleDefinitions', rolBlobOwner)
++    principalId: funcApp.identity.principalId
++    principalType: 'ServicePrincipal'
++    description: 'AzureWebJobsStorage; sin acceso a datos del contenedor dataprotection-keys (ADR-001 5.5.1)'
++    conditionVersion: '2.0'
++    condition: condicionSinDataProtection
++  }
++}
++
++// Cola y tabla sin cambio en ADR-001 (B-09: revisar si Queue es necesario solo con temporizadores).
+ resource raStorageFunc 'Microsoft.Authorization/roleAssignments@2022-04-01' = [for rol in [
+-  rolBlobOwner
+   rolQueueContributor
+   rolTableContributor
+ ]: {
+@@ -928,6 +1086,11 @@ output remitenteCorreo string = remitente
+ output usuarioFunctionApp string = funcApp.name
+ output usuarioApi string = apiApp.name
+ output accesoOperadorAbierto bool = accesoOperador
++// ADR-001 5.5: valores de DataProtection__* (para verificacion; no son secretos)
++output dataProtectionBlobUri string = dataProtectionBlobUri
++output dataProtectionKeyId string = dpKey.properties.keyUri
++output dataProtectionContainer string = nombreContenedorDp
++output saltosProxyConfiables int = saltosProxyConfiables
+ // C4: IP fijas de los Private Endpoints
+ output ipPeSql string = privados[0].ip
+ output ipPeKeyVault string = privados[1].ip
+diff --git a/infra/main.bicepparam b/infra/main.bicepparam
+index 8a17ab4..1a5c509 100644
+--- a/infra/main.bicepparam
++++ b/infra/main.bicepparam
+@@ -32,6 +32,10 @@ param sqlAdminGroupName = 'grp-cobranza-sql-admin'
+ param location = 'brazilsouth'
+ param acsDataLocation = 'United States'
+ 
++// ADR-001 5.4.1: 1 sin WAF (topologia actual). Pasa a 2 solo en el mismo despliegue que
++// active D11 (WAF) con la Web App sin acceso publico.
++param saltosProxyConfiables = 1
++
+ param prefijo = 'cobranza'
+ param ambiente = 'dev'
+ param appServicePlanSku = 'B1'
+diff --git a/scripts/s10_configurar_jobs.sh b/scripts/s10_configurar_jobs.sh
+index 8ed6a52..1e177d6 100644
+--- a/scripts/s10_configurar_jobs.sh
++++ b/scripts/s10_configurar_jobs.sh
+@@ -68,7 +68,14 @@ az rest --method get \
+   --url "$(az functionapp show -g "$RG" -n "$FUNC_APP" --query id -o tsv)/config/configreferences/appsettings/Cobranza__AcsConnectionString?api-version=2023-12-01" \
+   --query "properties.status" -o tsv || echo "Revisar manualmente en el portal: Configuracion > Referencias de Key Vault"
+ 
+-echo "== 3. Publicacion (paquete generado con: dotnet publish -c Release -o publish && cd publish && zip -r ../functions.zip .)"
+-az functionapp deployment source config-zip -g "$RG" -n "$FUNC_APP" --src "$PAQUETE"
++# 06-11-2026 (ADR-001): OMITIR_PUBLICACION=si salta este paso. Lo usa scripts/desplegar.sh,
++# que publica antes (paso 6) con la ventana SCM abierta por s12_endurecer.sh.
++if [[ "${OMITIR_PUBLICACION:-no}" == "si" ]]; then
++  echo "== 3. Publicacion omitida (OMITIR_PUBLICACION=si)"
++else
++  echo "== 3. Publicacion (paquete generado con: dotnet publish -c Release -o publish && cd publish && zip -r ../functions.zip .)"
++  echo "   Requiere el SCM abierto a la IP del operador: IP_PUBLICACION_SCM=<ip> scripts/s12_endurecer.sh (y repetirlo sin la variable al terminar)."
++  az functionapp deployment source config-zip -g "$RG" -n "$FUNC_APP" --src "$PAQUETE"
++fi
+ 
+ echo "Listo. Revisar ejecuciones en Application Insights (consultas en docs/consultas_kql_s10.kql)."
+diff --git a/scripts/s11_configurar_api.sh b/scripts/s11_configurar_api.sh
+index 5e737dc..3409442 100644
+--- a/scripts/s11_configurar_api.sh
++++ b/scripts/s11_configurar_api.sh
+@@ -1,33 +1,77 @@
+ #!/usr/bin/env bash
+ # =============================================================================
+ # s11_configurar_api.sh - Proyecto APT Cobranza Automatizada (Evidencia S11)
+-# Configura y publica la API interna en la Web App existente.
+-# Orden: 1) s11_registro_entra_id.sh  2) este script  3) autenticacion_api.bicep
++# Actualizado el 06-11-2026 por ADR-001 (autenticacion propia, sin Easy Auth).
++#
++# Alinea y verifica la configuracion de la Web App de la API con infra/main.bicep:
++#   1. Easy Auth deshabilitado (si estuviera activo interceptaria las solicitudes; SEG-05).
++#   2. Sin el ajuste obsoleto MICROSOFT_PROVIDER_AUTHENTICATION_SECRET.
++#   3. Ajustes de ADR-001 (valores tomados de las salidas de la plantilla, no escritos a mano):
++#        DataProtection__BlobUri, DataProtection__KeyIdentifier,
++#        Seguridad__SaltosProxyConfiables, ASPNETCORE_FORWARDEDHEADERS_ENABLED=false
++#      y ConnectionStrings__Cobranza.
++#   4. HTTPS, TLS 1.2, sin FTP, sonda /salud.
++#   5. Verificacion (lectura) de los ajustes.
++#
++# NO publica la API. La publicacion la hace scripts/desplegar.sh (paso 6) y solo si se
++# cumple la regla de transicion de ADR-001 5.11 (implementacion compilada, pruebas en
++# verde e informe de qa APROBADO o APROBADO CON OBSERVACIONES).
++#
++# Los ajustes coinciden con infra/main.bicep; un redespliegue de main los vuelve a
++# imponer. Este script sirve para corregir sin redesplegar.
++#
++# Variables: RG (por defecto rg-cobranza-apt) y DEPLOY_NAME (por defecto cobranza-main).
++# Requisitos: Azure CLI con sesion iniciada; Contributor o Website Contributor en la Web App.
++# Ya no requiere Key Vault ni el registro de Entra ID (s11_registro_entra_id.sh retirado).
+ # =============================================================================
+ set -euo pipefail
++# shellcheck source=scripts/comun_operacion.sh
++source "$(dirname "$0")/comun_operacion.sh"
+ 
+-RG="${RG:?Definir RG}"
+-WEB_APP="${WEB_APP:?Definir WEB_APP (nombre de la Web App de la API)}"
+-KV_NAME="${KV_NAME:?Definir KV_NAME}"
+-SQL_SERVER="${SQL_SERVER:?Definir SQL_SERVER (sin .database.windows.net)}"
+-SQL_DB="${SQL_DB:?Definir SQL_DB}"
+-PAQUETE="${PAQUETE:-api.zip}"   # dotnet publish src/Cobranza.Api -c Release -o publish-api && (cd publish-api && zip -r ../api.zip .)
++RG="${RG:-rg-cobranza-apt}"
++WEB_APP="${WEB_APP:-$(salida apiAppName)}"
++[[ -n "$WEB_APP" ]] || error "No se pudo leer apiAppName del despliegue ${DEPLOY_NAME} en ${RG}."
++BLOB_URI="$(salida dataProtectionBlobUri)"
++KEY_ID="$(salida dataProtectionKeyId)"
++SALTOS="$(salida saltosProxyConfiables)"
++SQL_FQDN="$(salida sqlServerFqdn)"; SQL_DB="$(salida sqlDatabaseName)"
++[[ -n "$BLOB_URI" && -n "$KEY_ID" && "$SALTOS" =~ ^[12]$ && -n "$SQL_FQDN" && -n "$SQL_DB" ]] \
++  || error "Faltan salidas de la plantilla (dataProtectionBlobUri, dataProtectionKeyId, saltosProxyConfiables, sqlServerFqdn, sqlDatabaseName)."
++SQL_CS="Server=tcp:${SQL_FQDN},1433;Database=${SQL_DB};Authentication=Active Directory Managed Identity;Encrypt=True;TrustServerCertificate=False;"
+ 
+-SQL_CS="Server=tcp:${SQL_SERVER}.database.windows.net,1433;Database=${SQL_DB};Authentication=Active Directory Managed Identity;Encrypt=True;TrustServerCertificate=False;"
++echo "== 1. Easy Auth (debe quedar deshabilitado, ADR-001)"
++EA="$(az webapp auth show -g "$RG" -n "$WEB_APP" --query "properties.platform.enabled" -o tsv 2>/dev/null | tr -d '\r' || true)"
++if [[ "${EA,,}" == "true" ]]; then
++  echo "   Easy Auth esta ACTIVO: se deshabilita."
++  az webapp auth update -g "$RG" -n "$WEB_APP" --enabled false --output none
++else
++  echo "   Easy Auth no activo (${EA:-sin configuracion})."
++fi
+ 
+-echo "== 1. Ajustes de aplicacion"
++echo "== 2. Ajuste obsoleto MICROSOFT_PROVIDER_AUTHENTICATION_SECRET"
++if [[ "$(az webapp config appsettings list -g "$RG" -n "$WEB_APP" --query "length([?name=='MICROSOFT_PROVIDER_AUTHENTICATION_SECRET'])" -o tsv | tr -d '\r')" != "0" ]]; then
++  az webapp config appsettings delete -g "$RG" -n "$WEB_APP" --setting-names MICROSOFT_PROVIDER_AUTHENTICATION_SECRET --output none
++  echo "   eliminado."
++else
++  echo "   no existe."
++fi
++
++echo "== 3. Ajustes de aplicacion (ADR-001)"
+ az webapp config appsettings set -g "$RG" -n "$WEB_APP" --output none --settings \
+   "ConnectionStrings__Cobranza=${SQL_CS}" \
+-  "MICROSOFT_PROVIDER_AUTHENTICATION_SECRET=@Microsoft.KeyVault(VaultName=${KV_NAME};SecretName=easyauth-client-secret)"
++  "DataProtection__BlobUri=${BLOB_URI}" \
++  "DataProtection__KeyIdentifier=${KEY_ID}" \
++  "Seguridad__SaltosProxyConfiables=${SALTOS}" \
++  "ASPNETCORE_FORWARDEDHEADERS_ENABLED=false"
+ 
+-echo "== 2. Configuracion general: HTTPS, TLS 1.2, sondeo de salud, sin FTP"
++echo "== 4. Configuracion general: HTTPS, TLS 1.2, sondeo de salud, sin FTP"
+ az webapp update -g "$RG" -n "$WEB_APP" --https-only true --output none
+ az webapp config set -g "$RG" -n "$WEB_APP" --min-tls-version 1.2 --ftps-state Disabled \
+   --generic-configurations '{"healthCheckPath":"/salud"}' --output none
+ 
+-echo "== 3. Publicacion"
+-az webapp deploy -g "$RG" -n "$WEB_APP" --src-path "$PAQUETE" --type zip
+-
+-echo "== 4. Verificacion basica"
+-HOST=$(az webapp show -g "$RG" -n "$WEB_APP" --query defaultHostName -o tsv)
+-echo "Probar desde un equipo con acceso de red: curl -s https://${HOST}/salud  (esperado: {\"estado\":\"ok\"})"
++echo "== 5. Verificacion"
++for k in DataProtection__BlobUri DataProtection__KeyIdentifier Seguridad__SaltosProxyConfiables ASPNETCORE_FORWARDEDHEADERS_ENABLED; do
++  v="$(az webapp config appsettings list -g "$RG" -n "$WEB_APP" --query "[?name=='${k}'].value | [0]" -o tsv | tr -d '\r')"
++  echo "   ${k} = ${v}"
++done
++echo "Listo. La API NO se publico (ADR-001 5.11). Siguiente: scripts/s12_endurecer.sh."
+diff --git a/scripts/s14_simulacro_pitr.sh b/scripts/s14_simulacro_pitr.sh
+index f2b7edf..ee9e6ba 100644
+--- a/scripts/s14_simulacro_pitr.sh
++++ b/scripts/s14_simulacro_pitr.sh
+@@ -75,3 +75,6 @@ marca "Servicio verificado por el operador"
+ marca "RTO medido (incidente -> servicio restablecido): $(( T_SERVICIO - T_INCIDENTE )) s = $(( (T_SERVICIO - T_INCIDENTE) / 60 )) min"
+ marca "Metas: RPO < 900 s (15 min); RTO < 14400 s (4 h)"
+ marca "Pendiente post simulacro: decidir si se mantiene ${DB_REST} o se vuelve a ${SQL_DB} y se elimina la restaurada (costo)."
++# ADR-001 4.2 / politica C.3 (06-11-2026): la restauracion no termina sin esta revision.
++marca "OBLIGATORIO (ADR-001 4.2): scripts/s14_revision_post_restauracion.sh --base-original ${SQL_DB} --base-restaurada ${DB_REST} --punto ${PUNTO}"
++marca "Luego verificar AUT-08, AUT-12 y AUT-17 en ${DB_REST}."
+
+# Retirados con git rm (en el indice, sin commit):
+D	infra/modulos/autenticacion_api.bicep
+D	scripts/s11_registro_entra_id.sh
+
+# Nuevos (sin seguimiento):
+?? scripts/comun_operacion.sh
+?? scripts/desplegar.sh
+?? scripts/desplegar_sql.sh
+?? scripts/s11_alta_clave_api.sh
+?? scripts/s11_alta_usuario.sh
+?? scripts/s11_baja_usuario.sh
+?? scripts/s11_restablecer_clave.sh
+?? scripts/s11_revocar_clave_api.sh
+?? scripts/s14_revision_post_restauracion.sh
+?? scripts/s15_purgar_log_acceso.sh

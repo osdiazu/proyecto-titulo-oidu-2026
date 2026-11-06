@@ -22,6 +22,11 @@
      05 -> UsuarioFunctionApp: EXECUTE sobre sp_SincronizarClientesRegularizados
            y sobre el tipo cob.ListaRut
      06 -> UsuarioApi: EXECUTE sobre los procedimientos de consulta
+     12 -> UsuarioApi: EXECUTE sobre procedimientos de autenticacion
+           (los 7 de ADR-001 5.2; los administrativos de 12 no se otorgan)
+   Ninguna identidad administrada recibe SELECT sobre cob.LogAcceso,
+   cob.ClaveApi, cob.UsuarioInterno ni cob.vw_LogAccesoEvidencia (ADR-001 5.1;
+   verificado en 02, 03, 04, 05, 06 y 12 el 06-11-2026; 00 consulta 5 lo comprueba).
    Respecto de S6-S8 se retiraron db_datareader (ambas identidades),
    EXECUTE ON SCHEMA::cob e INSERT sobre cob.LogNotificacion, porque 06 indica
    que la API no tiene SELECT directo sobre tablas y la escritura ocurre solo

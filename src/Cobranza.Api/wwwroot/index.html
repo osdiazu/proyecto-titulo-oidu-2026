@@ -11,10 +11,27 @@
     <h1>Cobranza Automatizada</h1>
     <p class="sub">Embotelladora del Pacífico S.A. - uso interno</p>
     <p id="usuario" class="usuario"></p>
+    <button id="btn-logout" type="button" hidden>Cerrar sesión</button>
+    <button id="btn-mostrar-cambio" type="button" hidden>Cambiar contraseña</button>
   </header>
 
   <main>
-    <section id="consulta" aria-labelledby="t-consulta">
+    <section id="cambio-clave" aria-labelledby="t-cambio" hidden>
+      <h2 id="t-cambio">Cambiar contraseña</h2>
+      <p id="aviso-cambio" hidden>Debe cambiar su contraseña temporal antes de continuar.</p>
+      <form id="form-cambio" autocomplete="off">
+        <label for="clave-actual">Contraseña actual</label>
+        <input id="clave-actual" type="password" autocomplete="current-password" maxlength="128" required>
+        <label for="clave-nueva">Contraseña nueva</label>
+        <input id="clave-nueva" type="password" autocomplete="new-password" maxlength="128" required>
+        <label for="clave-repetida">Repita la contraseña nueva</label>
+        <input id="clave-repetida" type="password" autocomplete="new-password" maxlength="128" required>
+        <button type="submit">Guardar</button>
+      </form>
+      <p id="resultado-cambio" role="status" hidden></p>
+    </section>
+
+    <section id="consulta" aria-labelledby="t-consulta" hidden>
       <h2 id="t-consulta">Consulta de cliente (Ventas y Finanzas)</h2>
       <form id="form-rut">
         <label for="rut">RUT del cliente</label>

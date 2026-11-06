@@ -8,6 +8,9 @@
    2. Vista cob.vw_EstadoActualCliente (ultimo estado de morosidad por cliente).
    3. cob.sp_GenerarAlertasVencimiento  (version 2, reemplaza la de S6-S8).
    4. cob.sp_RegistrarNotificacion       (registro idempotente del envio).
+      Version 06-11-2026 (ADR-001 5.12): admite EstadoEnvio = 'Limitado'
+      (HTTP 429 o rechazo de ACS por limite de envio), que NO suma Intentos;
+      sp_GenerarAlertasVencimiento no cambia y vuelve a ofrecer el aviso.
    5. cob.sp_IniciarSincronizacion / cob.sp_FinalizarSincronizacion.
    6. Permisos EXECUTE para la identidad de la Function App.
 
@@ -88,6 +91,8 @@ GO
         Mora2       : vencida hace @DiasMora2 o mas dias
       Se devuelve solo el aviso mas avanzado aplicable, para no enviar avisos atrasados.
       Se excluyen avisos ya aceptados por ACS y avisos con 3 intentos fallidos.
+      Un aviso 'Limitado' (ADR-001 5.12) no es Aceptado y no suma Intentos, por
+      lo que vuelve a ofrecerse en la ejecucion siguiente.
       Regla a validar con Finanzas: los avisos de mora no se envian si el cliente
       quedo Regularizado despues del vencimiento de la factura.
    --------------------------------------------------------------------------- */
@@ -149,7 +154,7 @@ CREATE OR ALTER PROCEDURE cob.sp_RegistrarNotificacion
     @FacturaId      int,
     @TipoAviso      varchar(15),
     @Destinatario   varchar(120),
-    @EstadoEnvio    varchar(15),          -- Aceptado | Fallido
+    @EstadoEnvio    varchar(15),          -- Aceptado | Fallido | Limitado
     @IdOperacionAcs varchar(100) = NULL,
     @Detalle        nvarchar(400) = NULL
 AS
@@ -157,8 +162,11 @@ BEGIN
     SET NOCOUNT ON;
     SET XACT_ABORT ON;
 
-    IF @EstadoEnvio NOT IN ('Aceptado', 'Fallido')
-        THROW 50002, N'EstadoEnvio debe ser Aceptado o Fallido.', 1;
+    IF @EstadoEnvio IS NULL OR @EstadoEnvio NOT IN ('Aceptado', 'Fallido', 'Limitado')
+        THROW 50002, N'EstadoEnvio debe ser Aceptado, Fallido o Limitado.', 1;
+
+    /* Limitado (429 o limite de ACS) no cuenta como intento (ADR-001 5.12, U5) */
+    DECLARE @SumaIntento int = CASE WHEN @EstadoEnvio = 'Limitado' THEN 0 ELSE 1 END;
 
     DECLARE @ClienteId int = (SELECT ClienteId FROM cob.Factura WHERE FacturaId = @FacturaId);
     IF @ClienteId IS NULL
@@ -170,7 +178,7 @@ BEGIN
                IdOperacionAcs = @IdOperacionAcs,
                Destinatario = @Destinatario,
                Detalle = @Detalle,
-               Intentos = Intentos + 1,
+               Intentos = Intentos + @SumaIntento,
                FechaActualizacion = SYSUTCDATETIME()
          WHERE FacturaId = @FacturaId AND TipoAviso = @TipoAviso;
 
@@ -178,7 +186,7 @@ BEGIN
             INSERT INTO cob.LogNotificacion
                 (FacturaId, ClienteId, TipoAviso, Destinatario, EstadoEnvio, IdOperacionAcs, Intentos, Detalle)
             VALUES
-                (@FacturaId, @ClienteId, @TipoAviso, @Destinatario, @EstadoEnvio, @IdOperacionAcs, 1, @Detalle);
+                (@FacturaId, @ClienteId, @TipoAviso, @Destinatario, @EstadoEnvio, @IdOperacionAcs, @SumaIntento, @Detalle);
     COMMIT;
 END
 GO

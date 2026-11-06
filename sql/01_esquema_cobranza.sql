@@ -24,6 +24,16 @@
      - cob.UsuarioInterno se mantiene SIN CAMBIOS (rediseno en ADR-001);
        es la unica sentencia no idempotente del script.
 
+   Version 06-11-2026 (ADR-001, autenticacion propia; detalle en
+   evidencias/2026-11-06_adr001_sql/CAMBIOS.md):
+     - cob.UsuarioInterno con la definicion de ADR-001 5.1 (usuario y hash de
+       contrasena en lugar de EntraObjectId) y guarda de idempotencia. Si la
+       base tiene la definicion anterior (EntraObjectId), el script se detiene.
+     - CK_LogNotificacion_EstadoEnvio admite 'Limitado' (ADR-001 5.12). Si la
+       tabla ya existe con el CHECK anterior, se reemplaza de forma controlada.
+     - Las tablas cob.ClaveApi y cob.LogAcceso y los procedimientos de
+       autenticacion se crean en 12_autenticacion.sql.
+
    Intercalacion: la base se crea con Modern_Spanish_CI_AS (infra/main.bicep);
    las columnas heredan la intercalacion de la base.
    Ejecutar con sqlcmd -b para detener el despliegue ante un error.
@@ -42,13 +52,14 @@ GO
 IF COL_LENGTH(N'cob.Cliente', N'EstadoActual') IS NOT NULL
    OR COL_LENGTH(N'cob.LogNotificacion', N'ResultadoEnvio') IS NOT NULL
    OR COL_LENGTH(N'cob.LogSincronizacion', N'Resultado') IS NOT NULL
+   OR COL_LENGTH(N'cob.UsuarioInterno', N'EntraObjectId') IS NOT NULL
    OR EXISTS (SELECT 1 FROM sys.check_constraints AS cc
               WHERE SCHEMA_NAME(cc.schema_id) = N'cob'
                 AND (cc.definition LIKE N'%JobSincronizacion%'
                   OR cc.definition LIKE N'%PreVencimiento%'
                   OR cc.definition LIKE N'%Supermercado%'))
 BEGIN
-    RAISERROR(N'01: la base contiene la estructura S6-S8 (incompatible con 03-11). Se detiene sin cambios; ver evidencias/2026-11-05_sql01_correccion_c01/CAMBIOS.md.', 16, 1);
+    RAISERROR(N'01: la base contiene la estructura S6-S8 (incompatible con 03-12) o cob.UsuarioInterno con EntraObjectId (anterior a ADR-001). Se detiene sin cambios; ver evidencias/2026-11-05_sql01_correccion_c01/CAMBIOS.md y evidencias/2026-11-06_adr001_sql/CAMBIOS.md.', 16, 1);
     SET NOEXEC ON;
 END
 GO
@@ -132,7 +143,8 @@ GO
 /* ---------- LOG_NOTIFICACION ----------
    Una fila por factura y tipo de aviso (UNIQUE); los reintentos actualizan
    la misma fila (cob.sp_RegistrarNotificacion, script 04).
-   TipoAviso segun D3 y 00:88; EstadoEnvio segun 00:89.
+   TipoAviso segun D3 y 00:88; EstadoEnvio segun 00 y ADR-001 5.12
+   (Limitado = rechazo de ACS por limite de envio; no cuenta como intento).
    Nombres de restricciones iguales a los de 04 (04 no las vuelve a crear). */
 IF OBJECT_ID(N'cob.LogNotificacion', N'U') IS NULL
 BEGIN
@@ -144,7 +156,7 @@ BEGIN
             CONSTRAINT CK_LogNotificacion_Tipo CHECK (TipoAviso IN ('Preaviso','Vencimiento','Mora1','Mora2')),
         Destinatario       NVARCHAR(254) NULL,
         EstadoEnvio        VARCHAR(15)   NOT NULL
-            CONSTRAINT CK_LogNotificacion_EstadoEnvio CHECK (EstadoEnvio IN ('Aceptado','Fallido')),
+            CONSTRAINT CK_LogNotificacion_EstadoEnvio CHECK (EstadoEnvio IN ('Aceptado','Fallido','Limitado')),
         IdOperacionAcs     VARCHAR(100)  NULL,
         Intentos           INT           NOT NULL CONSTRAINT DF_LogNotificacion_Intentos DEFAULT (0),
         Detalle            NVARCHAR(400) NULL,
@@ -154,6 +166,25 @@ BEGIN
         CONSTRAINT UQ_LogNotificacion_Factura_Tipo UNIQUE (FacturaId, TipoAviso)
     );
     CREATE INDEX IX_LogNotificacion_Cliente ON cob.LogNotificacion (ClienteId);
+END
+GO
+
+/* Alteracion controlada (ADR-001 5.12): si la tabla ya existia con el CHECK
+   anterior (Aceptado, Fallido), se reemplaza por el que admite Limitado.
+   SQL Server guarda IN (...) como OR de igualdades; por eso se busca el literal. */
+IF OBJECT_ID(N'cob.LogNotificacion', N'U') IS NOT NULL
+   AND COL_LENGTH(N'cob.LogNotificacion', N'EstadoEnvio') IS NOT NULL
+   AND NOT EXISTS (SELECT 1 FROM sys.check_constraints AS cc
+                   WHERE cc.parent_object_id = OBJECT_ID(N'cob.LogNotificacion')
+                     AND cc.name = N'CK_LogNotificacion_EstadoEnvio'
+                     AND cc.definition LIKE N'%''Limitado''%')
+BEGIN
+    IF EXISTS (SELECT 1 FROM sys.check_constraints AS cc
+               WHERE cc.parent_object_id = OBJECT_ID(N'cob.LogNotificacion')
+                 AND cc.name = N'CK_LogNotificacion_EstadoEnvio')
+        ALTER TABLE cob.LogNotificacion DROP CONSTRAINT CK_LogNotificacion_EstadoEnvio;
+    ALTER TABLE cob.LogNotificacion WITH CHECK
+        ADD CONSTRAINT CK_LogNotificacion_EstadoEnvio CHECK (EstadoEnvio IN ('Aceptado','Fallido','Limitado'));
 END
 GO
 
@@ -177,17 +208,42 @@ BEGIN
 END
 GO
 
-/* ---------- USUARIO_INTERNO ----------
-   SIN CAMBIOS respecto de S6-S8: su rediseno lo define el ADR-001 (en
-   actualizacion por el arquitecto). No se le agrego guarda de idempotencia
-   para no modificar el bloque; volver a ejecutar 01 da error 2714 solo aqui. */
-CREATE TABLE cob.UsuarioInterno (
-    UsuarioId       INT IDENTITY(1,1) NOT NULL CONSTRAINT PK_UsuarioInterno PRIMARY KEY,
-    EntraObjectId   UNIQUEIDENTIFIER NOT NULL CONSTRAINT UQ_UsuarioInterno_Oid UNIQUE,
-    Nombre          NVARCHAR(120) NOT NULL,
-    Rol             VARCHAR(10)   NOT NULL CONSTRAINT CK_UsuarioInterno_Rol CHECK (Rol IN ('Finanzas','Ventas','Admin')),
-    Activo          BIT           NOT NULL CONSTRAINT DF_UsuarioInterno_Activo DEFAULT (1)
-);
+/* ---------- USUARIO_INTERNO (ADR-001 5.1) ----------
+   Usuarios del panel con autenticacion propia de la API (sin Entra ID).
+   - Usuario: minusculas, 3 a 50 caracteres, solo [a-z0-9._-]. Las
+     comparaciones de patron usan intercalacion binaria (Latin1_General_BIN2);
+     con la intercalacion de la base (CI) Usuario = LOWER(Usuario) siempre seria
+     verdadero. LEN = DATALENGTH impide espacios finales (LEN no los cuenta).
+     La unicidad es insensible a mayusculas por la intercalacion de la base.
+   - HashClave: salida Base64 de PasswordHasher V3 (la API y la herramienta de
+     alta calculan el hash; a SQL nunca llega la contrasena).
+   - SelloSeguridad: cambia al cambiar o restablecer la contrasena, al
+     desactivar, al cambiar el rol o al invalidar sesiones (script 12).
+   Escritura solo mediante los procedimientos de 12_autenticacion.sql. */
+IF OBJECT_ID(N'cob.UsuarioInterno', N'U') IS NULL
+BEGIN
+    CREATE TABLE cob.UsuarioInterno (
+        UsuarioId        INT IDENTITY(1,1) NOT NULL CONSTRAINT PK_UsuarioInterno PRIMARY KEY,
+        Usuario          VARCHAR(50)      NOT NULL CONSTRAINT UQ_UsuarioInterno_Usuario UNIQUE,
+        Nombre           NVARCHAR(120)    NOT NULL,
+        Rol              VARCHAR(10)      NOT NULL CONSTRAINT CK_UsuarioInterno_Rol CHECK (Rol IN ('Finanzas','Ventas','Admin')),
+        Activo           BIT              NOT NULL CONSTRAINT DF_UsuarioInterno_Activo DEFAULT (1),
+        HashClave        VARCHAR(256)     NOT NULL,
+        DebeCambiarClave BIT              NOT NULL CONSTRAINT DF_UsuarioInterno_DebeCambiarClave DEFAULT (1),
+        IntentosFallidos SMALLINT         NOT NULL CONSTRAINT DF_UsuarioInterno_IntentosFallidos DEFAULT (0)
+            CONSTRAINT CK_UsuarioInterno_IntentosFallidos CHECK (IntentosFallidos >= 0),
+        BloqueadoHasta   DATETIME2(0)     NULL,
+        UltimoAcceso     DATETIME2(0)     NULL,
+        FechaCambioClave DATETIME2(0)     NULL,
+        SelloSeguridad   UNIQUEIDENTIFIER NOT NULL CONSTRAINT DF_UsuarioInterno_SelloSeguridad DEFAULT (NEWID()),
+        FechaCreacion    DATETIME2(0)     NOT NULL CONSTRAINT DF_UsuarioInterno_FechaCreacion DEFAULT (SYSUTCDATETIME()),
+        CONSTRAINT CK_UsuarioInterno_Usuario CHECK (
+                Usuario COLLATE Latin1_General_BIN2 = LOWER(Usuario) COLLATE Latin1_General_BIN2
+            AND LEN(Usuario) BETWEEN 3 AND 50
+            AND DATALENGTH(Usuario) = LEN(Usuario)
+            AND Usuario NOT LIKE '%[^a-z0-9._-]%' COLLATE Latin1_General_BIN2)
+    );
+END
 GO
 
 /* ---------- Tipo tabla para recibir RUT regularizados desde el job ----------
@@ -204,6 +260,8 @@ GO
      05 -> cob.LogCambioPedido, cob.fn_NormalizarRut,
            cob.sp_LiberarPedidosRetenidos, cob.tr_EstadoMorosidad_Liberar,
            cob.sp_SincronizarClientesRegularizados
+     12 -> cob.ClaveApi, cob.LogAcceso, procedimientos de autenticacion,
+           cob.vw_LogAccesoEvidencia (ADR-001)
    ===================================================================== */
 
 SET NOEXEC OFF;

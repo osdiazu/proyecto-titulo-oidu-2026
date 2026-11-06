@@ -13,8 +13,10 @@ namespace Cobranza.Functions.Funciones;
 /// correo con Azure Communication Services y registra el resultado en cob.LogNotificacion.
 /// Control de cuota (hallazgo H1, dominio administrado: 5 por minuto y 10 por hora): maximo de
 /// envios por ejecucion y pausa entre envios, ambos desde configuracion (Cobranza__*).
-/// Un rechazo por limite (HTTP 429) no se registra como intento fallido: corta la ejecucion y
-/// los avisos no enviados quedan pendientes para la siguiente ejecucion programada.
+/// Un rechazo por limite (HTTP 429) no cuenta como intento fallido (ADR-001 5.12, decision U5):
+/// se registra con EstadoEnvio = 'Limitado' (sp_RegistrarNotificacion no incrementa Intentos con ese
+/// estado, sql/04), se corta la ejecucion y los avisos no enviados quedan pendientes para la
+/// siguiente ejecucion programada.
 /// </summary>
 public sealed class NotificacionesFunction(
     IRepositorioNotificaciones repo,
@@ -26,6 +28,14 @@ public sealed class NotificacionesFunction(
 {
     /// <summary>Evento de log para consultar los cortes por limite en Application Insights.</summary>
     public static readonly EventId EventoLimiteAcs = new(4290, "LimiteAcs429");
+
+    /// <summary>Evento de log si no se pudo registrar el estado Limitado en la base.</summary>
+    public static readonly EventId EventoRegistroLimitadoFallido = new(4291, "RegistroLimitadoFallido");
+
+    /// <summary>Valores de EstadoEnvio admitidos por cob.sp_RegistrarNotificacion (sql/04).</summary>
+    public const string EstadoAceptado = "Aceptado";
+    public const string EstadoFallido = "Fallido";
+    public const string EstadoLimitado = "Limitado";
 
     private readonly OpcionesCobranza _o = opciones.Value;
 
@@ -59,21 +69,33 @@ public sealed class NotificacionesFunction(
                 // El estado final de entrega se mide con los registros de ACS en Log Analytics.
                 var op = await email.SendAsync(WaitUntil.Started, mensaje, ct);
                 procesados++;
-                await repo.RegistrarNotificacionAsync(a, "Aceptado", op.Id, null, ct);
+                await repo.RegistrarNotificacionAsync(a, EstadoAceptado, op.Id, null, ct);
                 aceptados++;
             }
             catch (RequestFailedException ex) when (LimiteAcs.EsRechazoPorLimite(ex))
             {
-                // Limite de ACS: no es un fallo del aviso. No se llama a sp_RegistrarNotificacion
-                // (no suma Intentos, no lo acerca a la exclusion de 3 intentos) y se corta el lote.
+                // Limite de ACS: no es un fallo del aviso. Se registra como Limitado (RF-05: el evento
+                // queda en la bitacora; sp_RegistrarNotificacion no suma Intentos con ese estado, por lo
+                // que no lo acerca a la exclusion de 3 intentos) y se corta el lote.
                 cortadoPorLimite = true;
                 retryAfter = LimiteAcs.ObtenerRetryAfter(ex, reloj.GetUtcNow());
                 log.LogWarning(EventoLimiteAcs, ex,
                     "ACS rechazo el envio por limite (HTTP {Status}, codigo {ErrorCode}) en factura {FacturaId} aviso {Tipo}. " +
-                    "Se corta la ejecucion sin registrar intento; quedan {Diferidos} avisos para la siguiente ejecucion. " +
+                    "Se registra como Limitado y se corta la ejecucion; quedan {Diferidos} avisos para la siguiente ejecucion. " +
                     "Retry-After: {RetryAfterSegundos} s.",
                     ex.Status, ex.ErrorCode, a.FacturaId, a.TipoAviso, avisos.Count - procesados,
                     retryAfter?.TotalSeconds);
+                try
+                {
+                    await repo.RegistrarNotificacionAsync(a, EstadoLimitado, null, DetalleLimite(ex, retryAfter), ct);
+                }
+                catch (Exception exReg) when (exReg is not OperationCanceledException)
+                {
+                    // El corte del lote se mantiene aunque falle el registro (por ejemplo, si sql/04 aun
+                    // no admite Limitado): el aviso sigue elegible en la siguiente ejecucion.
+                    log.LogError(EventoRegistroLimitadoFallido, exReg,
+                        "No se pudo registrar el estado Limitado de la factura {FacturaId} aviso {Tipo}.", a.FacturaId, a.TipoAviso);
+                }
                 break;
             }
             catch (RequestFailedException ex)
@@ -81,7 +103,7 @@ public sealed class NotificacionesFunction(
                 procesados++;
                 fallidos++;
                 log.LogWarning(ex, "Envio fallido factura {FacturaId} aviso {Tipo} (HTTP {Status}).", a.FacturaId, a.TipoAviso, ex.Status);
-                await repo.RegistrarNotificacionAsync(a, "Fallido", null, $"HTTP {ex.Status} {ex.ErrorCode}: {ex.Message}", ct);
+                await repo.RegistrarNotificacionAsync(a, EstadoFallido, null, $"HTTP {ex.Status} {ex.ErrorCode}: {ex.Message}", ct);
             }
         }
 
@@ -94,10 +116,14 @@ public sealed class NotificacionesFunction(
 
         return resultado;
     }
+
+    private static string DetalleLimite(Azure.RequestFailedException ex, TimeSpan? retryAfter) =>
+        $"HTTP {ex.Status} {ex.ErrorCode}: rechazo por limite de envio de ACS" +
+        (retryAfter is { } r ? $"; Retry-After {r.TotalSeconds:0} s" : "");
 }
 
 /// <summary>Resumen de una ejecucion del job de notificaciones.</summary>
-/// <param name="Diferidos">Avisos obtenidos que no se intentaron por corte de limite (incluye el rechazado con 429).</param>
+/// <param name="Diferidos">Avisos obtenidos que no se enviaron por corte de limite (incluye el rechazado con 429, registrado como Limitado).</param>
 public sealed record ResultadoNotificaciones(
     int Pendientes,
     int Aceptados,

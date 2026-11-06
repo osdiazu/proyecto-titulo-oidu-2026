@@ -32,6 +32,10 @@ param sqlAdminGroupName = 'grp-cobranza-sql-admin'
 param location = 'brazilsouth'
 param acsDataLocation = 'United States'
 
+// ADR-001 5.4.1: 1 sin WAF (topologia actual). Pasa a 2 solo en el mismo despliegue que
+// active D11 (WAF) con la Web App sin acceso publico.
+param saltosProxyConfiables = 1
+
 param prefijo = 'cobranza'
 param ambiente = 'dev'
 param appServicePlanSku = 'B1'

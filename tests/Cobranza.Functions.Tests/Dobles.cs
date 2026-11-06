@@ -19,8 +19,12 @@ internal sealed class RepositorioFalso(IReadOnlyList<AvisoPendiente> avisos) : I
         return Task.FromResult<IReadOnlyList<AvisoPendiente>>(avisos.Take(maxFilas).ToList());
     }
 
+    /// <summary>Si tiene valor, el registro con ese estado lanza una excepcion (simula un error de la base).</summary>
+    public string? FallarAlRegistrar { get; set; }
+
     public Task RegistrarNotificacionAsync(AvisoPendiente a, string estado, string? idOperacion, string? detalle, CancellationToken ct)
     {
+        if (estado == FallarAlRegistrar) throw new InvalidOperationException("Error simulado de sp_RegistrarNotificacion.");
         Registros.Add((a.FacturaId, a.TipoAviso, estado, idOperacion, detalle));
         return Task.CompletedTask;
     }

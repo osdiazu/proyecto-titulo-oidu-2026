@@ -1,0 +1,40 @@
+# Ajustes y restricciones de los sitios en el ARM compilado (el what-if enmascara siteConfig)
+== [format('app-api-{0}-{1}', variables('sufijo'), take(variables('unico'), 6))]
+   ipSecurityRestrictionsDefaultAction = "Deny"
+   ipSecurityRestrictions = "[variables('reglasTransicionApi')]"
+   scmIpSecurityRestrictionsUseMain = false
+   scmIpSecurityRestrictionsDefaultAction = "Deny"
+   healthCheckPath = "/salud"
+   setting APPLICATIONINSIGHTS_CONNECTION_STRING = [reference(resourceId('Microsoft.Insights/components', format('appi-{0}', variables('sufijo'))), '2020-02-02').ConnectionString]
+   setting ConnectionStrings__Cobranza = [format('Server=tcp:{0},1433;Database={1};Authentication=Active Directory Managed Identity;Encrypt=True;TrustServerCertificate=False;', reference(resourceId('Microsoft.Sql/servers', format('sql-{0}-{1}', variables('sufijo'), take(variables('unico'), 6))), '2021-11-01').fullyQualifiedDomainName, 'sqldb-cobranza')]
+   setting DataProtection__BlobUri = [format('{0}{1}/keys.xml', reference(resourceId('Microsoft.Storage/storageAccounts', format('st{0}{1}{2}', take(replace(parameters('prefijo'), '-', ''), 8), parameters('ambiente'), take(variables('unico'), 6))), '2023-05-01').primaryEndpoints.blob, variables('nombreContenedorDp'))]
+   setting DataProtection__KeyIdentifier = [reference(resourceId('Microsoft.KeyVault/vaults/keys', format('kv-{0}-{1}-{2}', take(parameters('prefijo'), 8), parameters('ambiente'), take(variables('unicoKv'), 6)), 'dataprotection-cobranza-api'), '2023-07-01').keyUri]
+   setting Seguridad__SaltosProxyConfiables = [string(parameters('saltosProxyConfiables'))]
+   setting ASPNETCORE_FORWARDEDHEADERS_ENABLED = false
+== [format('func-jobs-{0}-{1}', variables('sufijo'), take(variables('unico'), 6))]
+   ipSecurityRestrictionsDefaultAction = "Deny"
+   ipSecurityRestrictions = null
+   scmIpSecurityRestrictionsUseMain = false
+   scmIpSecurityRestrictionsDefaultAction = "Deny"
+   healthCheckPath = null
+   setting FUNCTIONS_EXTENSION_VERSION = ~4
+   setting FUNCTIONS_WORKER_RUNTIME = dotnet-isolated
+   setting AzureWebJobsStorage__accountName = [format('st{0}{1}{2}', take(replace(parameters('prefijo'), '-', ''), 8), parameters('ambiente'), take(variables('unico'), 6))]
+   setting APPLICATIONINSIGHTS_CONNECTION_STRING = [reference(resourceId('Microsoft.Insights/components', format('appi-{0}', variables('sufijo'))), '2020-02-02').ConnectionString]
+   setting CRON_SINCRONIZACION = [parameters('cronSincronizacion')]
+   setting CRON_NOTIFICACIONES = [parameters('cronNotificaciones')]
+   setting Cobranza__SqlCobranza = [format('Server=tcp:{0},1433;Database={1};Authentication=Active Directory Managed Identity;Encrypt=True;TrustServerCertificate=False;', reference(resourceId('Microsoft.Sql/servers', format('sql-{0}-{1}', variables('sufijo'), take(variables('unico'), 6))), '2021-11-01').fullyQualifiedDomainName, 'sqldb-cobranza')]
+   setting Cobranza__SqlOrigen = [format('{0}ApplicationIntent=ReadOnly;', format('Server=tcp:{0},1433;Database={1};Authentication=Active Directory Managed Identity;Encrypt=True;TrustServerCertificate=False;', reference(resourceId('Microsoft.Sql/servers', format('sql-{0}-{1}', variables('sufijo'), take(variables('unico'), 6))), '2021-11-01').fullyQualifiedDomainName, 'sqldb-cobranza'))]
+   setting Cobranza__VistaOrigen = origen_sim.vw_ClientesRegularizados
+   setting Cobranza__AcsConnectionString = [format('@Microsoft.KeyVault(SecretUri={0})', reference(resourceId('Microsoft.KeyVault/vaults/secrets', format('kv-{0}-{1}-{2}', take(parameters('prefijo'), 8), parameters('ambiente'), take(variables('unicoKv'), 6)), 'acs-connection-string'), '2023-07-01').secretUri)]
+   setting Cobranza__RemitenteCorreo = [format('DoNotReply@{0}', reference(resourceId('Microsoft.Communication/emailServices/domains', format('ecs-{0}', variables('sufijo')), 'AzureManagedDomain'), '2023-04-01').mailFromSenderDomain)]
+   setting Cobranza__DiasPreaviso = [string(parameters('diasPreaviso'))]
+   setting Cobranza__DiasMora1 = [string(parameters('diasMora1'))]
+   setting Cobranza__DiasMora2 = [string(parameters('diasMora2'))]
+   setting Cobranza__MaxCorreosPorEjecucion = [string(parameters('maxCorreosPorEjecucion'))]
+   setting Cobranza__PausaEntreCorreosMs = [string(parameters('pausaEntreCorreosMs'))]
+   setting Cobranza__NombreEmpresa = Embotelladora del Pacifico S.A.
+   setting Cobranza__CanalesPagoTexto = [parameters('canalesPagoTexto')]
+   setting Cobranza__TelefonoContacto = [parameters('telefonoContacto')]
+   setting Cobranza__CorreoContacto = [parameters('correoContacto')]
+== variable reglasTransicionApi = "[if(variables('accesoOperador'), createArray(createObject('name', 'operador-transicion', 'action', 'Allow', 'ipAddress', format('{0}/32', variables('ipOperadorSinMascara')), 'priority', 100, 'description', 'ADR-001 5.11: IP del operador durante la ventana (ipOperador)')), createArray())]"

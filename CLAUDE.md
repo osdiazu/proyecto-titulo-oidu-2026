@@ -1,7 +1,7 @@
 # CLAUDE.md — Proyecto APT Cobranza Automatizada
 
 Contexto maestro del proyecto para Claude Code (VS Code). Todo agente y la sesión principal deben leer este archivo antes de actuar.
-Última consolidación: 05-11-2026 (revisión 2: región brazilsouth, autenticación propia ADR-001, D12-D17; los valores reemplazados se conservan en el mismo lugar, marcados "Reemplazado 05-11-2026"). Fuentes: carpeta `docs/` (ver `docs/00_INDICE.md`) y `docs/adr/`.
+Última consolidación: 06-11-2026 (revisión 3: implementación local de ADR-001, orden SQL con 12 y 13, scripts recreados; ningún recurso nuevo en Azure). Revisión 2 del 05-11-2026: región brazilsouth, autenticación propia ADR-001, D12-D17; los valores reemplazados se conservan en el mismo lugar, marcados "Reemplazado 05-11-2026"). Fuentes: carpeta `docs/` (ver `docs/00_INDICE.md`) y `docs/adr/`.
 
 ---
 
@@ -87,25 +87,27 @@ Requerimientos no funcionales:
   - Web App (API) `DOTNETCORE|10.0`, sonda de salud `/salud`. Proyecto: `src/Cobranza.Api`.
   - Function App `DOTNET-ISOLATED|10.0` (jobs de sincronización y notificaciones) con ajustes `Cobranza__*`; los textos de Finanzas usan valores DEMO inventados (D17). Proyecto: `src/Cobranza.Functions`. (Reemplazado 05-11-2026; antes: "los valores de Finanzas van como parámetros vacíos. Nombre del proyecto de Functions: PENDIENTE".)
 - Observabilidad: Log Analytics + Application Insights.
-- Identidad: identidades administradas con RBAC mínimo hacia SQL, Key Vault y Storage (API sin acceso a secretos; Function App solo al secreto `acs-connection-string`); Azure SQL solo Entra ID (grupo `grp-cobranza-sql-admin`). Usuarios del panel y consumidores de la API con autenticación propia de la aplicación (ADR-001, D13): usuario y contraseña con cookie de ASP.NET Core (PBKDF2 de `PasswordHasher`, bloqueo por intentos, roles `Finanzas`, `Ventas`, `Admin` desde `cob.UsuarioInterno`) y clave de API por consumidor en el encabezado `X-Api-Key` (hash SHA-256 en `cob.ClaveApi`, valor en Key Vault; consumidor DEMO `ventas-demo`). Data Protection de la API: contenedor `dataprotection-keys` (con condición ABAC que excluye a la Function App) y clave `dataprotection-cobranza-api` en Key Vault. Easy Auth v2 y los roles de aplicación de Entra ID no se usan. Sin MFA. Estado: diseñado; implementación en curso. (Reemplazado 05-11-2026; antes: "identidades administradas con RBAC mínimo; Easy Auth v2 con roles de aplicación `Ventas.Consulta`, `Finanzas.Consulta`, `TI.Operacion`; Entra ID Free (asignación de roles por usuario, sin grupos)". Motivo: Easy Auth requiere consentimiento de administrador del tenant Duoc.)
+- Identidad: identidades administradas con RBAC mínimo hacia SQL, Key Vault y Storage (API sin acceso a secretos; Function App solo al secreto `acs-connection-string`); Azure SQL solo Entra ID (grupo `grp-cobranza-sql-admin`). Usuarios del panel y consumidores de la API con autenticación propia de la aplicación (ADR-001, D13): usuario y contraseña con cookie de ASP.NET Core (PBKDF2 de `PasswordHasher`, bloqueo por intentos, roles `Finanzas`, `Ventas`, `Admin` desde `cob.UsuarioInterno`) y clave de API por consumidor en el encabezado `X-Api-Key` (hash SHA-256 en `cob.ClaveApi`, valor en Key Vault; consumidor DEMO `ventas-demo`). Data Protection de la API: contenedor `dataprotection-keys` (con condición ABAC que excluye a la Function App) y clave `dataprotection-cobranza-api` en Key Vault. Easy Auth v2 y los roles de aplicación de Entra ID no se usan. Sin MFA. Estado: implementado y validado localmente el 06-11-2026 (build y pruebas en verde, what-if limpio); NO desplegado ni probado en Azure. (Reemplazado 06-11-2026; antes: "Estado: diseñado; implementación en curso".) (Reemplazado 05-11-2026; antes: "identidades administradas con RBAC mínimo; Easy Auth v2 con roles de aplicación `Ventas.Consulta`, `Finanzas.Consulta`, `TI.Operacion`; Entra ID Free (asignación de roles por usuario, sin grupos)". Motivo: Easy Auth requiere consentimiento de administrador del tenant Duoc.)
 - Seguridad perimetral opción B (condicionada, PENDIENTE aprobación): Application Gateway WAF v2 delante de App Service con Private Endpoint de entrada (sexto PE) y sin acceso público.
 - Fuente de regularizados: BD real de la embotelladora no definida. Se usa fuente simulada `origen_sim.vw_ClientesRegularizados (Rut, FechaRegularizacion)`.
 
-Plantilla `infra/main.bicep`: el original S10 no estaba en el repositorio ni en el disco. El 05-11-2026 se RECONSTRUYÓ desde la versión S6-S8 (`Entorno_Base_IaC_SQL_S6-S8.zip`) aplicando los cambios C1-C6 de `docs/06`, más `operadorObjectId`, región brazilsouth, parámetros por variables de entorno (`readEnvironmentVariable`, sin IDs en git) y `cicloKeyVault` para redesplegar tras eliminar el RG (protección de purga). Resultado tras las correcciones de qa (diagnósticos de auditoría de SQL `master` y de Key Vault): 31 declaraciones / 49 recursos; `bicep build`, `lint` y `what-if` (48 Create con `ipOperador` vacío) limpios con Bicep 0.48.1. Detalle en `evidencias/2026-11-05_whatif_brazilsouth/CAMBIOS.md` y `evidencias/2026-11-05_correcciones_qa_devops/CAMBIOS.md`. Modelo de uso: desplegar, tomar evidencias, eliminar con `scripts/eliminar_entorno.sh` (solo humano) y redesplegar cuando se requiera. (Reemplazado 05-11-2026; antes: "Plantilla `infra/main.bicep` (versión S10): 28 declaraciones / 46 recursos. Validada con Bicep CLI 0.48.1 sin errores ni advertencias".)
+Plantilla `infra/main.bicep`: el original S10 no estaba en el repositorio ni en el disco. El 05-11-2026 se RECONSTRUYÓ desde la versión S6-S8 (`Entorno_Base_IaC_SQL_S6-S8.zip`) aplicando los cambios C1-C6 de `docs/06`, más `operadorObjectId`, región brazilsouth, parámetros por variables de entorno (`readEnvironmentVariable`, sin IDs en git) y `cicloKeyVault` para redesplegar tras eliminar el RG (protección de purga). Resultado tras las correcciones de qa (diagnósticos de auditoría de SQL `master` y de Key Vault): 31 declaraciones / 49 recursos; `bicep build`, `lint` y `what-if` (48 Create con `ipOperador` vacío) limpios con Bicep 0.48.1. Detalle en `evidencias/2026-11-05_whatif_brazilsouth/CAMBIOS.md` y `evidencias/2026-11-05_correcciones_qa_devops/CAMBIOS.md`. Modelo de uso: desplegar, tomar evidencias, eliminar con `scripts/eliminar_entorno.sh` (solo humano) y redesplegar cuando se requiera. Actualización 06-11-2026 (ADR-001): 37 declaraciones; what-if 53 Create / 0 Modify / 0 Delete con `ipOperador` vacío (54 con IP). Agrega contenedor `dataprotection-keys`, clave `dataprotection-cobranza-api`, dos asignaciones de la API, TDE explícito, condición ABAC sobre el Blob Data Owner de la Function App, Web App con entrada Deny y regla Allow `operador-transicion` (solo con `ipOperador`), SCM Deny sin herencia en ambos sitios, parámetro `saltosProxyConfiables`; retira `raKvApi` y el ajuste de Easy Auth. Evidencia en `evidencias/2026-11-06_adr001_devops/CAMBIOS.md`. (Reemplazado 05-11-2026; antes: "Plantilla `infra/main.bicep` (versión S10): 28 declaraciones / 46 recursos. Validada con Bicep CLI 0.48.1 sin errores ni advertencias".)
 
 ---
 
 ## 4. Base de datos
 
 Esquema `cob`:
-- Tablas: `Cliente`, `Factura` (vencimiento calculado), `EstadoMorosidad`, `Pedido`, `LogNotificacion` (único por factura y tipo de aviso), `LogSincronizacion`, `UsuarioInterno`, `LogCambioPedido` (sin FK, alimentada con `OUTPUT INTO`).
+- Tablas: `Cliente`, `Factura` (vencimiento calculado), `EstadoMorosidad`, `Pedido`, `LogNotificacion` (único por factura y tipo de aviso; estado `Limitado` desde 06-11-2026), `LogSincronizacion`, `UsuarioInterno` (redefinida el 06-11-2026 según ADR-001 5.1: hash de contraseña, bloqueo, sello de seguridad, cambio obligatorio de clave), `LogCambioPedido` (sin FK, alimentada con `OUTPUT INTO`), `ClaveApi` y `LogAcceso` (06-11-2026, `sql/12`).
 - Tipo tabla: `cob.ListaRut`.
 - Lógica: `sp_SincronizarClientesRegularizados`, `tr_EstadoMorosidad_Liberar`, `sp_LiberarPedidosRetenidos`, `sp_GenerarAlertasVencimiento`. Control de concurrencia con `sp_getapplock`.
 - Escritura solo mediante procedimientos almacenados.
 - Usuarios de base contenidos: `UsuarioFunctionApp`, `UsuarioApi` (identidades administradas).
 
-Orden de ejecución SQL (`scripts/desplegar_sql.sh`): 01, 02 (UsuarioFunctionApp, UsuarioApi), 03, 04, 05 (UsuarioFunctionApp), 06 (UsuarioApi), 11, 00 (verificación), 07 (pruebas, resultado esperado 10/10). El script 08 carga datos DEMO solo para pruebas.
-Nombres conocidos: `sql/01_esquema_cobranza.sql`, `sql/02_identidades_y_permisos.sql`. Los nombres completos de 00 y 03 a 11: confirmar en el repositorio.
+Autenticación propia (ADR-001, 06-11-2026): `sql/12_autenticacion.sql` agrega `cob.ClaveApi`, `cob.LogAcceso` (con columna `Detalle`), 7 procedimientos con GRANT a `UsuarioApi` (login, logout, cambio de clave, validación de clave de API), 11 procedimientos administrativos sin GRANT (solo `grp-cobranza-sql-admin` vía scripts `s11_*`) y errores 50060-50076. `sql/13_pruebas_autenticacion.sql`: 28 casos PA-01 a PA-28. `cob.LogNotificacion` admite el estado `Limitado` (429 de ACS, no suma intentos). Validado solo en forma estática (ScriptDom); no ejecutado.
+
+Orden de ejecución SQL (`scripts/desplegar_sql.sh`, 06-11-2026): 01, 02 (UsuarioFunctionApp, UsuarioApi), 03, 04, 05, 06, 12, 11, 00 (verificación), 07 (esperado 10/10), 13 (esperado 28/28); 08 (datos DEMO) solo con `--demo`. El script toma `UsuarioFunctionApp` y `UsuarioApi` de las salidas del despliegue `cobranza-main`. (Reemplazado 06-11-2026; antes: "01, 02 (UsuarioFunctionApp, UsuarioApi), 03, 04, 05 (UsuarioFunctionApp), 06 (UsuarioApi), 11, 00 (verificación), 07 (pruebas, resultado esperado 10/10). El script 08 carga datos DEMO solo para pruebas".)
+Nombres conocidos: `sql/01_esquema_cobranza.sql`, `sql/02_identidades_y_permisos.sql`, `sql/12_autenticacion.sql`, `sql/13_pruebas_autenticacion.sql`. Los nombres completos de 00 y 03 a 11 están en el repositorio (`sql/`); confirmado 06-11-2026. (Antes: "confirmar en el repositorio".)
 
 ---
 
@@ -124,9 +126,9 @@ Nombres conocidos: `sql/01_esquema_cobranza.sql`, `sql/02_identidades_y_permisos
 | D9 | Respaldo con redundancia de zona; RA-GRS descartado por no haber región pareada (motivo válido para Chile Central; brazilsouth sí tiene región pareada, South Central US, por lo que D9 debe reevaluarse) | Vigente; reevaluación PENDIENTE (05-11-2026) |
 | D10 | Brecha de recuperación ante desastre regional asumida como decisión del equipo | Vigente; reevaluar junto con D9 (05-11-2026) |
 | D11 | WAF v2 condicionado a aprobación | PENDIENTE |
-| D12 | Job de notificaciones DEMO: máximo 10 por ejecución, pausa 15.000 ms (capacidad 60 por día hábil, sin margen frente al límite de 10 por hora del dominio administrado). Un 429 o rechazo por límite detiene el lote y no cuenta como intento fallido (implementado y probado el 05-11-2026: se registra en Application Insights, EventId 4290; el estado `Limitado` en `cob.LogNotificacion` está diseñado en ADR-001, no implementado). Producción: requiere dominio propio y aumento de límites (H1). Ver ADR-001 sección 5.12. (Reemplazado 05-11-2026; antes: "máximo 90 por ejecución, pausa 2.100 ms", estado "Debe ajustarse".) | Vigente para DEMO (decisión del usuario 05-11-2026); producción PENDIENTE |
+| D12 | Job de notificaciones DEMO: máximo 10 por ejecución, pausa 15.000 ms (capacidad 60 por día hábil, sin margen frente al límite de 10 por hora del dominio administrado). Un 429 o rechazo por límite detiene el lote y no cuenta como intento fallido (implementado y probado el 05-11-2026: se registra en Application Insights, EventId 4290; el estado `Limitado` en `cob.LogNotificacion` quedó implementado en SQL y en Functions el 06-11-2026; antes: "diseñado en ADR-001, no implementado"). Producción: requiere dominio propio y aumento de límites (H1). Ver ADR-001 sección 5.12. (Reemplazado 05-11-2026; antes: "máximo 90 por ejecución, pausa 2.100 ms", estado "Debe ajustarse".) | Vigente para DEMO (decisión del usuario 05-11-2026); producción PENDIENTE |
 | D13 | Autenticación propia en la API: cookie con usuario y contraseña para el panel y clave de API para Ventas sistema a sistema (consumidor DEMO `ventas-demo`); sin Easy Auth ni roles de Entra ID; sin MFA. Ver `docs/adr/ADR-001-autenticacion-propia-sin-entra-usuarios.md` | Vigente (aceptada 05-11-2026); valores DEMO de bloqueo y sesión aprobados (05-11-2026); límite por IP, longitudes de contraseña y vigencia máxima de claves de API: PENDIENTE |
-| D14 | Entrega de credenciales temporales: presencial con uso inmediato y cambio obligatorio frente al operador; claves de API leídas de Key Vault por el consumidor DEMO; sin git, correo ni chat. Ningún agente ejecuta scripts de alta o restablecimiento (regla 9). Ver `docs/seguridad/politica_credenciales_y_accesos.md` | Vigente (el usuario delegó el canal en `seguridad` y aprobó sus valores DEMO el 05-11-2026; el ADR y la política aún figuran como Propuesta hasta su revisión) |
+| D14 | Entrega de credenciales temporales: presencial con uso inmediato y cambio obligatorio frente al operador; claves de API leídas de Key Vault por el consumidor DEMO; sin git, correo ni chat. Ningún agente ejecuta scripts de alta o restablecimiento (regla 9). Ver `docs/seguridad/politica_credenciales_y_accesos.md` | Vigente (el usuario delegó el canal en `seguridad` y aprobó sus valores DEMO el 05-11-2026; el ADR y la política aún figuran como Propuesta hasta su revisión. Actualización 06-11-2026: la política figura como "Aprobada por el equipo (05-11-2026)" y el ADR está en revisión 2 (implementación); el nombre del aprobador humano sigue PENDIENTE) |
 | D15 | Retención de `cob.LogAcceso`: 90 días en línea; purga manual mensual por `grp-cobranza-sql-admin` con `cob.sp_PurgarLogAcceso` (mínimo 90 días) | Vigente para el entorno académico (definida por `seguridad`, aprobada 05-11-2026); producción PENDIENTE |
 | D16 | Región brazilsouth y tenant Duoc sin permisos adicionales (ver sección 3) | Vigente (05-11-2026) |
 | D17 | Textos de Finanzas para la demo (canales de pago, teléfono, correo de contacto): valores inventados rotulados DEMO, fijados en `infra/main.bicepparam` | Vigente para DEMO (05-11-2026); valores reales PENDIENTE Finanzas |
@@ -145,37 +147,48 @@ Hallazgo H2: el App Service B1 de una instancia no tiene redundancia de zona ni 
 
 ---
 
-## 7. Estado actual (al 05-11-2026, revisión 2)
+## 7. Estado actual (al 06-11-2026, revisión 3; antes: "al 05-11-2026, revisión 2")
 
 - Suscripción de Azure: disponible desde el 05-11-2026, "Azure for Students" en el tenant Duoc UC; el operador (Oscar Díaz Ulloa) es Owner. (Reemplazado 05-11-2026; antes: "no disponible a la fecha de los últimos documentos (17-10-2026)".)
 - Objetos creados en Azure y Entra ID (con aprobación, evidencia en `evidencias/2026-11-05_acciones_azure_operador/REGISTRO.md`): grupo de recursos vacío `rg-cobranza-apt` (brazilsouth), grupo `grp-cobranza-sql-admin` (operador como dueño y miembro), proveedores Microsoft.Communication, microsoft.insights, Microsoft.KeyVault y Microsoft.OperationalInsights registrados. Recursos de la solución desplegados: ninguno. (Reemplazado 05-11-2026; antes: "Recursos desplegados en Azure: ninguno".)
 - `sql/01` corregido el 05-11-2026 (hallazgo C-01 de qa): compatible con 00 y 03-11 por validación estática; 07 daría 10/10 sin ejecutar (no hay motor SQL local). Ver `evidencias/2026-11-05_sql01_correccion_c01/`.
 - Proyecto de Functions: `src/Cobranza.Functions` (confirmado 05-11-2026).
-- Código .NET (05-11-2026): `dotnet build` en verde (0 advertencias, `TreatWarningsAsErrors`) y `dotnet test` 23/23 en `tests/Cobranza.Functions.Tests`, sin paquetes vulnerables. Evidencia en `evidencias/2026-11-05_desarrollo_build_429/`. La API todavía usa `EasyAuthHandler` y NO debe publicarse hasta implementar ADR-001 (hallazgo A-01).
+- Código .NET (05-11-2026): `dotnet build` en verde (0 advertencias, `TreatWarningsAsErrors`) y `dotnet test` 23/23 en `tests/Cobranza.Functions.Tests`, sin paquetes vulnerables. Evidencia en `evidencias/2026-11-05_desarrollo_build_429/`. (Estado del 05-11-2026; antes: "La API todavía usa `EasyAuthHandler` y NO debe publicarse hasta implementar ADR-001 (hallazgo A-01)".)
+- Implementación de ADR-001 (06-11-2026): `EasyAuthHandler` retirado; un `X-MS-CLIENT-PRINCIPAL` falsificado devuelve 401. `dotnet build` 0 advertencias, `dotnet test` 102/102 (API) y 25/25 (Functions), sin paquetes vulnerables. Infraestructura, SQL y scripts de seguridad validados localmente. Evidencias en `evidencias/2026-11-06_adr001_{desarrollo,devops,sql,seguridad}/` y revisión de qa en `evidencias/qa/2026-11-06_revision_adr001.md`. La publicación de la API sigue condicionada a la aprobación de qa (`desplegar.sh` exige `APROBACION_QA`). Nada desplegado en Azure: el despliegue completo queda para la siguiente sesión, con aprobación humana.
 - Despliegue y pruebas P01-P37 en Azure: programados para la semana 11 (indicación del equipo, 17-10-2026).
 - Entorno de trabajo: desde el 05-11-2026 el equipo trabaja en su máquina local con VS Code y Claude Code, con permisos para compilar y ejecutar herramientas. El sistema operativo y las versiones instaladas deben registrarse en la primera tarea (ver `PRIMERA_TAREA.md`); no suponerlos.
 - Código .NET (API y Functions): compilado y probado localmente el 05-11-2026 (ver viñeta siguiente). (Reemplazado 05-11-2026; antes: "escrito, nunca compilado".)
-- Bicep: compilado y con lint limpio (0.48.1). Scripts bash: `bash -n` y ShellCheck 0.10.0 sin hallazgos según documentos S10; en la máquina local del 05-11-2026 ShellCheck no está instalado, por lo que los scripts nuevos o modificados solo tienen `bash -n` (ShellCheck NO VERIFICADO). Plan de direccionamiento: 15/15 OK.
-- Scripts SQL: revisados, no ejecutados.
+- Bicep: compilado y con lint limpio (0.48.1). Scripts bash: `bash -n` y ShellCheck 0.10.0 sin hallazgos según documentos S10; en la máquina local del 05-11-2026 ShellCheck no está instalado, por lo que los scripts nuevos o modificados solo tienen `bash -n` (ShellCheck NO VERIFICADO; al 06-11-2026 incluye los 9 scripts nuevos de `devops` y los `s12_*` modificados). Plan de direccionamiento: 15/15 OK.
+- Scripts SQL: revisados y validados en forma estática, no ejecutados. Herramientas no instaladas en la estación al 06-11-2026: `sqlcmd` (requerido por `desplegar_sql.sh` y los `s11_*`), ShellCheck, zip.
 
 ### Estructura de repositorio esperada (según entregables S8-S15)
 
 ```
-infra/main.bicep, infra/main.bicepparam
-sql/01_esquema_cobranza.sql, sql/02_identidades_y_permisos.sql, ... (00 a 11)
-src/Cobranza.Api/                    API .NET 10
+infra/main.bicep, infra/main.bicepparam, infra/entorno.ejemplo.env (el .local.env no se versiona)
+sql/00 a 11 (base S10), sql/12_autenticacion.sql, sql/13_pruebas_autenticacion.sql (06-11-2026)
+src/Cobranza.Api/                    API .NET 10 (autenticación propia, ADR-001)
 src/Cobranza.Functions/             confirmado 05-11-2026
-tests/Cobranza.Functions.Tests/      23 pruebas (05-11-2026)
-docs/adr/, docs/seguridad/           ADR-001 y política de credenciales
-scripts/desplegar.sh                 8 pasos
-scripts/desplegar_sql.sh
-scripts/verificar_despliegue.sh      pruebas P01-P32
-scripts/validar_direccionamiento.py
+src/Cobranza.Comun/                  formato de clave de API
+src/Cobranza.Herramientas/           hash-clave, nueva-clave-api (solo humano, regla 9)
+tests/Cobranza.Api.Tests/            102 pruebas (06-11-2026)
+tests/Cobranza.Functions.Tests/      25 pruebas (06-11-2026; antes: 23 el 05-11-2026)
+docs/adr/, docs/seguridad/           ADR-001, política de credenciales y 6 plantillas
+pruebas/consumidor_ventas_demo.sh, pruebas/carga_api_k6.js
+scripts/desplegar.sh                 10 pasos, recreado 06-11-2026 (antes: "8 pasos", original no encontrado)
+scripts/desplegar_sql.sh             recreado 06-11-2026 (orden de la sección 4)
+scripts/comun_operacion.sh           biblioteca común de los scripts de operación
+scripts/s11_alta_usuario.sh, s11_restablecer_clave.sh, s11_baja_usuario.sh,
+scripts/s11_alta_clave_api.sh, s11_revocar_clave_api.sh    solo humano (regla 9)
+scripts/s11_configurar_api.sh        sin Easy Auth; ya no publica la API
+scripts/s14_revision_post_restauracion.sh, s15_purgar_log_acceso.sh
+scripts/verificar_despliegue.sh      pruebas P01-P32 (no encontrado)
+scripts/validar_direccionamiento.py  (no encontrado)
 scripts/s12_endurecer.sh             ubicación confirmada 05-11-2026
 scripts/eliminar_entorno.sh          solo humano (05-11-2026)
-docs/GUIA_DESPLIEGUE.md
+docs/GUIA_DESPLIEGUE.md              (no encontrado)
 docs/generar_topologia.py
 ```
+Retirados el 06-11-2026 por D13: `scripts/s11_registro_entra_id.sh`, `infra/modulos/autenticacion_api.bicep`, `src/Cobranza.Api/Seguridad/EasyAuthHandler.cs` (quedan en el historial de git).
 
 Origen de este código: `Repositorio_Cobranza_Automatizada_S10-S15.zip` e `Implementacion_S10_Anexos.zip`, entregados en conversaciones anteriores. Este paquete NO incluye ese código; debe copiarse en la raíz del repositorio antes de empezar. Si un archivo listado no existe al abrir el repositorio, se informa y no se recrea por iniciativa propia.
 
@@ -195,9 +208,11 @@ Origen de este código: `Repositorio_Cobranza_Automatizada_S10-S15.zip` e `Imple
 10. Valores DEMO de seguridad aprobados (05-11-2026). PENDIENTE: límite de login por IP (10/min), longitud de contraseña (12/128), vigencia máxima de claves de API (180 días), superposición en rotación (1 h), frecuencia de `UltimoUso` (60 min) (ADR-001 sección 5.4).
 11. Responsable humano que autoriza altas, bajas y restablecimientos, y qué integrantes son miembros de `grp-cobranza-sql-admin`: PENDIENTE (canal definido en D14).
 12. Retención de `cob.LogAcceso` para producción (Ley 19.628 y Ley 21.719) y plazo de conservación de evidencias tras la evaluación (D15): PENDIENTE.
-13. Scripts no encontrados en el repositorio ni en el disco: `scripts/desplegar.sh`, `scripts/desplegar_sql.sh`, `scripts/verificar_despliegue.sh` (P01-P32), `scripts/validar_direccionamiento.py`, `docs/GUIA_DESPLIEGUE.md`. Decidir si se recrean.
+13. Scripts no encontrados: `scripts/desplegar.sh` y `scripts/desplegar_sql.sh` RECREADOS el 06-11-2026 por `devops`. Siguen sin encontrarse `scripts/verificar_despliegue.sh` (P01-P32), `scripts/validar_direccionamiento.py`, `docs/GUIA_DESPLIEGUE.md`: decidir si se recrean. (Antes: los cinco PENDIENTE.)
 14. Retención de Log Analytics (30 días) frente a PITR (35 días) (SEG-H02): decisión de costo PENDIENTE.
-15. Validación real de SQL (07 = 10/10) en un motor local o en Azure: PENDIENTE.
+15. Validación real de SQL (07 = 10/10 y 13 = 28/28) en un motor local o en Azure: PENDIENTE.
+16. Verificaciones de ADR-001 que solo se hacen en Azure: persistencia de claves de Data Protection tras reinicio (AUT-15), AUT-17, prueba negativa ABAC (SEG-DP-03), sonda `/salud` con entrada Deny, Application Insights sin datos sensibles, lectura de stdin por go-sqlcmd: PENDIENTE (06-11-2026).
+17. Antes del despliegue (informe de qa `evidencias/qa/2026-11-06_revision_adr001.md`, veredicto para commit APROBADO CON OBSERVACIONES): corregir M-01 (`s12_endurecer.sh` acepta cualquier informe "APROBADO" como `APROBACION_QA` sin verificar el alcance) y M-02 (`desplegar_sql.sh` no detiene el despliegue si 07, 13 o 00 fallan); instalar `sqlcmd` y ShellCheck; registrar la aprobación humana. Bajos B-01 a B-13 en el informe.
 
 ---
 
@@ -218,10 +233,10 @@ Origen de este código: `Repositorio_Cobranza_Automatizada_S10-S15.zip` e `Imple
 - docs/02 (sección 5) y docs/05 indican Entra ID y Easy Auth v2 para los usuarios; vigente: autenticación propia (D13, ADR-001). docs/04 lista Entra ID P1 "requerido para acceso condicional"; con D13 no aplica al panel.
 - `main.bicep` está documentado como "validado S10, 28/46"; el original no existe y el vigente es una reconstrucción 31/49.
 - `sql/01` S6-S8 era incompatible con 03-11 (C-01); corregido el 05-11-2026. El original queda en `evidencias/2026-11-05_sql01_correccion_c01/01_original_S6S8.sql`.
-- `EasyAuthHandler.cs` cita `s12_registro_entra_id.sh`; el script se llama `s11_registro_entra_id.sh` (ambos obsoletos por D13).
+- RESUELTA 06-11-2026 (archivos retirados): `EasyAuthHandler.cs` citaba `s12_registro_entra_id.sh`; el script se llama `s11_registro_entra_id.sh` (ambos obsoletos por D13).
 - Archivos de agentes (`.claude/agents/*.md`) y la sección 10 mencionan Easy Auth y Chile Central; vigente: D13 y brazilsouth.
 - `OpcionesCobranza.cs`, `local.settings.example.json` y `s10_configurar_jobs.sh` usaban 100/h, 30/min y 90/2100; vigente: H1 (5/10) y D12 DEMO (10/15000).
-- `s11_registro_entra_id.sh` (líneas 10-11) dice que se requiere el rol Application Developer; en el tenant Duoc los usuarios pueden crear apps sin ese rol (script obsoleto por D13).
+- RESUELTA 06-11-2026 (script retirado): `s11_registro_entra_id.sh` (líneas 10-11) decía que se requiere el rol Application Developer; en el tenant Duoc los usuarios pueden crear apps sin ese rol (script obsoleto por D13).
 
 ---
 
@@ -247,8 +262,8 @@ Flujo estándar por cada tarea:
 Secuencia de despliegue sugerida (semana 11):
 1. `desarrollador`: `dotnet build` y `dotnet test` de toda la solución.
 2. `devops`: `bicep build`, `lint`, `az deployment group what-if` con parámetros completos (sin PENDIENTE).
-3. Humano aprueba; `devops` ejecuta `scripts/desplegar.sh`.
-4. `dba`: `scripts/desplegar_sql.sh` en el orden de la sección 4; pruebas 07 deben dar 10/10.
-5. `devops` + `desarrollador`: publicación de API y Functions; verificación de `/salud`.
-6. `seguridad`: `s12_endurecer.sh` y verificación de exposición pública.
+3. Humano aprueba y ejecuta `scripts/desplegar.sh` (10 pasos con confirmación en cada uno; incluye `desplegar_sql.sh`, publicación, `s12_endurecer.sh`, `/salud` y cierre de la ventana del operador) desde su propia terminal. (Reemplazado 06-11-2026; antes: "Humano aprueba; `devops` ejecuta `scripts/desplegar.sh`".)
+4. `dba`: revisa la salida de `scripts/desplegar_sql.sh` en el orden de la sección 4; pruebas 07 deben dar 10/10 y 13 deben dar 28/28. Las altas de usuarios y la clave de API `ventas-demo` las ejecuta un humano (regla 9).
+5. Publicación de Functions y API, `s12_endurecer.sh` y `/salud`: los ejecuta el humano dentro de `desplegar.sh` (pasos 6 a 10). La API solo se publica con `APROBACION_QA` apuntando a un informe de qa que apruebe la publicación (regla 5.11 del ADR). Recomendación de qa: correr pasos 1 a 5, revisar la salida SQL con qa y retomar desde el paso 6. (Reemplazado 06-11-2026; antes: "`devops` + `desarrollador`: publicación de API y Functions; verificación de `/salud`".)
+6. `seguridad`: `s12_verificar_seguridad.sh` y `s12_pruebas_red.sh` (exposición pública). (Reemplazado 06-11-2026; antes: "`s12_endurecer.sh` y verificación de exposición pública".)
 7. `qa`: `scripts/verificar_despliegue.sh` (P01-P32) y casos P33-P37; informe final.

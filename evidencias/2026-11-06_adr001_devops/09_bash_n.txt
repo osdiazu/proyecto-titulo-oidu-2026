@@ -1,0 +1,49 @@
+# bash -n de scripts/*.sh y pruebas/*.sh
+scripts/comun_operacion.sh                    OK
+scripts/desplegar.sh                          OK
+scripts/desplegar_sql.sh                      OK
+scripts/eliminar_entorno.sh                   OK
+scripts/s10_configurar_jobs.sh                OK
+scripts/s11_alta_clave_api.sh                 OK
+scripts/s11_alta_usuario.sh                   OK
+scripts/s11_baja_usuario.sh                   OK
+scripts/s11_configurar_api.sh                 OK
+scripts/s11_restablecer_clave.sh              OK
+scripts/s11_revocar_clave_api.sh              OK
+scripts/s12_endurecer.sh                      OK
+scripts/s12_pruebas_red.sh                    OK
+scripts/s12_verificar_seguridad.sh            OK
+scripts/s14_revision_post_restauracion.sh     OK
+scripts/s14_simulacro_pitr.sh                 OK
+scripts/s15_purgar_log_acceso.sh              OK
+pruebas/consumidor_ventas_demo.sh             OK
+
+# Fin de linea CRLF en scripts (debe ser 0):
+0
+
+# set -x / tee en los scripts SEG-H01 (debe ser vacio):
+scripts/s11_alta_usuario.sh:27:# compartida, papel, fotografias. No usar set -x, tee ni redirigir la salida.
+scripts/s11_restablecer_clave.sh:24:# Sin set -x, sin tee, sin redirigir la salida.
+scripts/s11_baja_usuario.sh:18:# Sin set -x, sin tee. Evidencia en evidencias/seguridad/ sin IP ni identificadores completos.
+scripts/s11_alta_clave_api.sh:35:# Sin set -x, sin tee. Evidencia: docs/seguridad/plantilla_claves_api.md.
+scripts/s11_revocar_clave_api.sh:26:# Sin set -x, sin tee. Evidencia: docs/seguridad/plantilla_claves_api.md.
+scripts/comun_operacion.sh:10:# No contiene identificadores, IP ni secretos. No usa set -x ni tee.
+
+# set -euo pipefail:
+scripts/s11_alta_clave_api.sh:1
+scripts/s11_alta_usuario.sh:1
+scripts/s11_baja_usuario.sh:1
+scripts/s11_configurar_api.sh:1
+scripts/s11_restablecer_clave.sh:1
+scripts/s11_revocar_clave_api.sh:1
+scripts/s14_revision_post_restauracion.sh:1
+scripts/s15_purgar_log_acceso.sh:1
+scripts/desplegar.sh:1
+scripts/desplegar_sql.sh:1
+
+# Cabecera SEG-H01:
+scripts/s11_alta_usuario.sh:1
+scripts/s11_restablecer_clave.sh:1
+scripts/s11_baja_usuario.sh:1
+scripts/s11_alta_clave_api.sh:1
+scripts/s11_revocar_clave_api.sh:1

@@ -1,0 +1,16 @@
+# bash -n scripts/s12_endurecer.sh
+OK
+  bytes CR (esperado 0): 0
+  lineas: 219
+# bash -n scripts/s12_verificar_seguridad.sh
+OK
+  bytes CR (esperado 0): 0
+  lineas: 253
+# bash -n scripts/s12_pruebas_red.sh
+OK
+  bytes CR (esperado 0): 0
+  lineas: 219
+# bash -n evidencias/2026-11-06_adr001_seguridad/herramienta/prueba_en_seco.sh
+OK
+  bytes CR (esperado 0): 0
+  lineas: 90

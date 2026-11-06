@@ -1,0 +1,17 @@
+# dotnet build Cobranza.slnx --no-restore --no-incremental
+  Cobranza.Comun -> C:\Users\<usuario>\Documents\Proyecto de titulo - Final\Cobranza_Automatizada_Contexto_ClaudeCode\cobranza-automatizada\src\Cobranza.Comun\bin\Debug\net10.0\Cobranza.Comun.dll
+  Cobranza.Herramientas -> C:\Users\<usuario>\Documents\Proyecto de titulo - Final\Cobranza_Automatizada_Contexto_ClaudeCode\cobranza-automatizada\src\Cobranza.Herramientas\bin\Debug\net10.0\Cobranza.Herramientas.dll
+  Determinando los proyectos que se van a restaurar...
+  Se ha restaurado C:\Users\<usuario>\Documents\Proyecto de titulo - Final\Cobranza_Automatizada_Contexto_ClaudeCode\cobranza-automatizada\src\Cobranza.Functions\obj\Debug\net10.0\WorkerExtensions\WorkerExtensions.csproj (en 499 ms).
+  WorkerExtensions -> C:\Users\<usuario>\Documents\Proyecto de titulo - Final\Cobranza_Automatizada_Contexto_ClaudeCode\cobranza-automatizada\src\Cobranza.Functions\obj\Debug\net10.0\WorkerExtensions\bin\Release\net8.0\Microsoft.Azure.Functions.Worker.Extensions.dll
+  Cobranza.Api -> C:\Users\<usuario>\Documents\Proyecto de titulo - Final\Cobranza_Automatizada_Contexto_ClaudeCode\cobranza-automatizada\src\Cobranza.Api\bin\Debug\net10.0\Cobranza.Api.dll
+  Cobranza.Functions -> C:\Users\<usuario>\Documents\Proyecto de titulo - Final\Cobranza_Automatizada_Contexto_ClaudeCode\cobranza-automatizada\src\Cobranza.Functions\bin\Debug\net10.0\Cobranza.Functions.dll
+  Cobranza.Functions.Tests -> C:\Users\<usuario>\Documents\Proyecto de titulo - Final\Cobranza_Automatizada_Contexto_ClaudeCode\cobranza-automatizada\tests\Cobranza.Functions.Tests\bin\Debug\net10.0\Cobranza.Functions.Tests.dll
+  Cobranza.Api.Tests -> C:\Users\<usuario>\Documents\Proyecto de titulo - Final\Cobranza_Automatizada_Contexto_ClaudeCode\cobranza-automatizada\tests\Cobranza.Api.Tests\bin\Debug\net10.0\Cobranza.Api.Tests.dll
+
+Compilación correcta.
+    0 Advertencia(s)
+    0 Errores
+
+Tiempo transcurrido 00:00:04.29
+exit=0

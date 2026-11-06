@@ -7,8 +7,8 @@ using Microsoft.Extensions.Options;
 namespace Cobranza.Functions.Tests;
 
 /// <summary>
-/// M-05: un rechazo por limite de ACS (429) no se registra como intento fallido y corta el lote;
-/// los demas errores siguen registrandose como Fallido (suman Intentos en sp_RegistrarNotificacion).
+/// M-05 y ADR-001 5.12: un rechazo por limite de ACS (429) se registra como Limitado (no suma Intentos
+/// en sp_RegistrarNotificacion) y corta el lote; los demas errores siguen registrandose como Fallido.
 /// </summary>
 public class NotificacionesFunctionTests
 {
@@ -26,16 +26,21 @@ public class NotificacionesFunctionTests
     }
 
     [Fact]
-    public async Task Rechazo429_NoRegistraIntento_YCortaElLote()
+    public async Task Rechazo429_RegistraLimitado_YCortaElLote()
     {
         var (fn, repo, email, _, _) = Crear(5, n => n == 3 ? Datos.Error429() : null);
 
         var r = await fn.ProcesarAsync(CancellationToken.None);
 
         Assert.Equal(3, email.Enviados.Count);                        // no intenta los avisos 4 y 5
-        Assert.Equal(2, repo.Registros.Count);                        // solo los 2 aceptados
-        Assert.All(repo.Registros, x => Assert.Equal("Aceptado", x.Estado));
-        Assert.DoesNotContain(repo.Registros, x => x.FacturaId == 3); // el 429 no llama a sp_RegistrarNotificacion
+        Assert.Equal(3, repo.Registros.Count);                        // 2 aceptados y 1 limitado
+        Assert.Equal(2, repo.Registros.Count(x => x.Estado == "Aceptado"));
+        var limitado = Assert.Single(repo.Registros, x => x.Estado == "Limitado");
+        Assert.Equal(3, limitado.FacturaId);
+        Assert.Null(limitado.IdOperacion);
+        Assert.StartsWith("HTTP 429 TooManyRequests", limitado.Detalle);
+        Assert.DoesNotContain(repo.Registros, x => x.Estado == "Fallido");
+        Assert.DoesNotContain(repo.Registros, x => x.FacturaId > 3);
         Assert.True(r.CortadoPorLimite);
         Assert.Equal(2, r.Aceptados);
         Assert.Equal(0, r.Fallidos);
@@ -43,14 +48,15 @@ public class NotificacionesFunctionTests
     }
 
     [Fact]
-    public async Task Rechazo429_EnPrimerEnvio_NoRegistraNada()
+    public async Task Rechazo429_EnPrimerEnvio_SoloRegistraLimitado()
     {
         var (fn, repo, email, _, reloj) = Crear(4, _ => Datos.Error429());
 
         var r = await fn.ProcesarAsync(CancellationToken.None);
 
         Assert.Single(email.Enviados);
-        Assert.Empty(repo.Registros);
+        var reg = Assert.Single(repo.Registros);
+        Assert.Equal((1, "Limitado"), (reg.FacturaId, reg.Estado));
         Assert.Empty(reloj.Esperas);
         Assert.Equal(4, r.Diferidos);
     }
@@ -64,7 +70,7 @@ public class NotificacionesFunctionTests
         var r = await fn.ProcesarAsync(CancellationToken.None);
 
         Assert.Single(email.Enviados);
-        Assert.Empty(repo.Registros);
+        Assert.Equal("Limitado", Assert.Single(repo.Registros).Estado);
         Assert.True(r.CortadoPorLimite);
     }
 
@@ -79,6 +85,31 @@ public class NotificacionesFunctionTests
         var e = Assert.Single(log.Entradas, x => x.Evento.Id == NotificacionesFunction.EventoLimiteAcs.Id);
         Assert.Equal(LogLevel.Warning, e.Nivel);
         Assert.Contains("120", e.Mensaje);
+    }
+
+    [Fact]
+    public async Task Rechazo429_RegistroLimitadoFalla_IgualCortaElLote()
+    {
+        var (fn, repo, email, log, _) = Crear(3, n => n == 1 ? Datos.Error429() : null);
+        repo.FallarAlRegistrar = "Limitado";
+
+        var r = await fn.ProcesarAsync(CancellationToken.None);
+
+        Assert.Single(email.Enviados);
+        Assert.Empty(repo.Registros);
+        Assert.True(r.CortadoPorLimite);
+        Assert.Equal(3, r.Diferidos);
+        Assert.Contains(log.Entradas, x => x.Evento.Id == NotificacionesFunction.EventoRegistroLimitadoFallido.Id && x.Nivel == LogLevel.Error);
+    }
+
+    [Fact]
+    public async Task Rechazo429_ConRetryAfter_LoIncluyeEnElDetalle()
+    {
+        var (fn, repo, _, _, _) = Crear(1, _ => Datos.Error429(("Retry-After", "120")));
+
+        await fn.ProcesarAsync(CancellationToken.None);
+
+        Assert.EndsWith("Retry-After 120 s", Assert.Single(repo.Registros).Detalle);
     }
 
     [Theory]

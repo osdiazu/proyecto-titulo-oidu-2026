@@ -2,14 +2,15 @@
 
 | Campo | Valor |
 | --- | --- |
-| Estado | Decisión principal (opción C): Aceptada por el equipo (05-11-2026). Revisión 1 (05-11-2026): Propuesta, pendiente de revisión de `qa` y de confirmación humana |
+| Estado | Decisión principal (opción C): Aceptada por el equipo (05-11-2026), sin cambio. Revisión 1 (05-11-2026): Propuesta, pendiente de revisión de `qa` y de confirmación humana. Revisión 2 (06-11-2026): Propuesta, pendiente de revisión de `qa` y de confirmación humana; registra lo implementado (sección 10) y las verificaciones que solo se hacen en Azure (sección 11) |
+| Estado de implementación (06-11-2026) | Implementado y validado localmente (build, pruebas en proceso, análisis estático de SQL, `bicep build`/`lint`/`what-if`, `bash -n` y pruebas en seco). NO desplegado ni probado en Azure. SQL no ejecutado en ningún motor. Detalle en la sección 11 |
 | Aprobó | Decisión principal: usuario de la sesión de Claude Code (operador, Owner de la suscripción Azure for Students), según lo informado por el orquestador el 05-11-2026. Revisión 1: incorpora decisiones del usuario del 05-11-2026 informadas por el orquestador (sección 0.1); la revisión en sí no está aprobada. Nombre del integrante que aprueba: PENDIENTE de registrar (CLAUDE.md sección 10: responsable humano aún no definido) |
-| Redactó | Agente `arquitecto` (Claude Code), 05-11-2026 |
+| Redactó | Agente `arquitecto` (Claude Code), 05-11-2026. Revisión 2: agente `arquitecto`, 06-11-2026, por encargo del orquestador |
 | Reemplaza | Decisión "Easy Auth v2 + roles Ventas.Consulta, Finanzas.Consulta, TI.Operacion; Entra ID Free = asignación por usuario" (docs/05, CLAUDE.md sección 3) |
 | Relacionado | Cambio de región a `brazilsouth` (decisión del usuario, aplicada por `devops` en `infra/main.bicep`; ver `evidencias/2026-11-05_whatif_brazilsouth/CAMBIOS.md`, N10). Informe `evidencias/qa/2026-11-05_revision_whatif_brazilsouth_adr001.md` (veredicto RECHAZADO por C-01 y A-01). Política `docs/seguridad/politica_credenciales_y_accesos.md` (propuesta de `seguridad`) |
 | Requerimientos | RF-01, RF-05, RF-06, RF-07, RNF-02, RNF-05, RNF-06, RNF-07 |
 
-Nota de alcance: este ADR es diseño. Nada de lo descrito está implementado, compilado ni desplegado a la fecha. Ningún agente ejecutó scripts contra Azure ni contra la base para redactarlo.
+Nota de alcance (revisión 2, 06-11-2026): el diseño de este ADR está implementado y validado localmente por `dba`, `desarrollador`, `devops` y `seguridad` (evidencias en `evidencias/2026-11-06_adr001_sql/`, `evidencias/2026-11-06_adr001_desarrollo/`, `evidencias/2026-11-06_adr001_devops/` y `evidencias/2026-11-06_adr001_seguridad/`). Nada está desplegado ni probado en Azure, los scripts SQL no se ejecutaron en ningún motor y ningún agente ejecutó los scripts de SEG-H01. Las diferencias entre el diseño y lo implementado están en la sección 10; lo que solo se puede verificar en Azure, en la sección 11. Para redactar esta revisión no se ejecutó nada contra Azure ni contra la base. (Reemplazado 06-11-2026; antes: "Nota de alcance: este ADR es diseño. Nada de lo descrito está implementado, compilado ni desplegado a la fecha. Ningún agente ejecutó scripts contra Azure ni contra la base para redactarlo.")
 
 ---
 
@@ -19,6 +20,7 @@ Nota de alcance: este ADR es diseño. Nada de lo descrito está implementado, co
 | --- | --- | --- | --- |
 | Inicial | 05-11-2026 | Decisión opción C y diseño detallado | Orquestador y operador |
 | Revisión 1 | 05-11-2026 | Regla de transición (A-01, sección 5.11); RBAC mínimo y separación de Data Protection (M-07, sección 5.5); encabezados reenviados (M-08b, sección 5.4.1); dependencia de `sql/07` con C-01 (sección 6); lista 5.10 completada; riesgos B-10 (sección 4.2); política de credenciales de `seguridad` (sección D de la política) aplicada en 4.2, 5.1, 5.2, 5.4, 5.7, 5.9, 5.10 y 6.1; regla SEG-H01; D12 DEMO (sección 5.12); textos DEMO de Finanzas (sección 5.12); ediciones propuestas a CLAUDE.md actualizadas (sección 8); valores DEMO de seguridad de A.11 marcados como aprobados por el equipo (05-11-2026) | `qa` (informe del 05-11-2026), `seguridad` (política del 05-11-2026), decisiones del usuario (0.1) |
+| Revisión 2 | 06-11-2026 | Estado de implementación (encabezado y sección 11); referencia inexistente "Lista definitiva de tareas por agente (Fase A)" resuelta con la sección 5.13; desviaciones de `dba` (D-1 a D-13), `desarrollador`, `devops` y `seguridad` (sección 10); notas "(Reemplazado 06-11-2026 ...)" o "(Implementado 06-11-2026 ...)" en 4.2, 5.1, 5.2, 5.5, 5.5.1, 5.9, 5.10, 5.11, 5.12 y 8; hallazgos M-N3 y B-N5 de `qa` (`evidencias/qa/2026-11-06_revision_precommit.md`). La decisión (opción C, aceptada 05-11-2026) y los valores DEMO aprobados no cambian; los pendientes de 5.4 siguen PENDIENTE | Evidencias de los agentes del 06-11-2026, informe de `qa` del 06-11-2026, encargo del orquestador |
 
 ### 0.1 Decisiones del usuario incorporadas (05-11-2026, informadas por el orquestador)
 
@@ -118,7 +120,7 @@ Se adopta la opción C:
   - Se invalidan todas las sesiones de la base restaurada con `cob.sp_InvalidarTodasLasSesiones`.
   - Si la base original no existe (restauración LTR o entorno eliminado), se aplica la regla conservadora: revocar todas las claves de API, emitir claves nuevas, desactivar a todos los usuarios que no sean `Admin` y restablecer todas las contraseñas.
   - La restauración no termina hasta completar la revisión y verificar AUT-08, AUT-12 y AUT-17.
-  - Se implementa en `scripts/s14_simulacro_pitr.sh` (paso nuevo) o en un script aparte `scripts/s14_revision_post_restauracion.sh` (decide `devops`, sección 5.10).
+  - Se implementa en un script aparte, `scripts/s14_revision_post_restauracion.sh` (decisión de `devops`, 06-11-2026; `s14_simulacro_pitr.sh` solo agrega un recordatorio al final). Los restablecimientos de contraseña no los hace ese script: quedan al humano con `s11_restablecer_clave.sh` (SEG-H01). Escrito, NO ejecutado. (Reemplazado 06-11-2026; antes: "Se implementa en `scripts/s14_simulacro_pitr.sh` (paso nuevo) o en un script aparte `scripts/s14_revision_post_restauracion.sh` (decide `devops`, sección 5.10).")
 - Log Analytics retiene 30 días y PITR cubre 35 (SEG-H02): la auditoría SQL no cubre toda la ventana de restauración. Por eso la retención de `cob.LogAcceso` es de 90 días (5.1).
 
 ### 4.3 RNF-02 (TLS, TDE, credenciales en Key Vault)
@@ -201,9 +203,12 @@ Nota: la definición inicial usaba `NVARCHAR(100)` para `Consumidor`; con el pat
 | ClaveApiId | INT | Sí | Para eventos de claves de API |
 | IpOrigen | VARCHAR(45) | Sí | IPv4 o IPv6 textual, obtenida según 5.4.1 |
 | AgenteUsuario | NVARCHAR(200) | Sí | Truncado a 200 |
-| Actor | NVARCHAR(128) | No | DEFAULT ORIGINAL_LOGIN(): identidad de la API o miembro del grupo admin que escribió |
+| Actor | NVARCHAR(128) | No | DEFAULT ORIGINAL_LOGIN(): identidad de la API o miembro del grupo admin que escribió. Qué devuelve `ORIGINAL_LOGIN()` para una identidad administrada y para un miembro del grupo en Azure SQL: PENDIENTE verificar en Azure |
+| Detalle (agregada 06-11-2026, desviación D-1 de `dba`) | NVARCHAR(200) | Sí | Total purgado, `Rol X -> Y`, `Activo 1 -> 0`, usuarios afectados por una invalidación masiva, consumidor/prefijo/vencimiento de una clave. Nunca contraseñas, hashes ni claves. La API no la lee ni la escribe. Motivo: 5.7 exige registrar el total purgado y RNF-05 pide valor anterior y nuevo |
 
 Índices: `IX_LogAcceso_Fecha (FechaUtc)` e `IX_LogAcceso_Usuario (UsuarioId, FechaUtc DESC)`.
+
+CHECK adicionales implementados (06-11-2026, desviación D-7 de `dba`): `CK_ClaveApi_NombreSecretoKv` (`NombreSecretoKv = 'apikey-' + Consumidor + '-' + Prefijo`), `CK_ClaveApi_Prefijo` (`LEN = 8`) y `CK_LogAcceso_UsuarioIngresado` (patrón o `(formato no valido)`). La sanitización en SQL (`cob.fn_SanearUsuarioIngresado`, sin GRANT) no convierte a minúsculas: un texto con mayúsculas se guarda como `(formato no valido)`; la API normaliza antes de llamar (D-11). Funciones auxiliares sin GRANT: `cob.fn_SanearUsuarioIngresado` y `cob.fn_EnmascararIp`.
 
 Retención (U3, definida por `seguridad`): 90 días en línea; purga con `cob.sp_PurgarLogAcceso` (política de credenciales, sección B). Aprobada por el equipo (05-11-2026) junto con los valores DEMO de A.11; pendiente de revisión de `qa`. Para producción: PENDIENTE (4.5). Las filas purgadas siguen existiendo en los respaldos LTR hasta su vencimiento; se acepta y se declara.
 
@@ -246,6 +251,11 @@ Sin GRANT (los ejecuta solo un miembro de `grp-cobranza-sql-admin`, igual que `s
 Vista nueva sin GRANT: `cob.vw_LogAccesoEvidencia`, con la IP enmascarada (IPv4 al /24, IPv6 al /48) y el agente de usuario reducido u omitido, para exportar evidencias.
 
 Los mensajes de error usan el rango 50060-50079 (sql/05 y sql/11 ya usan 50020 y 50040-50043). `dba` debe confirmar que `sql/02` y `sql/06` no otorgan SELECT sobre `cob.LogAcceso` a ninguna identidad administrada.
+
+Implementado (06-11-2026, `sql/12_autenticacion.sql`; análisis estático, no ejecutado):
+- Errores 50060 a 50076 (desviación D-5 de `dba`). El ADR solo fijaba 50060. Los relevantes para la API: 50060 (`sp_CambiarClave` no actualiza) y 50061 (`sp_RegistrarLoginExitoso` con un `UsuarioId` que dejó de existir; la API responde el 401 genérico, no 500). `sp_PurgarLogAcceso` usa 50071 (menos de 90 o más de 36.500 días) y 50072. Firmas completas y errores por procedimiento: `evidencias/2026-11-06_adr001_sql/CAMBIOS.md`, secciones 3 y 4.
+- `dba` confirmó que ningún script otorga SELECT sobre `cob.LogAcceso` ni permisos sobre la vista, las funciones ni los 11 procedimientos administrativos; `UsuarioApi` tiene EXECUTE solo sobre los 7 procedimientos de la primera tabla (más los 5 de `sql/06`). La consulta 5 de `sql/00` lo verifica en la base real (PENDIENTE de ejecución).
+- Precisiones de contrato (D-2 a D-4, D-6, D-8, D-9, D-12): ver sección 10.1.
 
 ### 5.3 Algoritmos
 
@@ -332,6 +342,8 @@ Claves de Data Protection (protegen la cookie y los tokens antifalsificación):
   - Nombres propuestos: contenedor `dataprotection-keys`, blob `keys.xml`, clave Key Vault `dataprotection-cobranza-api`. Ajustes: `DataProtection__BlobUri` y `DataProtection__KeyIdentifier` (valores los produce la plantilla; no se escriben a mano).
   - Impacto de pérdida: si se pierden las claves (por ejemplo, al eliminar el grupo de recursos con `eliminar_entorno.sh`), solo se invalidan las sesiones abiertas; no hay datos persistentes protegidos con Data Protection.
 - Alternativa aceptable si `devops` no alcanza a agregar los recursos antes de la semana 11: dejar el comportamiento por defecto de `%HOME%` y registrar el riesgo. Como `%HOME%` es propio de cada sitio, la Function App no tiene acceso a esas claves. Requiere aprobación explícita del equipo (PENDIENTE si se usa).
+- Implementado (06-11-2026): se adoptó la decisión recomendada. `devops` agregó el contenedor `dataprotection-keys`, la clave `dataprotection-cobranza-api` (RSA 2048, `wrapKey`/`unwrapKey`, creada solo si no existe) y los ajustes `DataProtection__BlobUri` y `DataProtection__KeyIdentifier` (salidas de la plantilla). El `desarrollador` hizo obligatoria la configuración fuera de `Development`: si faltan los ajustes o no son URI HTTPS, la API no arranca (prueba `Production_SinDataProtection_NoArranca`). Consecuencia: la alternativa `%HOME%` ya no es utilizable sin un cambio de código; si el equipo la necesitara, requiere decisión y cambio del `desarrollador`. Que las claves persistan tras un reinicio (AUT-15): PENDIENTE verificar en Azure (sección 11).
+- Telemetría (implementado 06-11-2026): inicializador `TelemetriaSinDatosSensibles` que elimina de toda telemetría las propiedades con nombres de `X-Api-Key`, `Authorization`, `Cookie`, `Set-Cookie`, token CSRF o cuerpos, y quita la cadena de consulta en `/api/v1/auth/*`; la API no registra `HttpLogging` ni cuerpos. Que Application Insights en Azure no capture esos datos por otra vía: PENDIENTE verificar en Azure (sección 11).
 
 #### 5.5.1 RBAC mínimo de las identidades administradas (M-07, revisión 1)
 
@@ -358,6 +370,8 @@ Condición ABAC de la Function App:
 - La documentación oficial (fuente 9.6) indica que las condiciones de asignación están disponibles (GA) para `Storage Blob Data Owner` y que se aplican a acciones de datos (DataActions), no a acciones de administración.
 - Expresión: la escribe `devops` en formato de condición versión 2.0, de modo que las acciones de datos de lectura, escritura, eliminación y etiquetas de blob se permitan solo si `@Resource[Microsoft.Storage/storageAccounts/blobServices/containers:name]` es distinto de `dataprotection-keys`. La sintaxis exacta se valida con `bicep build`, `what-if` y una prueba negativa en Azure (SEG-DP-03, sección 6); no se supone que funcione hasta probarla.
 - Riesgo residual: las acciones de administración de contenedores incluidas en el rol (por ejemplo, eliminar el contenedor) no admiten condiciones. Un compromiso de la Function App podría eliminar el contenedor y cerrar todas las sesiones (denegación de servicio), pero no leer ni insertar claves. Se acepta para el entorno académico.
+- Implementado (06-11-2026, `devops`, A4/A5): `raStorageFunc` se separó en `raBlobFunc` (`Storage Blob Data Owner` en la cuenta, `conditionVersion 2.0`) y el bucle `raStorageFunc` (Queue y Table, sin cambio). La condición restringe `blobs/read`, `write`, `delete`, `add/action`, `move/action`, `deleteBlobVersion/action`, `permanentDelete/action`, `tags/read` y `tags/write` a contenedores distintos de `dataprotection-keys`. Validada solo con `bicep build` y `what-if`; la prueba negativa SEG-DP-03 está PENDIENTE en Azure.
+- Riesgo residual adicional (06-11-2026, no previsto en la revisión 1): la acción `blobs/filter/action` (búsqueda por etiquetas a nivel de cuenta) no está en la condición. Un compromiso de la Function App podría ver nombres o etiquetas de blobs de `dataprotection-keys`, no su contenido. Requiere decisión del equipo: aceptarlo para el entorno académico o pedir a `devops` que la agregue (sección 10.3, desviación DV-6).
 
 Opciones descartadas para la separación:
 - Cuenta de Storage separada para Data Protection: requiere un sexto Private Endpoint de blob con IP fija nueva (cambia el plan de direccionamiento validado 15/15 y la lista de IP de CLAUDE.md sección 3) y un recurso más. Necesitaría su propio ADR.
@@ -433,10 +447,10 @@ Panel: nueva página `wwwroot/login.html` con `login.js`; `index.html` agrega bo
 
 Las altas las hace el equipo (U2). Detalle operativo completo en `docs/seguridad/politica_credenciales_y_accesos.md`, sección A.
 
-Regla SEG-H01 (obligatoria): ningún agente de Claude Code ejecuta `s11_alta_usuario.sh`, `s11_restablecer_clave.sh`, `s11_baja_usuario.sh`, `s11_alta_clave_api.sh`, `s11_revocar_clave_api.sh` ni los comandos de `Cobranza.Herramientas`. Los ejecuta un integrante humano, miembro de `grp-cobranza-sql-admin`, en su propia terminal y fuera de Claude Code. Motivo: la salida de la terminal del agente queda en la conversación, lo que equivale a pasar el secreto por chat. Los scripts piden confirmación interactiva; un mecanismo para detectar que corren dentro de Claude Code: PENDIENTE de verificación por `devops` (no suponer una variable de entorno).
+Regla SEG-H01 (obligatoria): ningún agente de Claude Code ejecuta `s11_alta_usuario.sh`, `s11_restablecer_clave.sh`, `s11_baja_usuario.sh`, `s11_alta_clave_api.sh`, `s11_revocar_clave_api.sh` ni los comandos de `Cobranza.Herramientas`. Los ejecuta un integrante humano, miembro de `grp-cobranza-sql-admin`, en su propia terminal y fuera de Claude Code. Motivo: la salida de la terminal del agente queda en la conversación, lo que equivale a pasar el secreto por chat. Los scripts piden confirmación interactiva; un mecanismo para detectar que corren dentro de Claude Code: PENDIENTE de verificación por `devops` (no suponer una variable de entorno). (Implementado 06-11-2026: `devops` verificó en la sesión del agente que se exportan `CLAUDECODE` y `CLAUDE_CODE_ENTRYPOINT` y que la entrada estándar no es una terminal; la función `exigir_humano` de `scripts/comun_operacion.sh` rechaza la ejecución con código 3 en cualquiera de esos casos. Es una barrera complementaria, no una garantía: la regla sigue siendo organizativa.)
 
 Herramienta: proyecto de consola nuevo `src/Cobranza.Herramientas` (net10.0), agregado a `Cobranza.slnx`, con dos comandos:
-- `hash-clave`: genera una contraseña temporal aleatoria de 20 caracteres (DEMO, 5.3) y la escribe directamente en la terminal, no en la salida estándar (`/dev/tty` en Linux y Git Bash; la consola en Windows). La salida estándar lleva solo el hash V3, que el script captura en una variable. Usa la misma configuración de `PasswordHasher` que la API. Cómo abrir la terminal en Git Bash para Windows sin pasar por stdout: PENDIENTE de verificación por el `desarrollador`; si no se puede garantizar, el comando falla en lugar de escribir la contraseña en stdout.
+- `hash-clave`: genera una contraseña temporal aleatoria de 20 caracteres (DEMO, 5.3) y la escribe directamente en la terminal, no en la salida estándar (`/dev/tty` en Linux y Git Bash; la consola en Windows). La salida estándar lleva solo el hash V3, que el script captura en una variable. Usa la misma configuración de `PasswordHasher` que la API. Cómo abrir la terminal en Git Bash para Windows sin pasar por stdout: PENDIENTE de verificación por el `desarrollador`; si no se puede garantizar, el comando falla en lugar de escribir la contraseña en stdout. (Implementado 06-11-2026: en Windows escribe en `CONOUT$` solo si la entrada estándar es una consola real; en mintty sin pseudoconsola termina con código 2 sin escribir en stdout. Si la instalación de cada integrante cumple la condición: PENDIENTE de verificación humana, `src/Cobranza.Herramientas/README.md` sección 6.)
 - `nueva-clave-api --consumidor <nombre> --salida-archivo <ruta>`: genera la clave con el formato de 5.3, la escribe solo en el archivo indicado y deja en la salida estándar solo el prefijo y el hash SHA-256 en hexadecimal.
 
 Procedimiento de alta de usuario del panel (script nuevo `scripts/s11_alta_usuario.sh`):
@@ -514,7 +528,12 @@ Cambian (en orden de dependencia dentro de cada agente; el orden entre agentes e
 | `scripts/s12_pruebas_red.sh` | RED-02 y pruebas nuevas RED-11 a RED-17 (sección 6) | seguridad |
 | `docs/seguridad/` | Plantillas sin datos `entrega_credenciales.md`, `claves_api.md`, `revision_post_restauracion.md` (las evidencias reales van en `evidencias/seguridad/`) | seguridad |
 
-Quedan obsoletos (eliminar o mover a una carpeta de históricos; el equipo decide, el historial de git los conserva):
+Notas de la revisión 2 (06-11-2026) sobre esta tabla (el estado de cada fila está en 5.13):
+- Las referencias de línea de esta tabla y de la sección 1 (por ejemplo "01, línea 106", "556-562", "800-808") corresponden a los archivos del 05-11-2026 y ya no son válidas (B-N5 de `qa`). No se actualizan; los cambios se ubican por nombre de recurso o procedimiento.
+- Nombres efectivos distintos de los previstos: proyecto de pruebas `tests/Cobranza.Api.Tests` (antes "nombre PENDIENTE"); además del plan se crearon `src/Cobranza.Comun/ClaveApiFormato.cs` (formato de clave compartido por la API y la herramienta), `src/Cobranza.Api/Seguridad/ConfiguracionSeguridad.cs`, `EndpointsAutenticacion.cs` y `TelemetriaSinDatosSensibles.cs`, `scripts/comun_operacion.sh`, `scripts/desplegar.sh` y seis plantillas en `docs/seguridad/`.
+- `scripts/desplegar_sql.sh` y `scripts/desplegar.sh` fueron escritos por `devops` (no copiados del paquete S10-S15). Esta tabla y CLAUDE.md (pendiente 13) dejaban su recreación como PENDIENTE de decisión humana; si esa decisión existe, no consta en las evidencias (ver sección 10.5).
+
+Quedan obsoletos (eliminar o mover a una carpeta de históricos; el equipo decide, el historial de git los conserva). (Estado 06-11-2026: `EasyAuthHandler.cs` eliminado; `s11_registro_entra_id.sh` e `infra/modulos/autenticacion_api.bicep` retirados con `git rm`, sin commit; `raKvApi` y el ajuste `MICROSOFT_PROVIDER_AUTHENTICATION_SECRET` retirados de `main.bicep`; `s11_configurar_api.sh` borra ese ajuste si existiera. El secreto `easyauth-client-secret` nunca existió en Azure. `asignaciones_roles.csv`: no verificado.)
 
 | Archivo o elemento | Motivo |
 | --- | --- |
@@ -532,8 +551,8 @@ Riesgo: `EasyAuthHandler.cs` acepta sin validar el encabezado `X-MS-CLIENT-PRINC
 Reglas:
 1. No se publica `src/Cobranza.Api` en Azure (paso 5 de la secuencia de despliegue, `s11_configurar_api.sh` o cualquier `zip deploy`) hasta que este ADR esté implementado, compilado, con pruebas en verde y con informe de `qa` APROBADO o APROBADO CON OBSERVACIONES.
 2. El primer cambio de código de la implementación es retirar `EasyAuthHandler.cs` y su registro en `Program.cs`, aunque el resto no esté listo. Desde ese commit, ninguna compilación de la API confía en `X-MS-CLIENT-PRINCIPAL`.
-3. Mientras rija la transición, la Web App tiene `ipSecurityRestrictionsDefaultAction = Deny` en `infra/main.bicep`, con una sola regla de permiso para `ipOperador` cuando tiene valor (vacío significa sin reglas de permiso). Esto cubre también el caso en que alguien publique por error. Si la sonda de salud `/salud` de App Service queda afectada por la restricción: PENDIENTE verificar en Azure; si lo está, `devops` lo informa antes de cambiar nada. Si el sitio SCM hereda o no la restricción (`scmIpSecurityRestrictionsUseMain`): lo decide `seguridad`, considerando que la publicación del operador usa SCM.
-4. La restricción se levanta solo cuando se cumplan las condiciones de la regla 1 y un humano lo apruebe; queda registrado en `evidencias/` con fecha. Con D11 aprobado, la restricción se reemplaza por el cierre del acceso público de la opción B.
+3. Mientras rija la transición, la Web App tiene `ipSecurityRestrictionsDefaultAction = Deny` en `infra/main.bicep`, con una sola regla de permiso para `ipOperador` cuando tiene valor (vacío significa sin reglas de permiso). Esto cubre también el caso en que alguien publique por error. Si la sonda de salud `/salud` de App Service queda afectada por la restricción: PENDIENTE verificar en Azure; si lo está, `devops` lo informa antes de cambiar nada. Si el sitio SCM hereda o no la restricción (`scmIpSecurityRestrictionsUseMain`): lo decide `seguridad`, considerando que la publicación del operador usa SCM. (Implementado 06-11-2026. Regla de permiso de la Web App: `operador-transicion`, Allow, `<ipOperador>/32`, prioridad 100, solo si `ipOperador` tiene valor. Decisión de `seguridad` sobre el SCM: no hereda (`scmIpSecurityRestrictionsUseMain=false`) y tiene acción por defecto `Deny` en la Web App y en la Function App, tanto en `main.bicep` como en `s12_endurecer.sh`; solo admite la regla temporal `operador-publicacion` cuando se exporta `IP_PUBLICACION_SCM`, y con la transición vigente el SCM de la Web App queda sin reglas de permiso, lo que impide técnicamente publicar la API. La Function App también queda con entrada `Deny`. Efecto sobre la sonda `/salud`: PENDIENTE verificar en Azure, sección 11.)
+4. La restricción se levanta solo cuando se cumplan las condiciones de la regla 1 y un humano lo apruebe; queda registrado en `evidencias/` con fecha. Con D11 aprobado, la restricción se reemplaza por el cierre del acceso público de la opción B. (Implementado 06-11-2026 en `s12_endurecer.sh` con `ESTADO_TRANSICION`: `vigente` por defecto; `publicacion-aprobada` exige `APROBACION_QA` con un informe de veredicto APROBADO; `levantada` exige `APROBACION_LEVANTAMIENTO` con la plantilla `docs/seguridad/plantilla_levantamiento_transicion.md` firmada. El script nunca abre la Web App. En `scripts/desplegar.sh` la API solo se publica con `APROBACION_QA`.)
 5. La regla no bloquea `az deployment group create` de la plantilla (la plantilla no publica código).
 
 ### 5.12 Notificaciones DEMO: D12 revisado y textos de Finanzas (revisión 1)
@@ -548,11 +567,35 @@ D12 DEMO (U5):
   - Qué códigos de error de ACS, además del 429, indican límite: PENDIENTE de verificación por el `desarrollador` en la documentación del SDK; no se suponen.
   - Los demás errores siguen contando como `Fallido` (máximo 3 intentos).
   - `sql/06` (`AvisosFallidos30d`) y `sql/11` (reintento manual de `Fallido`) no cuentan `Limitado`. Si el panel debe mostrar los avisos limitados: PENDIENTE decidir.
+  - Implementado 06-11-2026 (resuelve M-N3 de `qa` del 06-11-2026): `NotificacionesFunction.cs` registra `Limitado` con `sp_RegistrarNotificacion` y corta el lote, además del log EventId 4290; si el registro de `Limitado` falla, escribe EventId 4291 y el lote igual se corta (el aviso sigue elegible). `sql/01` admite `Limitado` en `CK_LogNotificacion_EstadoEnvio` y `sql/04` no incrementa `Intentos` con ese estado (PA-20 de `sql/13`, no ejecutado). Se trata como límite el 429 y el código `TooManyRequests` aunque no venga el estado 429; otros 4xx/5xx cuentan como `Fallido`. Otros códigos de ACS que indiquen límite: siguen PENDIENTE de verificación en la documentación del SDK. (La revisión 1 ya describía este diseño; lo que cambia es su estado: de diseñado a implementado.)
 
 Textos de Finanzas DEMO (U4, M-04):
 - `devops` fija en `infra/main.bicepparam` valores inventados para `canalesPagoTexto`, `telefonoContacto` y `correoContacto`, rotulados DEMO en el valor o en un comentario junto al valor (igual que los días DEMO). `correoContacto` debe pasar la validación `[EmailAddress]`; se recomienda un dominio reservado para documentación (`example.com`, RFC 2606) para no apuntar a una persona real.
 - Así la Function App arranca (`ValidateOnStart`) y los jobs pueden probarse en la semana 11. Los valores reales siguen PENDIENTES de Finanzas (pendiente 3 de CLAUDE.md).
 - Antes de ejecutar el job contra ACS, `qa` confirma que los correos de los clientes DEMO de `sql/08` son direcciones controladas por el equipo, para no enviar correos a terceros (PENDIENTE revisar `sql/08`).
+
+### 5.13 Registro de tareas asignadas por agente (Fase A) y su estado (revisión 2)
+
+Origen: los encargos del orquestador del 06-11-2026 a `dba` y `seguridad` citaron una sección "Lista definitiva de tareas por agente (Fase A)" de este ADR. Esa sección no existía (lo verificaron `dba` y `seguridad` con búsqueda en el archivo). Las tareas se tomaron de la tabla 5.10, de 5.5.1, de las secciones 6 y 7.1 y de la política de credenciales (D.3, D.5, D.6). Esta sección registra lo asignado y su estado al 06-11-2026; no agrega tareas nuevas. Estados: "Hecho (local)" significa escrito y validado localmente, NO desplegado ni ejecutado en Azure.
+
+| Agente | Tarea (fuente) | Estado al 06-11-2026 | Evidencia |
+| --- | --- | --- | --- |
+| dba | `sql/01` con `cob.UsuarioInterno` nueva y `Limitado` en `LogNotificacion` (5.1, 5.10) | Hecho (local, análisis estático) | `evidencias/2026-11-06_adr001_sql/` |
+| dba | `sql/04` `Limitado` sin sumar intento (5.12) | Hecho (local, análisis estático) | ídem |
+| dba | `sql/12` tablas, 7 procedimientos con GRANT, 11 administrativos sin GRANT, vista, funciones auxiliares (5.1, 5.2) | Hecho (local, análisis estático), con desviaciones D-1 a D-13 (10.1) | ídem |
+| dba | `sql/13` pruebas PA-01 a PA-28 (5.10) | Hecho (local); 28/28 esperado por traza, NO ejecutado | ídem |
+| dba | `sql/00` y cabecera de `sql/02` (5.10) | Hecho (local) | ídem |
+| desarrollador | Retiro de `EasyAuthHandler.cs` (5.11 regla 2) | Hecho; prueba `A01_EasyAuthHandler_NoExisteEnElEnsamblado` | `evidencias/2026-11-06_adr001_desarrollo/` |
+| desarrollador | `Program.cs`, esquemas, políticas, CSRF, limitador, encabezados reenviados, Data Protection, telemetría, endpoints, panel y login (5.3 a 5.8) | Hecho (local): build 0 advertencias, 102/102 pruebas (25 Functions, 77 API) | ídem (`03_build.txt`, `04_test.txt`) |
+| desarrollador | `Cobranza.Herramientas` (5.9) | Hecho (local); no ejecutada por agentes (SEG-H01) | ídem; `src/Cobranza.Herramientas/README.md` |
+| desarrollador | 429 como `Limitado` en la Function (5.12) | Hecho (local) | ídem |
+| desarrollador | `pruebas/carga_api_k6.js` y `pruebas/consumidor_ventas_demo.sh` (5.10) | Escritos; `bash -n` del consumidor OK; no ejecutados | ídem (`07_sintaxis_scripts.txt`); `evidencias/2026-11-06_adr001_devops/09_bash_n.txt` |
+| devops | `main.bicep` y `main.bicepparam` (5.5, 5.5.1, 5.4.1, 5.11, B-01) | Hecho (local): build y lint limpios; what-if 53 Create (ventana cerrada) y 54 Create (IP de documentación) | `evidencias/2026-11-06_adr001_devops/` |
+| devops | Scripts SEG-H01 `s11_*`, `s14_revision_post_restauracion.sh`, `s15_purgar_log_acceso.sh`, `desplegar_sql.sh`, `desplegar.sh`, `s11_configurar_api.sh`, `s10_configurar_jobs.sh`, README (5.9, 5.10) | Escritos, `bash -n` OK, NO ejecutados; ShellCheck NO VERIFICADO | ídem |
+| seguridad | `s12_endurecer.sh`, `s12_verificar_seguridad.sh`, `s12_pruebas_red.sh` (5.10, 6.2, 6.3, SEG-H08) | Escritos, `bash -n` y pruebas en seco con `az`/`curl` simulados; NO ejecutados contra Azure | `evidencias/2026-11-06_adr001_seguridad/` |
+| seguridad | Plantillas de `docs/seguridad/` y actualización de la política (D.6) | Hecho | ídem |
+| qa | Revisión independiente de la Fase A (7.1 punto 5) | PENDIENTE | — |
+| humano | Aprobaciones de 5.11 regla 1, despliegue, ejecución SQL y verificaciones de la sección 11 | PENDIENTE | — |
 
 ---
 
@@ -659,6 +702,8 @@ Búsqueda realizada en `scripts/`, `docs/`, `pruebas/` y `sql/` el 05-11-2026.
 
 Estas ediciones las aplica el orquestador o el `arquitecto` solo cuando un humano las apruebe. Las secciones 0, 3, 7 y 10 de CLAUDE.md están fuera de lo que el `arquitecto` puede editar; se proponen para que las aplique quien corresponda.
 
+Nota de la revisión 2 (06-11-2026, M-N2 de `qa`): el título "(no aplicadas)" ya no es exacto. Las ediciones de 8.1 a 8.5 figuran en CLAUDE.md (revisión 2 del 05-11-2026), con redacciones que difieren en detalle de las propuestas aquí (por ejemplo, D12 en CLAUDE.md dice que `Limitado` está "diseñado, no implementado", y D14 figura como Vigente). Las de 8.6 (`docs/00_INDICE.md` y `docs/05`) no se encontraron aplicadas en `docs/` al 06-11-2026. El texto de esta sección se conserva como registro de lo propuesto; las actualizaciones nuevas que derivan de la revisión 2 están en 10.5.
+
 ### 8.1 CLAUDE.md sección 3, viñeta "Identidad" (reemplazo)
 
 > - Identidad: identidades administradas con RBAC mínimo hacia SQL, Key Vault y Storage (API sin acceso a secretos; Function App solo al secreto `acs-connection-string`); Azure SQL solo Entra ID (grupo `grp-cobranza-sql-admin`). Usuarios del panel y consumidores de la API con autenticación propia de la aplicación (ADR-001, D13): usuario y contraseña con cookie de ASP.NET Core (PBKDF2 de `PasswordHasher`, bloqueo por intentos, roles `Finanzas`, `Ventas`, `Admin` desde `cob.UsuarioInterno`) y clave de API por consumidor en el encabezado `X-Api-Key` (hash SHA-256 en `cob.ClaveApi`, valor en Key Vault; consumidor DEMO `ventas-demo`). Easy Auth v2 y los roles de aplicación de Entra ID no se usan (requieren consentimiento de administrador en el tenant Duoc). Sin MFA.
@@ -728,3 +773,111 @@ Nota en la fila D3 o en el pendiente 3: "Textos de Finanzas DEMO (inventados y r
 | 9.6 | Authorize access to Azure Blob Storage using Azure role assignment conditions: https://learn.microsoft.com/en-us/azure/storage/blobs/storage-auth-abac | Condiciones GA sobre `Storage Blob Data Owner`; aplican a DataActions, no a Actions de administración | 05-11-2026 (revisión 1) |
 
 No se consultó documentación oficial sobre la política de consentimiento de Duoc: el hecho fue verificado por el operador en el tenant y lo informó el orquestador. Los hechos sobre Key Vault (`exp` informativo) provienen de la política de `seguridad`, que cita "About Azure Key Vault secrets"; el arquitecto no los reverificó.
+
+Revisión 2 (06-11-2026): no se consultaron fuentes externas nuevas. Todo lo agregado proviene de las evidencias de los agentes del 06-11-2026, del informe de `qa` del 06-11-2026 y de la lectura del código del repositorio.
+
+---
+
+## 10. Desviaciones de implementación (06-11-2026, revisión 2)
+
+Criterio: "Desviación" es todo lo implementado que difiere del texto de las secciones 5 y 6 o que lo precisa donde el ADR no decía nada. La columna "Decisión del equipo" indica si hace falta que un humano decida o confirme; "No" significa que la desviación es coherente con el ADR y basta con la revisión de `qa`.
+
+### 10.1 `dba` (fuente: `evidencias/2026-11-06_adr001_sql/CAMBIOS.md`, sección 5)
+
+| Id | Desviación | Motivo | Decisión del equipo |
+| --- | --- | --- | --- |
+| D-1 | Columna `cob.LogAcceso.Detalle NVARCHAR(200) NULL` (incorporada en 5.1) | 5.7 exige registrar el total purgado y RNF-05 el valor anterior y nuevo; la tabla no tenía dónde guardarlo | No (`seguridad` puede usarla en la política B y C.3) |
+| D-2 | `sp_ObtenerUsuarioPorId` con `@IncluirHash = 0` devuelve `HashClave` en NULL, no omite la columna | Forma estable del conjunto de resultados | No |
+| D-3 | Tipos no especificados en el ADR: `@IpOrigen VARCHAR(45)` y `@AgenteUsuario NVARCHAR(200)` en todos los procedimientos; tipos de los administrativos | Coherencia con las columnas de 5.1 | No |
+| D-4 | Conjuntos de resultados: `sp_RegistrarLoginFallido` siempre 1 fila; `sp_CambiarClave` devuelve `SelloSeguridad`; administrativos sin filas salvo Purgar (`FilasBorradas`), Listar y Verificar | Contrato mínimo y estable para scripts | No |
+| D-5 | Errores 50061 a 50076 además de 50060 (incorporado en 5.2). `sp_RegistrarLoginExitoso` lanza 50061 si el `UsuarioId` dejó de existir | Mensajes explícitos en lugar de errores genéricos | No (la API lo trata, 10.2) |
+| D-6 | Los procedimientos validan el rol con `COLLATE Latin1_General_BIN2` (`finanzas` se rechaza con 50063); el CHECK de la tabla sigue insensible a mayúsculas | ASP.NET compara roles distinguiendo mayúsculas | No (`s11_alta_usuario.sh` pasa `Finanzas`/`Ventas`/`Admin` exactos) |
+| D-7 | CHECK adicionales `CK_ClaveApi_NombreSecretoKv`, `CK_ClaveApi_Prefijo`, `CK_LogAcceso_UsuarioIngresado` (incorporado en 5.1) | Hacer cumplir en la tabla los formatos descritos | No |
+| D-8 | `sp_RevocarClaveApi` idempotente: si ya estaba revocada no hay error ni evento nuevo; 50069 solo para prefijo inexistente | La revisión posterior a restauración repite revocaciones | No |
+| D-9 | `sp_VerificarCambioClave` decide "posterior" por `LogAccesoId`, no por `FechaUtc` | `FechaUtc` tiene precisión de 1 s | No |
+| D-10 | `cob.vw_LogAccesoEvidencia` también oculta el dominio del `Actor` (`usuario@***`) | Política B.5.3 | No |
+| D-11 | `fn_SanearUsuarioIngresado` no convierte a minúsculas | El ADR exige minúsculas y la API normaliza antes | No |
+| D-12 | Si llega `ClaveIncorrecta` para una cuenta ya bloqueada, el procedimiento suma 1 y extiende el bloqueo | Es el único UPDATE atómico descrito; según 5.7 la API debe enviar `CuentaBloqueada` sin verificar la contraseña | No (la API envía `CuentaBloqueada`, 10.2) |
+| D-13 | Casos de `sql/13` numerados `PA-01` a `PA-28`, no `AUT-xx` | AUT-01 a AUT-18 son pruebas de la API; PA-09 cubre la parte SQL de AUT-18 y PA-10 la de AUT-16 | No |
+
+Además: `sp_PurgarLogAcceso` rechaza también más de 36.500 días (50071); `sp_RegistrarNotificacion` rechaza `@EstadoEnvio` NULL (50002). Riesgos que solo despeja una ejecución real: `INSERT ... EXEC` con transacciones y `OUTPUT INTO` sobre variables de tabla, `THROW` después de un `COMMIT` anidado, comportamiento de `[a-z]` con `Latin1_General_BIN2` sobre `varchar` (CAMBIOS.md 6.3).
+
+### 10.2 `desarrollador` (fuente: código y pruebas en `src/` y `tests/`, `evidencias/2026-11-06_adr001_desarrollo/`, `src/Cobranza.Herramientas/README.md`)
+
+Nota: la carpeta de evidencias del `desarrollador` no contiene un informe de cambios (`CAMBIOS.md`); solo salidas de comandos. Las desviaciones de esta tabla se reconstruyeron a partir del código, los nombres de las pruebas, el README de la herramienta y el encargo del orquestador.
+
+| Id | Desviación o precisión | Motivo | Decisión del equipo |
+| --- | --- | --- | --- |
+| DS-1 | Con la cuenta bloqueada, la API envía el motivo `CuentaBloqueada` y nunca `ClaveIncorrecta`, también en `cambiar-clave`; el bloqueo vence a la hora original (pruebas `D12_*`) | Evita que el procedimiento extienda el bloqueo (D-12 de `dba`) | No |
+| DS-2 | El error 50061 en `sp_RegistrarLoginExitoso` se responde con el 401 genérico, sin cookie, y se registra una advertencia con el `UsuarioId` (prueba `D5_UsuarioEliminadoDuranteElLogin_401Generico_SinCookie_NoEs500`) | D-5 de `dba`; evitar un 500 que revele el caso | No |
+| DS-3 | Caché de validación de claves de API en memoria: solo validaciones correctas, clave = hash, duración `Seguridad__SegundosCacheClaveApi` (60 s DEMO), máximo 1.000 entradas. Una revocación tarda como máximo 60 s (AUT-12 cubierto en proceso) | 5.3; el límite de entradas no estaba en el ADR | No |
+| DS-4 | Data Protection en Blob + Key Vault obligatoria fuera de `Development`: sin los ajustes la API no arranca. En `Development` usa el almacenamiento local por defecto y `DefaultAzureCredential`; en Azure, `ManagedIdentityCredential` de sistema | 5.5; impedir que la API corra en Azure con claves sin protección | Informativa: elimina en la práctica la alternativa `%HOME%` de 5.5. Solo requiere decisión si el equipo quisiera esa alternativa |
+| DS-5 | Si `ASPNETCORE_FORWARDEDHEADERS_ENABLED=true`, la API no arranca (prueba `ForwardedHeadersDeLaPlataformaHabilitado_NoArranca`). `KnownProxies` y `KnownIPNetworks` vacías; `ForwardLimit = SaltosProxyConfiables` | 5.4.1 regla 1, reforzada en código | No |
+| DS-6 | Opciones `Seguridad__*` sin valores por defecto en código, con rangos y coherencia validados al arranque (`ValidateOnStart`); valores DEMO en `appsettings.json` con nota de cuáles están aprobados y cuáles PENDIENTE | 5.4 | No |
+| DS-7 | Telemetría: inicializador `TelemetriaSinDatosSensibles` (incorporado en 5.5) | 5.5 y 5.7 | No; verificación en Azure (sección 11) |
+| DS-8 | `Cobranza.Herramientas`: usa el framework compartido `Microsoft.AspNetCore.App` para `PasswordHasher` (resuelve la duda de 5.3 sobre `Identity.Core`); `hash-clave` escribe en `/dev/tty` o `CONOUT$` y termina con código 2 si no hay consola; `nueva-clave-api` no sobrescribe un archivo con contenido (código 3) y entrega `<prefijo> <HEX MAYÚSCULAS>`; se invoca como DLL compilada, no con `dotnet run` | 5.9 | No; verificación humana en Git Bash (README sección 6) |
+| DS-9 | Proyecto nuevo `src/Cobranza.Comun` (`ClaveApiFormato.cs`), compartido por la API y la herramienta; proyecto de pruebas `tests/Cobranza.Api.Tests` | Una sola implementación del formato de clave (5.3) | No; CLAUDE.md sección 7 debe listarlos (10.5) |
+| DS-10 | Function: 429 o `TooManyRequests` se registra como `Limitado` (incorporado en 5.12); si ese registro falla, EventId 4291 y corte del lote | 5.12 y M-N3 | No |
+| DS-11 | Las pruebas de la API corren en proceso con dobles del repositorio SQL. Cubren AUT-01 a AUT-14, AUT-16, AUT-18, RED-12, RED-15, RED-16 y A-01; no cubren AUT-15 ni AUT-17 ni el comportamiento real de SQL | Sin motor SQL ni Azure | No; quedan para la sección 11 |
+
+### 10.3 `devops` (fuente: `evidencias/2026-11-06_adr001_devops/CAMBIOS.md`)
+
+| Id | Desviación o precisión | Motivo | Decisión del equipo |
+| --- | --- | --- | --- |
+| DV-1 | SCM de la Web App y de la Function App sin herencia (`scmIpSecurityRestrictionsUseMain=false`) y con `Deny`; la Function App también con entrada `Deny` (`ipSecurityRestrictionsDefaultAction`) en `main.bicep` | Pedido de `seguridad`: que redesplegar `main` no deje Kudu abierto ni reabra la Function App. La Function App solo tiene temporizadores | No (decisión delegada a `seguridad` en 5.11 regla 3); confirmar en Azure que los temporizadores no se ven afectados |
+| DV-2 | `scripts/desplegar.sh` con 10 pasos (CLAUDE.md sección 7 dice "8 pasos"): agrega validación previa, publicación con ventana SCM y cierre de la ventana | Integrar 5.11, la ventana del operador y la regla 7 de CLAUDE.md | Sí: confirmar la secuencia y la creación del script (pendiente 13 de CLAUDE.md) |
+| DV-3 | `s11_configurar_api.sh` ya no publica la API: solo deshabilita Easy Auth si estuviera activo, borra `MICROSOFT_PROVIDER_AUTHENTICATION_SECRET` y aplica ajustes desde las salidas de la plantilla. `s10_configurar_jobs.sh` acepta `OMITIR_PUBLICACION=si` | 5.11 regla 1; la publicación queda centralizada en `desplegar.sh` paso 6 | No |
+| DV-4 | Los scripts envían el lote SQL a `sqlcmd` por la entrada estándar (`sql_lote`: `-b -x`, Entra `ActiveDirectoryDefault`) en lugar de `-v` con el hash | Reduce la exposición del hash en la lista de procesos (B-10b de 4.2); el texto del lote sigue en la auditoría SQL | No; verificar que go-sqlcmd lee stdin (sección 11) |
+| DV-5 | Revisión posterior a restauración en script aparte `s14_revision_post_restauracion.sh` (incorporado en 4.2); restablecimientos de contraseña a cargo del humano | 4.2 dejaba la elección a `devops` | No |
+| DV-6 | Condición ABAC sin `blobs/filter/action` (incorporado en 5.5.1) | No incluida en la lista de acciones | Sí: aceptar el riesgo residual o agregar la acción |
+| DV-7 | Regla de permiso de la Web App con nombre `operador-transicion` (Allow, `/32`, prioridad 100). `main.bicep` y la evidencia citan "SEG-H11" como registro del nombre, pero ese identificador no aparece en la política ni en otro documento del repositorio | 5.11 regla 3 no fijaba el nombre | No para el nombre; `seguridad` debe registrar SEG-H11 o corregir la cita |
+| DV-8 | Parámetro `saltosProxyConfiables` (rango 1 a 2, valor 1 en `main.bicepparam`) y salida homónima | 5.4.1 regla 3 | No |
+| DV-9 | `sqlTde` explícito (cierra B-01), clave RSA 2048 creada solo si no existe, salidas `dataProtection*`. Resultado: 37 declaraciones; what-if 53 Create con `ipOperador` vacío | 4.3 y 5.5 | No; CLAUDE.md sección 3 dice 31/49 (10.5) |
+| DV-10 | En `desplegar.sh`, el paso 6 ejecuta `s12_endurecer.sh` completo (cierra SQL y Key Vault), por eso SQL va en el paso 5; las altas posteriores requieren reabrir la ventana del operador | Efecto colateral de reutilizar `s12_endurecer.sh` | Informativa; se documenta en la política A.10 |
+
+### 10.4 `seguridad` (fuente: `evidencias/2026-11-06_adr001_seguridad/CAMBIOS.md`)
+
+| Id | Desviación o precisión | Motivo | Decisión del equipo |
+| --- | --- | --- | --- |
+| SG-1 | Decisión de SCM de 5.11 regla 3 (ver DV-1 y 5.11) | Kudu da acceso al sistema de archivos y a las variables del sitio | No (delegada a `seguridad`) |
+| SG-2 | `s12_endurecer.sh` gobierna la transición con `ESTADO_TRANSICION` (`vigente`, `publicacion-aprobada`, `levantada`) y exige `APROBACION_QA` o `APROBACION_LEVANTAMIENTO`; nunca abre la Web App | 5.11 reglas 1, 3 y 4 | No |
+| SG-3 | Apertura del SCM solo con `IP_PUBLICACION_SCM`; `IP_OPERADOR` se ignora con aviso | `IP_OPERADOR` queda exportada al cargar `infra/entorno.local.env` y abriría Kudu sin decisión explícita | No |
+| SG-4 | `s12_endurecer.sh` cierra Key Vault (`publicNetworkAccess Disabled`, `Deny`, sin `ipRules`), elimina solo `operador-temporal` en SQL (avisa de otras reglas sin borrarlas) y reaplica Storage sin acceso público | SEG-H08 | No |
+| SG-5 | Controles adicionales a 6.2: SEG-DP-03 dividido en 03a (condición) y 03b (prueba manual); SEG-KV-02b, 06a/b/c, 07 (opcional), 08; SEG-TR-02; SEG-EA-02; SEG-23 a SEG-31 (Storage, SCM, `nsg-pe`); SEG-DNS-01 a 05. Estado NO VERIFICADO en la matriz | Alcance del agente (exposición pública, DNS privado) | No |
+| SG-6 | Pruebas de 6.3 divididas: RED-12a/12b, RED-13a/b, RED-16a (automática)/16b (manual en SQL), RED-17/17b (`ORIGEN_PRUEBA=externa`). Los logins de prueba usan usuarios inexistentes; RED-12b requiere la contraseña de una persona, leída sin eco desde `/dev/tty` | No bloquear cuentas; SEG-H01 | No |
+| SG-7 | La política de credenciales pasó a "Aprobada por el equipo (05-11-2026)" con historial propio | M-N2 de `qa` | Sí: registrar el nombre del integrante que aprobó (CLAUDE.md sección 10: responsable PENDIENTE) |
+
+### 10.5 Efectos sobre otros documentos (para el orquestador; el `arquitecto` no los aplica)
+
+- CLAUDE.md sección 5, D12: dice que el estado `Limitado` "está diseñado en ADR-001, no implementado"; al 06-11-2026 está implementado localmente (5.12, DS-10).
+- CLAUDE.md sección 7: dice que la API "todavía usa `EasyAuthHandler`" y "23/23"; al 06-11-2026 `EasyAuthHandler.cs` fue eliminado y hay 102/102 pruebas en dos proyectos. `desplegar.sh` figura con 8 pasos (ahora 10); la estructura no lista `src/Cobranza.Comun`, `src/Cobranza.Herramientas`, `tests/Cobranza.Api.Tests`, `sql/12`, `sql/13` ni los scripts nuevos. Sección 3 indica 31/49 para `main.bicep` (ahora 37 declaraciones; what-if 53 Create).
+- CLAUDE.md sección 8, pendiente 13: `desplegar.sh` y `desplegar_sql.sh` ya existen (escritos por `devops`); `verificar_despliegue.sh`, `validar_direccionamiento.py` y `GUIA_DESPLIEGUE.md` siguen sin existir. La decisión humana de recrearlos no consta.
+- CLAUDE.md sección 5, D13: la regla 5.11 y A-01 siguen vigentes hasta el informe de `qa` y la aprobación humana; no cambiar el estado de la publicación.
+- Política de credenciales: registrar SEG-H11 (DV-7) y el aprobador (SG-7).
+
+---
+
+## 11. Estado de verificación y verificaciones que solo se hacen en Azure (revisión 2)
+
+Estado al 06-11-2026: implementado y validado localmente; NO desplegado ni probado en Azure. Validaciones locales realizadas:
+- .NET: `dotnet build` 0 advertencias y 0 errores; `dotnet test` 102/102 (25 de Functions y 77 de la API, en proceso y con dobles); sin paquetes vulnerables (`evidencias/2026-11-06_adr001_desarrollo/`).
+- SQL: análisis estático con ScriptDom sobre 12 archivos, 0 errores y 0 hallazgos; control negativo con 5 errores introducidos detectado. `sql/07` 10/10 y `sql/13` 28/28 son resultados esperados por traza, NO ejecutados (no hay motor SQL local).
+- Bicep: `build`, `lint` y `build-params` limpios con 0.48.1; what-if 53 Create (ventana cerrada) y 54 Create (IP de documentación RFC 5737), 0 Modify, 0 Delete. El what-if es una lectura contra Azure; no crea recursos.
+- Scripts: `bash -n` en todos; pruebas en seco de los `s12_*` con `az`/`curl` simulados. ShellCheck NO VERIFICADO (no instalado).
+
+Verificaciones que solo se pueden hacer en Azure (o con `sqlcmd` contra Azure SQL), todas PENDIENTE y con aprobación humana previa:
+
+| Id | Verificación | Por qué no se puede hacer localmente | Responsable propuesto |
+| --- | --- | --- | --- |
+| AUT-15 | Tras reiniciar la Web App con una sesión abierta, la sesión sigue válida (claves de Data Protection persistidas en `dataprotection-keys` y protegidas con `dataprotection-cobranza-api`) | Requiere Blob, Key Vault e identidad administrada reales | `desarrollador` + `qa` |
+| AUT-17 | Una clave revocada antes de un simulacro de restauración sigue revocada tras `s14_revision_post_restauracion.sh` | Requiere PITR real y el script ejecutado por un humano (SEG-H01) | humano + `dba` + `qa` |
+| SEG-DP-03 (03b) | La identidad de la Function App recibe 403 al leer o escribir en `dataprotection-keys` (prueba negativa ABAC, `docs/seguridad/plantilla_prueba_negativa_abac.md`) | La condición solo se evalúa en Azure; ARM la valida al crear la asignación | `seguridad` + `qa` |
+| SALUD-01 | Efecto de `ipSecurityRestrictionsDefaultAction = Deny` sobre la sonda `/salud` (métrica `HealthCheckStatus`). Mientras rija 5.11 la API no está publicada, por lo que se espera estado no saludable | Depende del comportamiento de la plataforma | `devops` |
+| TEL-01 | Application Insights no contiene contraseñas, claves, cookies, tokens CSRF, encabezados `X-Api-Key`/`Authorization`/`Cookie` ni cuerpos de `/api/v1/auth/*` | Depende de la recolección real del SDK y del agente de App Service | `desarrollador` + `seguridad` |
+| SQL-STDIN | go-sqlcmd ejecuta el lote recibido por la entrada estándar (`sql_lote`); si falla, los scripts SEG-H01 no escriben en la base | `sqlcmd` no está instalado en la estación usada por los agentes; necesita Azure SQL con la ventana abierta | humano (operador) |
+| SQL-EXEC | `sql/07` 10/10 y `sql/13` 28/28; consulta 5 de `sql/00` (permisos no esperados); qué devuelve `ORIGINAL_LOGIN()` para la identidad administrada y para el grupo | Sin motor SQL local | `dba` (con aprobación humana) |
+| FH-01 | Valor por defecto de `ASPNETCORE_FORWARDEDHEADERS_ENABLED` en App Service Linux (Kudu, `env`) y RED-16 contra el front-end real | Depende de la plataforma | `seguridad` |
+| TMR-01 | Los temporizadores de la Function App funcionan con entrada `Deny` y SCM `Deny` (DV-1) | Depende de la plataforma | `devops` + `qa` |
+| AUD-01 | Si la auditoría de Azure SQL registra parámetros de llamadas RPC de la API (4.2, B-10b) | Requiere auditoría activa | `seguridad` |
+
+Fuera de Azure, pero también pendientes de una persona: `hash-clave` en Git Bash de cada integrante (README de la herramienta, sección 6) y ShellCheck sobre los scripts nuevos.

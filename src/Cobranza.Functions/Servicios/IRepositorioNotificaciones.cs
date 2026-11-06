@@ -11,7 +11,10 @@ public interface IRepositorioNotificaciones
 {
     Task<IReadOnlyList<AvisoPendiente>> ObtenerAvisosPendientesAsync(int maxFilas, CancellationToken ct);
 
-    /// <summary>estado: Aceptado o Fallido (valores admitidos por cob.sp_RegistrarNotificacion).</summary>
+    /// <summary>
+    /// estado: Aceptado, Fallido o Limitado (valores admitidos por cob.sp_RegistrarNotificacion, sql/04).
+    /// Limitado (429 de ACS) no incrementa Intentos (ADR-001 5.12).
+    /// </summary>
     Task RegistrarNotificacionAsync(AvisoPendiente a, string estado, string? idOperacion, string? detalle,
         CancellationToken ct);
 }

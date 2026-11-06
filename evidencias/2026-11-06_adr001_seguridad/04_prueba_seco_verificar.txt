@@ -1,0 +1,60 @@
+### V1 az simulado: devuelve vacio salvo identidades, NSG y diagnostico; falla role assignment y secret list
+### (valida que el script recorre todos los controles y clasifica CUMPLE / NO CUMPLE / NO VERIFICADO)
+SEG-01;API: solo HTTPS;true;;NO CUMPLE
+SEG-02;API: TLS minimo;1.2;;NO CUMPLE
+SEG-03;API: FTP deshabilitado;Disabled;;NO CUMPLE
+SEG-04;API: SCM con accion por defecto Deny;Deny;;NO CUMPLE
+SEG-05;API: Easy Auth deshabilitado (autenticacion propia ADR-001);false;false;CUMPLE
+SEG-06;API: identidad administrada;SystemAssigned;;NO CUMPLE
+SEG-07;Functions: solo HTTPS;true;;NO CUMPLE
+SEG-08;Functions: TLS minimo;1.2;;NO CUMPLE
+SEG-09;Functions: entrada publica denegada;Deny;;NO CUMPLE
+SEG-10;Functions: todo el trafico por VNet;true;;NO CUMPLE
+SEG-11;SQL: acceso publico;Disabled;;NO CUMPLE
+SEG-12;SQL: TLS minimo;1.2;;NO CUMPLE
+SEG-13;SQL: solo autenticacion Entra ID;true;;NO CUMPLE
+SEG-14;SQL: TDE habilitado;Enabled;;NO CUMPLE
+SEG-15;SQL: auditoria habilitada;Enabled;;NO CUMPLE
+SEG-16;Key Vault: autorizacion RBAC;true;;NO CUMPLE
+SEG-17;Key Vault: proteccion de purga;true;;NO CUMPLE
+SEG-18;Key Vault: acceso publico;Disabled;;NO CUMPLE
+SEG-19;Storage: TLS minimo;TLS1_2;;NO CUMPLE
+SEG-20;Storage: sin acceso anonimo a blobs;false;;NO CUMPLE
+SEG-21;Storage: sin clave compartida;false;;NO CUMPLE
+SEG-22;Private Endpoints no aprobados;0;;NO CUMPLE
+SEG-23;Storage: acceso publico;Disabled;;NO CUMPLE
+SEG-24;Functions: SCM con accion por defecto Deny;Deny;;NO CUMPLE
+SEG-25;API: SCM no hereda reglas del sitio principal;false;;NO CUMPLE
+SEG-26;Functions: SCM no hereda reglas del sitio principal;false;;NO CUMPLE
+SEG-27;API: SCM sin reglas de permiso al cerrar la ventana;0;;NO CUMPLE
+SEG-28;Functions: SCM sin reglas de permiso al cerrar la ventana;0;;NO CUMPLE
+SEG-29;nsg-pe: Deny-VNet-Inbound en prioridad 4000;Deny/4000;Deny/4000;CUMPLE
+SEG-30;nsg-pe: 1433 permitido desde snet-app;Allow/10.20.1.0/24/1433;;NO CUMPLE
+SEG-31;nsg-pe: 443 permitido desde snet-app;Allow/10.20.1.0/24/443;;NO CUMPLE
+SEG-DNS-01;DNS privado SQL;10.20.2.4;;NO CUMPLE
+SEG-DNS-02;DNS privado Key Vault;10.20.2.5;;NO CUMPLE
+SEG-DNS-03;DNS privado blob;10.20.2.6;;NO CUMPLE
+SEG-DNS-04;DNS privado queue;10.20.2.7;;NO CUMPLE
+SEG-DNS-05;DNS privado table;10.20.2.8;;NO CUMPLE
+SEG-DP-01;Asignaciones RBAC (lectura fallida);-;NO VERIFICADO (no se pudo leer az role assignment list o las identidades);NO VERIFICADO
+SEG-DP-02;Asignaciones RBAC (lectura fallida);-;NO VERIFICADO (no se pudo leer az role assignment list o las identidades);NO VERIFICADO
+SEG-KV-01;Asignaciones RBAC (lectura fallida);-;NO VERIFICADO (no se pudo leer az role assignment list o las identidades);NO VERIFICADO
+SEG-KV-02;Asignaciones RBAC (lectura fallida);-;NO VERIFICADO (no se pudo leer az role assignment list o las identidades);NO VERIFICADO
+SEG-KV-02b;Asignaciones RBAC (lectura fallida);-;NO VERIFICADO (no se pudo leer az role assignment list o las identidades);NO VERIFICADO
+SEG-KV-03;Asignaciones RBAC (lectura fallida);-;NO VERIFICADO (no se pudo leer az role assignment list o las identidades);NO VERIFICADO
+SEG-DP-03a;Asignaciones RBAC (lectura fallida);-;NO VERIFICADO (no se pudo leer az role assignment list o las identidades);NO VERIFICADO
+SEG-DP-03b;Functions: lectura de blobs en dataprotection-keys rechazada (403);403;NO VERIFICADO (prueba manual: docs/seguridad/plantilla_prueba_negativa_abac.md);NO VERIFICADO
+SEG-KV-04;Secretos apikey-*: sin expiracion o vencidos habilitados;0;NO VERIFICADO (sin acceso al plano de datos de Key Vault);NO VERIFICADO
+SEG-KV-05;Key Vault: diagnostico de auditoria (categoryGroup audit) activo;existe;existe;CUMPLE
+SEG-KV-06a;Key Vault: sin ipRules;0;0;CUMPLE
+SEG-KV-06b;SQL: sin regla de firewall operador-temporal;0;;NO CUMPLE
+SEG-KV-06c;SQL: sin reglas de firewall (ninguna IP publica permitida);0;;NO CUMPLE
+SEG-KV-08;Key Vault: accion por defecto de red;Deny;;NO CUMPLE
+SEG-TR-01;API: regla de transicion ADR-001 5.11 (entrada por defecto Deny);Deny;;NO CUMPLE
+SEG-TR-02;API: sin reglas de permiso al cerrar la ventana (ipOperador vacio);0;;NO CUMPLE
+SEG-FH-01;API: ASPNETCORE_FORWARDEDHEADERS_ENABLED;false;sin ajuste;NO CUMPLE
+SEG-EA-02;API: sin ajuste MICROSOFT_PROVIDER_AUTHENTICATION_SECRET (Easy Auth obsoleto);0;;NO CUMPLE
+SEG-WAF;WAF no desplegado (D11 PENDIENTE);-;-;PENDIENTE
+Resumen: 4 de 54 controles cumplen; 9 no verificados. Archivo: matriz_seguridad_20261106_0943.csv
+Cookie, CSRF, limitador y encabezados reenviados: ver scripts/s12_pruebas_red.sh (RED-11 a RED-17).
+codigo de salida=0

@@ -1,0 +1,2 @@
+# az bicep build --file infra/main.bicep --outfile <temporal>
+exit=0

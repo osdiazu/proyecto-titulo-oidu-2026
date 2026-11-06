@@ -1,0 +1,890 @@
+diff --git a/docs/seguridad/politica_credenciales_y_accesos.md b/docs/seguridad/politica_credenciales_y_accesos.md
+index 84c8cae..55da518 100644
+--- a/docs/seguridad/politica_credenciales_y_accesos.md
++++ b/docs/seguridad/politica_credenciales_y_accesos.md
+@@ -2,20 +2,28 @@
+ 
+ | Campo | Valor |
+ | --- | --- |
+-| Estado | Propuesta del agente `seguridad`, 05-11-2026. Pendiente de revisión de `qa` y de aprobación humana |
+-| Redactó | Agente `seguridad` (Claude Code), 05-11-2026 |
+-| Aprueba | PENDIENTE (CLAUDE.md sección 10: responsable humano no definido) |
++| Estado | Aprobada por el equipo (05-11-2026): el usuario aprobó el canal de entrega (sección A) y los valores DEMO de A.11, según lo informado por el orquestador (hallazgo M-N2 de `qa`, `evidencias/qa/2026-11-06_revision_precommit.md`). Revisión 1 (06-11-2026): corrección B-N6 y aplicación de D.6; pendiente de revisión de `qa` |
++| Redactó | Agente `seguridad` (Claude Code), 05-11-2026; revisión 1, 06-11-2026 |
++| Aprueba | El equipo, 05-11-2026 (aprobación informada por el orquestador). Nombre del integrante que aprueba: PENDIENTE de registrar (CLAUDE.md sección 10: responsable humano no definido) |
+ | Base | `docs/adr/ADR-001-autenticacion-propia-sin-entra-usuarios.md` (aceptada 05-11-2026); decisiones del usuario del 05-11-2026 (consumidor DEMO "ventas-demo", altas por el propio equipo, retención definida por seguridad) |
+ | Región | `brazilsouth` |
+ | Requerimientos | RF-05, RF-06, RF-07, RNF-02, RNF-05, RNF-06 |
+ 
+-Nota de alcance: este documento es diseño. Nada de lo descrito está implementado, ejecutado ni desplegado. Los scripts que se nombran no existen todavía en el repositorio (salvo los indicados como existentes). Los valores marcados DEMO son de demostración y no fueron definidos por el equipo ni por la embotelladora.
++Nota de alcance: este documento es diseño. Nada de lo descrito está implementado, ejecutado ni desplegado. Los scripts que se nombran no existen todavía en el repositorio (salvo los indicados como existentes). Los valores marcados DEMO son de demostración: no los definió la embotelladora; los de A.11 fueron aprobados por el equipo el 05-11-2026 como valores DEMO.
++
++### Historial
++
++| Versión | Fecha | Cambios |
++| --- | --- | --- |
++| Inicial | 05-11-2026 | Propuesta del agente `seguridad` |
++| Aprobación | 05-11-2026 | El equipo aprueba el canal de entrega y los valores DEMO de A.11 (informado por el orquestador) |
++| Revisión 1 | 06-11-2026 | Estado actualizado (M-N2); sección 0 corregida: `diagKv` ya está en `main.bicep` (B-N6); D.6 aplicada en `scripts/s12_*` y plantillas de `docs/seguridad/` (SEG-H08); referencias a la auditoría de Key Vault actualizadas en A.2, A.8, D.5 y E |
+ 
+ ---
+ 
+ ## 0. Hechos verificados en el repositorio (05-11-2026)
+ 
+-Lo siguiente se leyó en el repositorio; las recomendaciones se apoyan en estos hechos.
++Lo siguiente se leyó en el repositorio el 05-11-2026; las recomendaciones se apoyan en estos hechos. Las filas marcadas "Actualizado 06-11-2026" se volvieron a leer en esa fecha. `devops` está modificando `infra/main.bicep` según ADR-001 (por ejemplo, retiro de `raKvApi` y alcance de `raKvFunc`); las filas sobre RBAC describen la plantilla al 06-11-2026 y deben releerse cuando termine ese cambio.
+ 
+ | Hecho | Fuente |
+ | --- | --- |
+@@ -24,8 +32,8 @@ Lo siguiente se leyó en el repositorio; las recomendaciones se apoyan en estos
+ | SQL: acceso público solo con `ipOperador` (regla `operador-temporal`); auditoría con `BATCH_COMPLETED_GROUP` hacia Log Analytics | `infra/main.bicep`, `sqlServer`, `sqlAuditoria` |
+ | Log Analytics con `retentionInDays: 30` | `infra/main.bicep`, `logAnalytics` |
+ | PITR 35 días; LTR `P8W` / `P12M`; los LTR sobreviven a la eliminación del grupo de recursos | `infra/main.bicep`, `sqlPitr`, `sqlLtr`; `scripts/eliminar_entorno.sh` |
+-| El diagnóstico de auditoría de Key Vault (`categoryGroup: audit`) solo existe en el módulo `infra/modulos/seguridad_perimetral.bicep`, no en `main.bicep` | `grep diagnosticSettings` |
+-| `s12_endurecer.sh` deshabilita el acceso público de SQL, pero no modifica Key Vault ni elimina la regla `operador-temporal` | `scripts/s12_endurecer.sh` |
++| Actualizado 06-11-2026 (B-N6). El diagnóstico de auditoría de Key Vault (`categoryGroup: audit`, recurso `diagKv`, nombre `diag-kv`) está en `infra/main.bicep` y, con el mismo nombre y ámbito, en `infra/modulos/seguridad_perimetral.bicep`; en Azure es un solo recurso. El hecho anterior ("solo existe en el módulo") dejó de ser cierto | `infra/main.bicep`, recurso `diagKv` |
++| Actualizado 06-11-2026. `s12_endurecer.sh` cierra SQL y Key Vault (sin `ipRules`) y elimina la regla `operador-temporal` (SEG-H08, D.6). Escrito y validado con `bash -n` y prueba en seco con `az` simulado; no ejecutado en Azure. Hasta el 05-11-2026 solo cerraba SQL | `scripts/s12_endurecer.sh`; `evidencias/2026-11-06_adr001_seguridad/` |
+ | `s14_simulacro_pitr.sh` restaura como base nueva en el mismo servidor; la base original sigue existiendo | `scripts/s14_simulacro_pitr.sh` |
+ | RUT DEMO disponibles: 76555555-8, 76666666-3, 77777777-7, 78888888-0, 76123456-0 | `sql/08_datos_prueba.sql` |
+ | `.gitignore` excluye `*.env`, `infra/entorno.local.env`, `local.settings.json` e `infra/*.parameters.json` | `.gitignore` |
+@@ -46,7 +54,7 @@ Lo siguiente se leyó en el repositorio; las recomendaciones se apoyan en estos
+ 
+ | Opción | Descripción | Ventajas | Desventajas y riesgos | Resultado |
+ | --- | --- | --- | --- | --- |
+-| a. Secreto en Key Vault con expiración corta | El operador guarda la contraseña temporal como secreto; el destinatario la lee con `az keyvault secret show` y luego se elimina | Sin costo relevante; RBAC por secreto; auditable si el diagnóstico de Key Vault está activo | 1) Red: Key Vault solo acepta la IP de `ipOperador` (una sola IP). El destinatario debe estar en esa misma IP pública o habría que agregar otra regla de IP, lo que es relajar una regla y requiere aprobación y registro. 2) RBAC: el destinatario necesita `Key Vault Secrets User` con alcance en ese secreto y una cuenta del tenant Duoc; la asignación la crea el Owner y puede tardar minutos en propagarse. 3) Según la documentación de Key Vault ("About Azure Key Vault secrets"), el atributo `exp` de un secreto es informativo y no impide la operación get; hay que deshabilitarlo o eliminarlo. Verificar en el despliegue. 4) Con protección de purga, el secreto eliminado queda en soft-delete 90 días y no se puede purgar: quien tenga `Secrets Officer` lo puede recuperar. 5) El valor queda en la salida de la terminal del destinatario. 6) La lectura solo queda auditada si se despliega el diagnóstico de Key Vault (hoy solo en `seguridad_perimetral.bicep`) | Descartada para contraseñas. Es el canal adecuado para la clave de API (A.5) |
++| a. Secreto en Key Vault con expiración corta | El operador guarda la contraseña temporal como secreto; el destinatario la lee con `az keyvault secret show` y luego se elimina | Sin costo relevante; RBAC por secreto; auditable si el diagnóstico de Key Vault está activo | 1) Red: Key Vault solo acepta la IP de `ipOperador` (una sola IP). El destinatario debe estar en esa misma IP pública o habría que agregar otra regla de IP, lo que es relajar una regla y requiere aprobación y registro. 2) RBAC: el destinatario necesita `Key Vault Secrets User` con alcance en ese secreto y una cuenta del tenant Duoc; la asignación la crea el Owner y puede tardar minutos en propagarse. 3) Según la documentación de Key Vault ("About Azure Key Vault secrets"), el atributo `exp` de un secreto es informativo y no impide la operación get; hay que deshabilitarlo o eliminarlo. Verificar en el despliegue. 4) Con protección de purga, el secreto eliminado queda en soft-delete 90 días y no se puede purgar: quien tenga `Secrets Officer` lo puede recuperar. 5) El valor queda en la salida de la terminal del destinatario. 6) La lectura queda auditada por el diagnóstico de Key Vault (`diagKv`, incluido en `main.bicep` al 06-11-2026; antes solo en `seguridad_perimetral.bicep`) | Descartada para contraseñas. Es el canal adecuado para la clave de API (A.5) |
+ | b. Mostrar una sola vez en la terminal del operador y entregar en persona | La herramienta genera la contraseña, la muestra una vez y el destinatario, presente, la usa de inmediato | Sin costo; no cambia la red ni el RBAC; no pasa por git, correo ni chat; el destinatario cambia la contraseña frente al operador, así que la vigencia real es de minutos | Requiere presencia física; el operador conoce la contraseña temporal (se mitiga con el cambio obligatorio inmediato); riesgo de que quede en el historial de la terminal (se mitiga en A.4) | Recomendada |
+ | c. Correo por ACS | Envío desde `DoNotReply@<dominio administrado>` | Automatizable | Contraseña en texto plano en buzones y servidores intermedios; límite H1 (5 por minuto y 10 por hora con dominio administrado); el dominio administrado no es de la embotelladora | Descartada |
+ | d1. El destinatario escribe su propia contraseña inicial en la terminal del operador (lectura sin eco, comando `hash-clave` del ADR 5.9) | Nadie más conoce la contraseña | El operador no ve la contraseña | El texto del lote de `sqlcmd` (que incluye el hash) queda en la auditoría SQL (`BATCH_COMPLETED_GROUP`, ADR 4.3). Una contraseña elegida por una persona tiene menos entropía que una aleatoria, así que el hash es más fácil de atacar fuera de línea si se filtra Log Analytics | Descartada como opción principal. Se acepta solo como variante si el equipo la aprueba |
+@@ -112,7 +120,7 @@ Justificación: no tiene costo, no requiere nada de TI de Duoc, no cambia la red
+ | --- | --- | --- |
+ | `cob.LogAcceso` | `AltaUsuario`, `RestablecimientoClave`, `CambioClave`, `LoginExitoso` y `LoginFallido` (con motivo), `CambioEstadoUsuario`, `CambioRolUsuario`, `AltaClaveApi`, `RevocacionClaveApi`, con `Actor = ORIGINAL_LOGIN()`, fecha UTC, IP y agente de usuario | Contraseñas, hashes, claves de API |
+ | Auditoría de Azure SQL (Log Analytics, 30 días) | Texto de los lotes `sqlcmd` del grupo administrador | Contraseñas en texto plano. Sí contiene el hash de la contraseña temporal y el hash SHA-256 de la clave de API (ADR 4.3); por eso la contraseña temporal es aleatoria y larga |
+-| Auditoría de Key Vault (`AuditEvent`, solo si se despliega `seguridad_perimetral.bicep` o se agrega a `main.bicep`) | Quién leyó o modificó `apikey-*` y cuándo | Valores de secretos |
++| Auditoría de Key Vault (`AuditEvent`, diagnóstico `diagKv` de `main.bicep`; se verifica con SEG-KV-05) | Quién leyó o modificó `apikey-*` y cuándo | Valores de secretos |
+ | `evidencias/seguridad/<fecha>_entrega_credenciales.md` (versionado en git) | Usuario, rol, tipo de operación (alta, restablecimiento o baja), fecha y hora UTC, operador, canal "presencial", confirmación del destinatario (nombre e iniciales) y hora del evento `CambioClave` | Contraseña, hash, IP pública del operador (se usa `<IP_OPERADOR>`, igual que en `evidencias/2026-11-05_whatif_brazilsouth/`) |
+ | `evidencias/seguridad/<fecha>_claves_api.md` | Consumidor, prefijo, nombre del secreto, fecha de vencimiento, operador y, si existe, el Object ID del lector truncado (`xxxx…xxxx`) | Clave completa o hash |
+ 
+@@ -130,7 +138,7 @@ Condiciones previas comunes:
+ - Lo ejecuta un integrante humano, miembro de `grp-cobranza-sql-admin` (PENDIENTE confirmar qué integrantes son miembros), en su propia terminal y fuera de Claude Code.
+ - Tiene acceso de red a SQL y a Key Vault con `IP_OPERADOR`. Abrir ese acceso es un despliegue de `main.bicep` que requiere confirmación humana (CLAUDE.md, reglas 5 y 7).
+ - Orden recomendado dentro de una ventana de trabajo: despliegue con `IP_OPERADOR`, luego `desplegar_sql.sh`, luego las altas de esta sección, luego el despliegue con `IP_OPERADOR` vacío y por último `s12_endurecer.sh`. Hay que considerar que `s12_endurecer.sh` deshabilita el acceso público de SQL: después de endurecer, las altas requieren volver a abrir el acceso.
+-- Al cerrar la sesión: `ipOperador` vacío, sin la regla `operador-temporal` y Key Vault con `publicNetworkAccess Disabled`. Se verifica con `s12_verificar_seguridad.sh`.
++- Al cerrar la sesión: `ipOperador` vacío, sin la regla `operador-temporal`, Key Vault con `publicNetworkAccess Disabled` y sin `ipRules`, y sitios SCM sin la regla `operador-publicacion`. Se cierra con `main.bicep` (`ipOperador` vacío) seguido de `s12_endurecer.sh` sin `IP_PUBLICACION_SCM`, y se verifica con `s12_verificar_seguridad.sh` (SEG-11, SEG-18, SEG-27, SEG-28, SEG-KV-06a, SEG-KV-06b, SEG-KV-06c). Registro con `docs/seguridad/plantilla_ventana_operador.md`.
+ 
+ #### A.10.1 Alta de usuario del panel
+ 
+@@ -384,11 +392,13 @@ Lector de la clave (integrante distinto del operador): solo `Key Vault Secrets U
+ 
+ Cambios en `infra/`:
+ 
+-1. Agregar a `main.bicep` el diagnóstico de auditoría de Key Vault (`categoryGroup: audit` hacia Log Analytics), que hoy solo está en `seguridad_perimetral.bicep` (hallazgo SEG-H03).
++1. Agregar a `main.bicep` el diagnóstico de auditoría de Key Vault (`categoryGroup: audit` hacia Log Analytics) (hallazgo SEG-H03). Aplicado por `devops`: `diagKv` está en `main.bicep` (verificado el 06-11-2026, B-N6).
+ 2. Actualizar el comentario de `raKvOperador` ("easyauth-client-secret en S11") a "claves de API (ADR-001)".
+ 3. Si se usa `sqlcmd -v` para pasar el hash, documentar en el script que el hash queda en la auditoría SQL (ADR 4.3).
+ 
+-### D.6 `seguridad` (`scripts/s12_*`, `docs/seguridad/`; se aplica en una tarea posterior, cuando `qa` termine y el orquestador lo autorice)
++### D.6 `seguridad` (`scripts/s12_*`, `docs/seguridad/`)
++
++Aplicada el 06-11-2026 por encargo del orquestador (Fase B de ADR-001). Escrita y validada con `bash -n` y pruebas en seco; no ejecutada en Azure. Evidencia: `evidencias/2026-11-06_adr001_seguridad/`. Plantillas: `plantilla_entrega_credenciales.md`, `plantilla_claves_api.md`, `plantilla_revision_post_restauracion.md` y, además, `plantilla_levantamiento_transicion.md`, `plantilla_prueba_negativa_abac.md` y `plantilla_ventana_operador.md`.
+ 
+ 1. `s12_endurecer.sh`:
+    - Cerrar también Key Vault: `az keyvault update --public-network-access Disabled` y eliminar sus `ipRules`.
+@@ -429,12 +439,12 @@ En "Alcance", línea de identidad, reemplazar "Easy Auth v2 con roles `Ventas.Co
+ | --- | --- | --- | --- | --- |
+ | SEG-H01 | Alta | Si un agente de Claude Code ejecuta los scripts de alta, la contraseña temporal y la clave de API (que la herramienta del ADR 5.9 escribe en stdout) quedan en la conversación, lo que equivale a un canal de chat | ADR 5.9: `hash-clave` "escribe por salida estándar ... la contraseña temporal" y `nueva-clave-api` "escribe ... la clave completa" | A.4, reglas 1 y 2; D.2, punto 3; D.4, punto 1 |
+ | SEG-H02 | Media | Log Analytics retiene 30 días y PITR cubre 35: la auditoría SQL no cubre toda la ventana de restauración | `retentionInDays: 30` y `retentionDays: 35` en `infra/main.bicep` | Retención de `cob.LogAcceso` de 90 días (B.1); C.3 se apoya en la base original |
+-| SEG-H03 | Media | Sin diagnóstico de auditoría de Key Vault en `main.bicep`: las lecturas de `apikey-*` no quedan auditadas si no se despliega el módulo S12 | El diagnóstico `diagKv` solo está en `infra/modulos/seguridad_perimetral.bicep` | D.5, cambios en `infra/`, punto 1 |
++| SEG-H03 | Media | Sin diagnóstico de auditoría de Key Vault en `main.bicep`: las lecturas de `apikey-*` no quedan auditadas si no se despliega el módulo S12 | Al 05-11-2026, `diagKv` solo estaba en `infra/modulos/seguridad_perimetral.bicep` | D.5, cambios en `infra/`, punto 1. Corregido en la plantilla (06-11-2026, `diagKv` en `main.bicep`); en Azure se verifica con SEG-KV-05 |
+ | SEG-H04 | Media | Restaurar desde un LTR (hasta 12 meses, sobrevive a la eliminación del entorno) reactiva claves de API cuyo valor sigue recuperable del Key Vault en soft-delete (90 días, sin purga) | `sqlLtr` P12M; `enablePurgeProtection: true`; `eliminar_entorno.sh` | C.3, punto 4 (regla conservadora); A.10.4 (revocar todo antes de eliminar el entorno) |
+ | SEG-H05 | Media | El esquema del ADR no permite exigir la vigencia de la contraseña temporal (sin campo de fecha de emisión en el alta ni motivo de rechazo) | ADR 5.1 y 5.2 | A.7; D.1, puntos 4, 6 y 7; D.3, punto 2 |
+ | SEG-H06 | Baja | El hash de la contraseña temporal queda en la auditoría SQL (`BATCH_COMPLETED_GROUP`) por el uso de `sqlcmd -v` | ADR 4.3; `sqlAuditoria` en `main.bicep` | Contraseña temporal aleatoria de 20 caracteres (DEMO) y de vida corta. Si las llamadas de la API por RPC registran los valores de sus parámetros en la auditoría: PENDIENTE verificar en Azure |
+ | SEG-H07 | Baja | `UsuarioIngresado` puede guardar una contraseña escrita por error en el campo de usuario | ADR 5.1 | B.3 (sanitización) |
+-| SEG-H08 | Media | `s12_endurecer.sh` cierra SQL pero no Key Vault ni elimina `operador-temporal`. Si se endurece con `ipOperador` todavía con valor, Key Vault queda abierto a esa IP | `scripts/s12_endurecer.sh` | D.6, punto 1 |
++| SEG-H08 | Media | `s12_endurecer.sh` cierra SQL pero no Key Vault ni elimina `operador-temporal`. Si se endurece con `ipOperador` todavía con valor, Key Vault queda abierto a esa IP | `scripts/s12_endurecer.sh` (05-11-2026) | D.6, punto 1. Corregido en el script (06-11-2026); en Azure se verifica con SEG-18, SEG-KV-06a, SEG-KV-06b y SEG-KV-06c |
+ | SEG-H09 | Baja | El atributo `exp` de los secretos de Key Vault no impide la lectura (según la documentación; verificar en Azure) | Documentación "About Azure Key Vault secrets" | La vigencia se controla en SQL; al revocar, se deshabilita y se elimina el secreto (A.9) |
+ 
+ ---
+@@ -452,4 +462,4 @@ En "Alcance", línea de identidad, reemplazar "Easy Auth v2 con roles `Ventas.Co
+    - Si la auditoría SQL registra los parámetros de las llamadas RPC.
+    - Telemetría de encabezados y cuerpos en Application Insights.
+ 8. Mecanismo para que los scripts detecten que se ejecutan dentro de Claude Code (D.5).
+-9. Aprobación de los valores DEMO de A.11.
++9. Aprobación de los valores DEMO de A.11: resuelto (aprobados por el equipo el 05-11-2026). Sigue PENDIENTE registrar el nombre del integrante que aprobó.
+diff --git a/scripts/s12_endurecer.sh b/scripts/s12_endurecer.sh
+index 4652c5d..cadae1c 100644
+--- a/scripts/s12_endurecer.sh
++++ b/scripts/s12_endurecer.sh
+@@ -3,16 +3,52 @@
+ # s12_endurecer.sh - Proyecto APT Cobranza Automatizada (Evidencia S12)
+ # Aplica configuraciones de endurecimiento sobre recursos EXISTENTES con
+ # operaciones de actualizacion parcial (no reemplaza su configuracion completa).
++# Actualizado el 06-11-2026 por ADR-001 (autenticacion propia, sin Easy Auth) y
++# por el hallazgo SEG-H08 (docs/seguridad/politica_credenciales_y_accesos.md).
+ #
+-# Orden recomendado:
+-#   1. Desplegar infra/modulos/seguridad_perimetral.bicep (con o sin WAF).
+-#   2. Ejecutar este script.
+-#   3. Ejecutar scripts/s12_verificar_seguridad.sh y registrar la matriz.
++# Este script SOLO cierra o mantiene cerrado: nunca abre puertos, nunca habilita
++# acceso publico y nunca agrega reglas de permiso a la Web App principal.
+ #
+-# IMPORTANTE: CERRAR_API_PUBLICA=si deja la API accesible SOLO por el Private
+-# Endpoint (Application Gateway o equipos dentro de la VNet). Usarlo solo cuando
+-# el Application Gateway WAF este desplegado y probado; de lo contrario la fuerza
+-# de ventas y Finanzas pierden el acceso al panel.
++# Orden recomendado (CLAUDE.md regla 7):
++#   1. Desplegar infra/main.bicep con ipOperador VACIO (cierre de la ventana).
++#   2. (Opcional, D11 aprobado) desplegar infra/modulos/seguridad_perimetral.bicep.
++#   3. Ejecutar este script. Debe reaplicarse despues de CADA despliegue de main.
++#   4. Ejecutar scripts/s12_verificar_seguridad.sh y registrar la matriz.
++#
++# Que cierra (SEG-H08):
++#   - Key Vault: publicNetworkAccess Disabled, defaultAction Deny y SIN ipRules.
++#   - Azure SQL: sin acceso publico y sin la regla de firewall operador-temporal.
++#   - Si main.bicep se vuelve a desplegar con ipOperador con valor, ambos se reabren
++#     a esa IP: la ventana se cierra con un nuevo despliegue con ipOperador vacio
++#     seguido de este script.
++#
++# Regla de transicion (ADR-001, seccion 5.11). Variable ESTADO_TRANSICION:
++#   vigente               (por defecto) La Web App queda con entrada por defecto Deny.
++#                         El sitio SCM de la Web App queda SIN reglas de permiso: la
++#                         API no se puede publicar (refuerzo tecnico de la regla 1).
++#   publicacion-aprobada  La Web App sigue con entrada Deny (la restriccion se mantiene
++#                         hasta que un humano la levante). El SCM de la Web App admite
++#                         IP_PUBLICACION_SCM para publicar. Exige APROBACION_QA con la
++#                         ruta del informe de qa (APROBADO o APROBADO CON OBSERVACIONES).
++#   levantada             El script deja de forzar Deny en la Web App principal (no la
++#                         abre: la apertura la define infra/main.bicep). Exige
++#                         APROBACION_LEVANTAMIENTO con la ruta de la evidencia humana
++#                         (plantilla docs/seguridad/plantilla_levantamiento_transicion.md).
++#
++# Sitio SCM (Kudu, publicacion) - decision de seguridad (ADR-001 5.11, regla 3):
++#   - scmIpSecurityRestrictionsUseMain=false: el SCM NO hereda las reglas del sitio
++#     principal. Si heredara, levantar la transicion (o abrir la API detras del WAF)
++#     abriria tambien Kudu, que permite leer el sistema de archivos y las variables
++#     del sitio.
++#   - scmIpSecurityRestrictionsDefaultAction=Deny en la Web App y en la Function App.
++#   - La unica regla de permiso admitida es operador-publicacion con la IP de
++#     IP_PUBLICACION_SCM, y solo durante la ventana de publicacion. Sin esa variable
++#     el script ELIMINA operador-publicacion (cierre de la ventana).
++#   - Se usa IP_PUBLICACION_SCM y no IP_OPERADOR a proposito: IP_OPERADOR suele quedar
++#     exportada desde infra/entorno.local.env y abriria Kudu sin intencion.
++#
++# CERRAR_API_PUBLICA=si (solo con D11/WAF aprobado y probado) deja la API accesible
++# SOLO por el Private Endpoint; de lo contrario los usuarios pierden el panel.
+ # =============================================================================
+ set -euo pipefail
+ 
+@@ -21,45 +57,163 @@ WEB_APP="${WEB_APP:?Definir WEB_APP}"
+ FUNC_APP="${FUNC_APP:?Definir FUNC_APP}"
+ SQL_SERVER="${SQL_SERVER:?Definir SQL_SERVER}"
+ STORAGE="${STORAGE:?Definir STORAGE (cuenta de la Function App)}"
+-IP_OPERADOR="${IP_OPERADOR:-}"            # IP publica/32 autorizada para publicar en SCM (opcional)
++KV_NAME="${KV_NAME:?Definir KV_NAME}"
++IP_PUBLICACION_SCM="${IP_PUBLICACION_SCM:-}"     # IP publica (o /32) del operador SOLO durante la publicacion
++ESTADO_TRANSICION="${ESTADO_TRANSICION:-vigente}"
++APROBACION_QA="${APROBACION_QA:-}"
++APROBACION_LEVANTAMIENTO="${APROBACION_LEVANTAMIENTO:-}"
+ CERRAR_API_PUBLICA="${CERRAR_API_PUBLICA:-no}"
+ 
++# ---------------------------------------------------------------------------
++# Validaciones previas (antes de modificar nada)
++# ---------------------------------------------------------------------------
++case "$ESTADO_TRANSICION" in
++  vigente) ;;
++  publicacion-aprobada)
++    if [[ -z "$APROBACION_QA" || ! -f "$APROBACION_QA" ]]; then
++      echo "ERROR: ESTADO_TRANSICION=publicacion-aprobada exige APROBACION_QA con la ruta de un informe de qa existente." >&2
++      exit 2
++    fi
++    # Se exige una linea de veredicto ("Veredicto ...:" o "... general:") con APROBADO y
++    # ninguna linea de veredicto con RECHAZADO. Ante la duda, el script no continua.
++    if ! grep -qiE "(veredicto|general)[^:]*:[[:space:]*]*APROBADO" "$APROBACION_QA" \
++       || grep -qiE "(veredicto|general)[^:]*:[[:space:]*]*RECHAZADO" "$APROBACION_QA"; then
++      echo "ERROR: el informe ${APROBACION_QA} no contiene un veredicto APROBADO (o contiene uno RECHAZADO)." >&2
++      exit 2
++    fi ;;
++  levantada)
++    if [[ -z "$APROBACION_LEVANTAMIENTO" || ! -f "$APROBACION_LEVANTAMIENTO" ]]; then
++      echo "ERROR: ESTADO_TRANSICION=levantada exige APROBACION_LEVANTAMIENTO con la ruta de la evidencia de aprobacion humana." >&2
++      exit 2
++    fi
++    if ! grep -qE "^\| *Aprobado por *\| *[^| ]" "$APROBACION_LEVANTAMIENTO"; then
++      echo "ERROR: ${APROBACION_LEVANTAMIENTO} no registra quien aprueba (fila 'Aprobado por' vacia)." >&2
++      exit 2
++    fi ;;
++  *)
++    echo "ERROR: ESTADO_TRANSICION debe ser vigente, publicacion-aprobada o levantada." >&2
++    exit 2 ;;
++esac
++
++if [[ -n "${IP_OPERADOR:-}" ]]; then
++  echo "AVISO: IP_OPERADOR tiene valor en esta terminal. Este script la IGNORA (no abre nada con ella)."
++  echo "       Si main.bicep se desplego con ipOperador, la ventana NO esta cerrada: volver a desplegar con ipOperador vacio y repetir este script."
++fi
++
++# Elimina todas las reglas de permiso del SCM con nombre operador-publicacion.
++cerrar_scm_operador () {
++  local APP="$1" TIPO="$2" cuenta
++  cuenta=$(az "$TIPO" config access-restriction show -g "$RG" -n "$APP" \
++             --query "length(scmIpSecurityRestrictions[?name=='operador-publicacion'])" -o tsv 2>/dev/null | tr -d '\r' || echo 0)
++  while [[ "${cuenta:-0}" -gt 0 ]]; do
++    az "$TIPO" config access-restriction remove -g "$RG" -n "$APP" --scm-site true \
++       --rule-name operador-publicacion --output none
++    cuenta=$((cuenta-1))
++  done
++}
++
+ endurecer_app () {
+-  local APP="$1" TIPO="$2"   # TIPO: webapp | functionapp
++  local APP="$1" TIPO="$2" PERMITIR_SCM="$3"   # TIPO: webapp | functionapp ; PERMITIR_SCM: si | no
++  local CFG
++  CFG="$(az "$TIPO" show -g "$RG" -n "$APP" --query id -o tsv | tr -d '\r')/config/web"
++
+   echo "== ${APP}: HTTPS, TLS 1.2, sin FTP, trafico saliente por la VNet"
+   az "$TIPO" update -g "$RG" -n "$APP" --set httpsOnly=true --output none
+   az "$TIPO" config set -g "$RG" -n "$APP" --min-tls-version 1.2 --ftps-state Disabled --output none
+-  az resource update --ids "$(az "$TIPO" show -g "$RG" -n "$APP" --query id -o tsv)/config/web" \
++  az resource update --ids "$CFG" \
+      --set properties.vnetRouteAllEnabled=true properties.scmMinTlsVersion=1.2 --output none
+ 
+-  echo "== ${APP}: sitio SCM (publicacion) cerrado salvo IP del operador"
+-  az resource update --ids "$(az "$TIPO" show -g "$RG" -n "$APP" --query id -o tsv)/config/web" \
++  echo "== ${APP}: sitio SCM independiente del principal y con accion por defecto Deny"
++  az resource update --ids "$CFG" \
+      --set properties.scmIpSecurityRestrictionsUseMain=false properties.scmIpSecurityRestrictionsDefaultAction=Deny --output none
+-  if [[ -n "$IP_OPERADOR" ]]; then
++
++  # Se elimina siempre la regla anterior para no acumular IP de sesiones previas.
++  cerrar_scm_operador "$APP" "$TIPO"
++  if [[ "$PERMITIR_SCM" == "si" && -n "$IP_PUBLICACION_SCM" ]]; then
++    echo "== ${APP}: SCM abierto SOLO a IP_PUBLICACION_SCM (regla operador-publicacion). Repetir este script sin esa variable al terminar de publicar."
+     az "$TIPO" config access-restriction add -g "$RG" -n "$APP" --scm-site true \
+-       --rule-name operador-publicacion --action Allow --ip-address "$IP_OPERADOR" --priority 100 --output none || true
++       --rule-name operador-publicacion --action Allow --ip-address "$IP_PUBLICACION_SCM" --priority 100 --output none
++  else
++    echo "== ${APP}: SCM sin reglas de permiso"
+   fi
+ }
+ 
+-endurecer_app "$FUNC_APP" functionapp
+-echo "== ${FUNC_APP}: sin trafico de entrada publico (los jobs no reciben solicitudes HTTP)"
+-az resource update --ids "$(az functionapp show -g "$RG" -n "$FUNC_APP" --query id -o tsv)/config/web" \
++# ---------------------------------------------------------------------------
++# Function App (los jobs no reciben solicitudes HTTP)
++# ---------------------------------------------------------------------------
++endurecer_app "$FUNC_APP" functionapp si
++echo "== ${FUNC_APP}: sin trafico de entrada publico"
++az resource update --ids "$(az functionapp show -g "$RG" -n "$FUNC_APP" --query id -o tsv | tr -d '\r')/config/web" \
+    --set properties.ipSecurityRestrictionsDefaultAction=Deny --output none
+ 
+-endurecer_app "$WEB_APP" webapp
++# ---------------------------------------------------------------------------
++# Web App (API) y regla de transicion ADR-001 5.11
++# ---------------------------------------------------------------------------
++if [[ "$ESTADO_TRANSICION" == "vigente" ]]; then
++  endurecer_app "$WEB_APP" webapp no
++  if [[ -n "$IP_PUBLICACION_SCM" ]]; then
++    echo "   (IP_PUBLICACION_SCM ignorada en la Web App: con la transicion vigente la API no se publica, ADR-001 5.11 regla 1)"
++  fi
++else
++  endurecer_app "$WEB_APP" webapp si
++fi
++
++WEB_CFG="$(az webapp show -g "$RG" -n "$WEB_APP" --query id -o tsv | tr -d '\r')/config/web"
+ if [[ "$CERRAR_API_PUBLICA" == "si" ]]; then
+-  echo "== ${WEB_APP}: entrada publica denegada (solo Private Endpoint / Application Gateway)"
+-  az resource update --ids "$(az webapp show -g "$RG" -n "$WEB_APP" --query id -o tsv)/config/web" \
+-     --set properties.ipSecurityRestrictionsDefaultAction=Deny --output none
++  echo "== ${WEB_APP}: entrada publica denegada (solo Private Endpoint / Application Gateway, D11)"
++  az resource update --ids "$WEB_CFG" --set properties.ipSecurityRestrictionsDefaultAction=Deny --output none
++elif [[ "$ESTADO_TRANSICION" != "levantada" ]]; then
++  echo "== ${WEB_APP}: regla de transicion ADR-001 5.11 vigente: entrada por defecto Deny (solo la regla de ipOperador definida en main.bicep)"
++  az resource update --ids "$WEB_CFG" --set properties.ipSecurityRestrictionsDefaultAction=Deny --output none
++  if [[ -z "${IP_OPERADOR:-}" ]]; then
++    PERMISOS=$(az resource show --ids "$WEB_CFG" \
++                 --query "length(properties.ipSecurityRestrictions[?action=='Allow' && ipAddress!='Any'])" -o tsv 2>/dev/null | tr -d '\r' || echo "?")
++    if [[ "$PERMISOS" != "0" ]]; then
++      echo "   AVISO: la Web App tiene ${PERMISOS} regla(s) de permiso con la ventana cerrada. Revisar: main.bicep debe dejarla sin reglas con ipOperador vacio."
++    fi
++  fi
+ else
+-  echo "== ${WEB_APP}: entrada publica se mantiene (protegida por Entra ID) hasta desplegar el WAF"
++  echo "== ${WEB_APP}: transicion levantada (evidencia: ${APROBACION_LEVANTAMIENTO})."
++  echo "   La entrada publica queda como la define infra/main.bicep, protegida por autenticacion propia (sin MFA) hasta desplegar el WAF (D11)."
+ fi
+ 
++# ---------------------------------------------------------------------------
++# Azure SQL (SEG-H08)
++# ---------------------------------------------------------------------------
+ echo "== Azure SQL: TLS minimo 1.2 y sin acceso publico"
+ az sql server update -g "$RG" -n "$SQL_SERVER" --minimal-tls-version 1.2 --enable-public-network false --output none
+ 
+-echo "== Storage: TLS 1.2, sin acceso anonimo a blobs, sin clave compartida"
++if az sql server firewall-rule show -g "$RG" -s "$SQL_SERVER" -n operador-temporal --output none 2>/dev/null; then
++  echo "== Azure SQL: eliminando la regla de firewall operador-temporal"
++  az sql server firewall-rule delete -g "$RG" -s "$SQL_SERVER" -n operador-temporal --output none
++else
++  echo "== Azure SQL: sin regla operador-temporal"
++fi
++RESTO_SQL=$(az sql server firewall-rule list -g "$RG" -s "$SQL_SERVER" --query "length(@)" -o tsv 2>/dev/null | tr -d '\r' || echo "?")
++if [[ "$RESTO_SQL" != "0" ]]; then
++  echo "   AVISO: quedan ${RESTO_SQL} regla(s) de firewall en SQL que no crea main.bicep. No se eliminan automaticamente: revisar y registrar."
++fi
++
++# ---------------------------------------------------------------------------
++# Key Vault (SEG-H08): sin acceso publico y sin ipRules
++# ---------------------------------------------------------------------------
++echo "== Key Vault: eliminando ipRules (no se muestran las IP)"
++mapfile -t REGLAS_KV < <(az keyvault network-rule list -g "$RG" -n "$KV_NAME" --query "ipRules[].value" -o tsv 2>/dev/null | tr -d '\r')
++for ip in "${REGLAS_KV[@]}"; do
++  if [[ -n "$ip" ]]; then
++    az keyvault network-rule remove -g "$RG" -n "$KV_NAME" --ip-address "$ip" --output none
++  fi
++done
++echo "   ipRules eliminadas: ${#REGLAS_KV[@]}"
++echo "== Key Vault: acceso publico Disabled y accion por defecto Deny"
++az keyvault update -g "$RG" -n "$KV_NAME" --public-network-access Disabled --default-action Deny --output none
++
++# ---------------------------------------------------------------------------
++# Storage
++# ---------------------------------------------------------------------------
++echo "== Storage: TLS 1.2, sin acceso anonimo a blobs, sin clave compartida, sin acceso publico"
+ az storage account update -g "$RG" -n "$STORAGE" --min-tls-version TLS1_2 \
+-   --allow-blob-public-access false --allow-shared-key-access false --output none
++   --allow-blob-public-access false --allow-shared-key-access false \
++   --public-network-access Disabled --default-action Deny --output none
+ 
+ echo "Listo. Ejecutar scripts/s12_verificar_seguridad.sh"
+diff --git a/scripts/s12_pruebas_red.sh b/scripts/s12_pruebas_red.sh
+index dff206e..04621b7 100644
+--- a/scripts/s12_pruebas_red.sh
++++ b/scripts/s12_pruebas_red.sh
+@@ -3,22 +3,123 @@
+ # s12_pruebas_red.sh - Proyecto APT Cobranza Automatizada (Evidencia S12)
+ # Pruebas de exposicion EJECUTADAS DESDE INTERNET (equipo fuera de la VNet).
+ # Cada prueba muestra el codigo HTTP o el error obtenido para registrarlo en la
+-# tabla de pruebas de la evidencia. Solo envia solicitudes de lectura.
++# tabla de pruebas de la evidencia.
++# Actualizado el 06-11-2026 por ADR-001 (tabla 6.3): RED-02 y RED-11 a RED-17.
++#
++# Que envia: solicitudes de lectura y, en RED-11/14/15/16, intentos de login con
++# usuarios INEXISTENTES (red11.inexistente, etc.) y contrasenas aleatorias. No
++# bloquea cuentas reales (el bloqueo solo aplica a usuarios existentes, ADR 5.2).
++# Cada intento queda en cob.LogAcceso como LoginFallido/UsuarioInexistente: es
++# esperado y sirve de evidencia de RED-16.
++#
++# Precondiciones:
++#   - RED-02 y RED-11 a RED-16 requieren la API NUEVA publicada (ADR-001 5.11,
++#     regla 1: solo con informe de qa APROBADO). Con la API anterior o sin codigo
++#     los resultados no son validos.
++#   - Mientras rija la transicion (5.11) la Web App solo acepta la IP de
++#     ipOperador: RED-02 y RED-11 a RED-16 se ejecutan DESDE ESA IP.
++#   - RED-17 se ejecuta desde OTRA red (por ejemplo, datos moviles) con
++#     ORIGEN_PRUEBA=externa.
++#   - RED-15 y RED-16 consumen el limite por IP (10/min DEMO): el script espera
++#     61 s entre ambas y al final.
++#
++# Variables:
++#   WEB_HOST FUNC_HOST KV_NAME   obligatorias
++#   WAF_HOST                     dominio del Application Gateway (vacio si no hay WAF)
++#   ORIGEN_PRUEBA                operador (por defecto) | externa (solo RED-01/17)
++#   PROBAR_SESION                si: pide usuario y contrasena por la terminal para
++#                                verificar la cookie de sesion (RED-12b). Lo ejecuta
++#                                SOLO un integrante humano en su terminal, nunca un
++#                                agente (regla SEG-H01). La contrasena se lee sin eco
++#                                y se envia a curl por la entrada estandar.
++#   LIMITE_LOGIN                 limite por IP por minuto (DEMO 10, ADR 5.4)
++#
++# La salida no muestra valores de cookies, tokens, claves ni contrasenas.
+ # =============================================================================
+ set -uo pipefail
+ WEB_HOST="${WEB_HOST:?Definir WEB_HOST (<webapp>.azurewebsites.net)}"
+ FUNC_HOST="${FUNC_HOST:?Definir FUNC_HOST (<funcapp>.azurewebsites.net)}"
+ KV_NAME="${KV_NAME:?Definir KV_NAME}"
+-WAF_HOST="${WAF_HOST:-}"     # dominio publicado en el Application Gateway (vacio si no hay WAF)
++WAF_HOST="${WAF_HOST:-}"
++ORIGEN_PRUEBA="${ORIGEN_PRUEBA:-operador}"
++PROBAR_SESION="${PROBAR_SESION:-no}"
++LIMITE_LOGIN="${LIMITE_LOGIN:-10}"
++API="https://${WEB_HOST}"
++
++TMPD=$(mktemp -d)
++trap 'rm -rf "$TMPD"' EXIT
+ 
+ codigo () { curl -s -o /dev/null -w '%{http_code}' --max-time 15 "$@" || echo "sin respuesta"; }
++# res "id" "descripcion" "esperado (regex)" "obtenido"
++res () {
++  local r="NO CUMPLE"; [[ "$4" =~ ^($3)$ ]] && r="CUMPLE"
++  printf '%-7s %-66s esperado %-10s obtenido %-14s %s\n' "$1" "$2" "$3" "$4" "$r"
++}
++aleatorio () { LC_ALL=C tr -dc "$1" < /dev/urandom | head -c "$2"; }
++
++# Obtiene token antifalsificacion en $TOKEN y la cookie __Host-cobranza-af en el jar $1.
++# El token solo se guarda en una variable; nunca se imprime.
++TOKEN=""
++token_csrf () {
++  local cuerpo
++  cuerpo=$(curl -s --max-time 15 -c "$1" -b "$1" "${API}/api/v1/auth/antiforgery" || true)
++  TOKEN=$(printf '%s' "$cuerpo" | sed -n 's/.*"token"[[:space:]]*:[[:space:]]*"\([^"]*\)".*/\1/p')
++}
++# Intento de login con usuario inexistente; devuelve el codigo HTTP.
++login_invalido () {   # login_invalido jar usuario [encabezado extra]
++  local clave extra=()
++  clave=$(aleatorio 'A-Za-z2-9' 24)
++  if [[ -n "${3:-}" ]]; then extra=(-H "$3"); fi
++  printf '{"usuario":"%s","clave":"%s"}' "$2" "$clave" | \
++    curl -s -o /dev/null -w '%{http_code}' --max-time 15 -c "$1" -b "$1" \
++      -H 'Content-Type: application/json' -H "X-CSRF-TOKEN: ${TOKEN}" "${extra[@]}" \
++      --data-binary @- "${API}/api/v1/auth/login" || echo "sin respuesta"
++}
++# Escapa barras invertidas y comillas dobles para incluir un texto en JSON.
++json_esc () {
++  local v="$1" bs='\' dq='"'
++  v="${v//"$bs"/"$bs$bs"}"
++  v="${v//"$dq"/"$bs$dq"}"
++  printf '%s' "$v"
++}
++# Muestra los atributos de una cookie de Set-Cookie SIN su valor.
++atributos_cookie () {   # atributos_cookie archivo_encabezados nombre
++  grep -i "^set-cookie: *$2=" "$1" | head -1 | tr -d '\r' | sed -E "s/^[Ss]et-[Cc]ookie: *$2=[^;]*/$2=<oculto>/"
++}
++RE_PATH=';[[:space:]]*path=/(;|$)'
++evaluar_cookie () {   # evaluar_cookie linea -> "ok" o "falta: ..."
++  local l="${1,,}" falta=""
++  [[ -z "$1" ]] && { echo "sin cookie"; return; }
++  [[ "$l" == *"; secure"* ]]           || falta+=" Secure"
++  [[ "$l" == *"; httponly"* ]]         || falta+=" HttpOnly"
++  [[ "$l" == *"samesite=strict"* ]]    || falta+=" SameSite=Strict"
++  [[ "$l" =~ $RE_PATH ]]               || falta+=" Path=/"
++  [[ "$l" != *"; domain="* ]]          || falta+=" sin-Domain"
++  [[ "$l" == __host-* ]]               || falta+=" prefijo-__Host-"
++  if [[ -z "$falta" ]]; then echo "ok"; else echo "falta:${falta}"; fi
++}
++
++echo "Pruebas de red $(date -u +%Y-%m-%dT%H:%MZ) - origen declarado: ${ORIGEN_PRUEBA}"
++
++if [[ "$ORIGEN_PRUEBA" == "externa" ]]; then
++  # Solo pruebas de exposicion desde una IP distinta de ipOperador.
++  echo "RED-01 API directa /salud (con transicion vigente o API cerrada: 403)    -> $(codigo "${API}/salud")"
++  c=$(codigo "${API}/")
++  res RED-17 "Transicion 5.11: Web App desde IP distinta de ipOperador (/)" "403" "$c"
++  c=$(codigo "${API}/api/v1/auth/antiforgery")
++  res RED-17b "Transicion 5.11: endpoint anonimo desde IP externa" "403" "$c"
++  echo "Fin (origen externo). Ejecutar el resto desde la IP del operador."
++  exit 0
++fi
+ 
+-echo "RED-01 API directa /salud (esperado con API cerrada: 403; abierta: 200)  -> $(codigo "https://${WEB_HOST}/salud")"
+-echo "RED-02 API directa sin sesion /api/v1/cartera/indicadores (esperado 401/302/403) -> $(codigo -H 'X-Requested-With: XMLHttpRequest' "https://${WEB_HOST}/api/v1/cartera/indicadores")"
++echo "RED-01 API directa /salud (esperado con API cerrada: 403; abierta: 200)  -> $(codigo "${API}/salud")"
++# RED-02 (ADR 6.3): solo 401. El 302 era la redireccion de Easy Auth (obsoleto).
++c=$(codigo -H 'X-Requested-With: XMLHttpRequest' "${API}/api/v1/cartera/indicadores")
++res RED-02 "Endpoint protegido sin credenciales" "401" "$c"
+ echo "RED-03 Function App desde internet (esperado 403)                       -> $(codigo "https://${FUNC_HOST}/")"
+ echo "RED-04 HTTP sin cifrar a la API (esperado 301 a HTTPS)                   -> $(codigo "http://${WEB_HOST}/salud")"
+ echo "RED-05 TLS 1.1 contra la API (esperado: fallo de negociacion)"
+-curl -s -o /dev/null --max-time 15 --tlsv1.1 --tls-max 1.1 "https://${WEB_HOST}/salud" && echo "   NEGOCIO TLS 1.1 (NO CUMPLE)" || echo "   rechazado (CUMPLE)"
++curl -s -o /dev/null --max-time 15 --tlsv1.1 --tls-max 1.1 "${API}/salud" && echo "   NEGOCIO TLS 1.1 (NO CUMPLE)" || echo "   rechazado (CUMPLE)"
+ echo "RED-06 Key Vault desde internet (esperado 403 ForbiddenByConnection o similar)"
+ az keyvault secret list --vault-name "$KV_NAME" -o none 2>&1 | head -2
+ if [[ -n "$WAF_HOST" ]]; then
+@@ -27,5 +128,92 @@ if [[ -n "$WAF_HOST" ]]; then
+   echo "RED-09 WAF con patron XSS (esperado 403)                                 -> $(codigo "https://${WAF_HOST}/?q=%3Cscript%3Ealert(1)%3C/script%3E")"
+   echo "RED-10 WAF HTTP 80 (esperado 301 a HTTPS)                                -> $(codigo "http://${WAF_HOST}/salud")"
+ else
+-  echo "RED-07 a RED-10: WAF no desplegado (PENDIENTE)"
++  echo "RED-07 a RED-10: WAF no desplegado (PENDIENTE D11)"
+ fi
++
++# ---------------------------------------------------------------------------
++# ADR-001 tabla 6.3
++# ---------------------------------------------------------------------------
++JAR="$TMPD/jar"; HDR="$TMPD/hdr"
++
++# RED-14: POST de login sin token CSRF (ni cookie antifalsificacion) -> 400.
++c=$(printf '{"usuario":"red14.inexistente","clave":"%s"}' "$(aleatorio 'A-Za-z2-9' 24)" | \
++    curl -s -o /dev/null -w '%{http_code}' --max-time 15 -H 'Content-Type: application/json' \
++    --data-binary @- "${API}/api/v1/auth/login" || echo "sin respuesta")
++res RED-14 "Login sin token CSRF" "400" "$c"
++
++# RED-12a: atributos de la cookie antifalsificacion (anonima).
++curl -s -o /dev/null -D "$HDR" --max-time 15 "${API}/api/v1/auth/antiforgery" || true
++linea=$(atributos_cookie "$HDR" "__Host-cobranza-af")
++echo "        Set-Cookie: ${linea:-<ausente>}"
++res RED-12a "Cookie __Host-cobranza-af: Secure, HttpOnly, SameSite=Strict, __Host-" "ok" "$(evaluar_cookie "$linea")"
++
++# RED-11: login con credenciales invalidas (con CSRF valido) -> 401.
++token_csrf "$JAR"
++if [[ -z "$TOKEN" ]]; then
++  res RED-11 "Login con credenciales invalidas" "401" "sin token CSRF"
++else
++  res RED-11 "Login con credenciales invalidas" "401" "$(login_invalido "$JAR" red11.inexistente)"
++fi
++
++# RED-13: X-Api-Key invalida -> 401 (formato invalido y formato valido inexistente).
++c=$(printf 'X-Api-Key: %s\n' "cobk_invalida" | curl -s -o /dev/null -w '%{http_code}' --max-time 15 -H @- \
++    "${API}/api/v1/clientes/76555555-8/estado" || echo "sin respuesta")
++res RED-13a "X-Api-Key con formato invalido" "401" "$c"
++falsa="cobk_$(aleatorio 'a-z2-7' 8)_$(aleatorio 'A-Za-z0-9_-' 43)"
++c=$(printf 'X-Api-Key: %s\n' "$falsa" | curl -s -o /dev/null -w '%{http_code}' --max-time 15 -H @- \
++    "${API}/api/v1/clientes/76555555-8/estado" || echo "sin respuesta")
++unset falsa
++res RED-13b "X-Api-Key con formato valido inexistente" "401" "$c"
++
++# RED-12b (opcional, humano): cookie de sesion tras un login correcto.
++if [[ "$PROBAR_SESION" == "si" ]]; then
++  if [[ ! -r /dev/tty ]]; then
++    res RED-12b "Cookie de sesion" "ok" "sin terminal"
++  else
++    printf 'Usuario DEMO para RED-12b: ' > /dev/tty; IFS= read -r U_SES < /dev/tty
++    printf 'Contrasena (sin eco): ' > /dev/tty; IFS= read -rs C_SES < /dev/tty; printf '\n' > /dev/tty
++    J2="$TMPD/jar2"; token_csrf "$J2"
++    c=$(printf '{"usuario":"%s","clave":"%s"}' "$(json_esc "$U_SES")" "$(json_esc "$C_SES")" | \
++        curl -s -o /dev/null -D "$HDR" -w '%{http_code}' --max-time 15 -c "$J2" -b "$J2" \
++          -H 'Content-Type: application/json' -H "X-CSRF-TOKEN: ${TOKEN}" \
++          --data-binary @- "${API}/api/v1/auth/login" || echo "sin respuesta")
++    unset C_SES U_SES
++    linea=$(atributos_cookie "$HDR" "__Host-cobranza-sesion")
++    echo "        login: ${c}; Set-Cookie: ${linea:-<ausente>}"
++    res RED-12b "Cookie __Host-cobranza-sesion: Secure, HttpOnly, SameSite=Strict, __Host-" "ok" "$(evaluar_cookie "$linea")"
++    # Cierre de la sesion de prueba (evento Logout).
++    curl -s -o /dev/null --max-time 15 -c "$J2" -b "$J2" -H "X-CSRF-TOKEN: ${TOKEN}" -X POST "${API}/api/v1/auth/logout" || true
++  fi
++else
++  echo "RED-12b  Cookie de sesion: NO EJECUTADA (PROBAR_SESION=si, solo un integrante humano)"
++fi
++
++# RED-15: mas de LIMITE_LOGIN intentos por minuto desde la misma IP -> 429.
++echo "        Esperando 61 s para iniciar RED-15 con la ventana del limitador limpia..."
++sleep 61
++token_csrf "$JAR"; codigos=""
++for i in $(seq 1 $((LIMITE_LOGIN + 2))); do
++  codigos+="$(login_invalido "$JAR" "red15.inexistente") "
++done
++echo "        codigos: ${codigos}"
++ultimo=$(awk '{print $NF}' <<<"$codigos")
++res RED-15 "Mas de ${LIMITE_LOGIN} intentos de login por minuto (ultimo intento)" "429" "$ultimo"
++
++# RED-16: X-Forwarded-For escrito por el cliente no evade el limitador.
++echo "        Esperando 61 s para RED-16..."
++sleep 61
++token_csrf "$JAR"; codigos=""
++for i in $(seq 1 $((LIMITE_LOGIN + 2))); do
++  codigos+="$(login_invalido "$JAR" "red16.inexistente" "X-Forwarded-For: 203.0.113.$((i + 10))") "
++done
++echo "        codigos: ${codigos}"
++ultimo=$(awk '{print $NF}' <<<"$codigos")
++res RED-16a "X-Forwarded-For rotado por el cliente no evade el limitador" "429" "$ultimo"
++echo "RED-16b  IpOrigen en cob.LogAcceso: verificacion MANUAL de un miembro de grp-cobranza-sql-admin."
++echo "         Consultar cob.vw_LogAccesoEvidencia para UsuarioIngresado = 'red16.inexistente':"
++echo "         esperado: ninguna fila con IP 203.0.113.0 (la red de documentacion RFC 5737); la IP"
++echo "         enmascarada debe ser la del operador (<IP_OPERADOR> en la evidencia)."
++echo "RED-17   Ejecutar desde otra red con ORIGEN_PRUEBA=externa (esperado 403)."
++sleep 61
++echo "Fin."
+diff --git a/scripts/s12_verificar_seguridad.sh b/scripts/s12_verificar_seguridad.sh
+index 2dd66a6..a852354 100644
+--- a/scripts/s12_verificar_seguridad.sh
++++ b/scripts/s12_verificar_seguridad.sh
+@@ -4,53 +4,250 @@
+ # Lee la configuracion real de los recursos y la compara con lo esperado.
+ # Genera matriz_seguridad_<fecha>.csv para adjuntar a la evidencia.
+ # Solo lectura: no modifica recursos.
++# Actualizado el 06-11-2026 por ADR-001 (tabla 6.2) y SEG-H08.
++#
++# Resultados posibles: CUMPLE, NO CUMPLE, NO VERIFICADO (el control no se pudo
++# leer; por ejemplo SEG-KV-04 necesita acceso de red al plano de datos de Key
++# Vault, que esta cerrado fuera de la ventana del operador).
++#
++# La matriz NO contiene Object IDs, IP publicas, nombres de secretos ni valores:
++# solo conteos y estados. Los IDs de identidades se usan en memoria.
++#
++# Variables:
++#   RG WEB_APP FUNC_APP SQL_SERVER SQL_DB KV_NAME STORAGE   obligatorias
++#   ESTADO_TRANSICION  vigente (por defecto) | publicacion-aprobada | levantada
++#   OPERADOR_OBJECT_ID opcional: habilita SEG-KV-07 (solo el operador con
++#                      Secrets Officer). No se escribe en la matriz.
+ # =============================================================================
+ set -uo pipefail
+ 
+ RG="${RG:?Definir RG}"; WEB_APP="${WEB_APP:?}"; FUNC_APP="${FUNC_APP:?}"
+ SQL_SERVER="${SQL_SERVER:?}"; SQL_DB="${SQL_DB:?}"; KV_NAME="${KV_NAME:?}"; STORAGE="${STORAGE:?}"
++ESTADO_TRANSICION="${ESTADO_TRANSICION:-vigente}"
++OPERADOR_OBJECT_ID="${OPERADOR_OBJECT_ID:-}"
++CONTENEDOR_DP="dataprotection-keys"            # ADR-001 5.5
++CLAVE_DP="dataprotection-cobranza-api"         # ADR-001 5.5
++SECRETO_ACS="acs-connection-string"
++
+ SALIDA="matriz_seguridad_$(date +%Y%m%d_%H%M).csv"
+ echo "id;control;esperado;obtenido;resultado" > "$SALIDA"
+-n=0; ok=0
++n=0; ok=0; nv=0
+ 
+-chk () {   # chk "control" "esperado" "obtenido"
++# chk "id" "control" "esperado" "obtenido"
++chk () {
+   n=$((n+1)); local r="NO CUMPLE"
+-  [[ "${3,,}" == "${2,,}" ]] && { r="CUMPLE"; ok=$((ok+1)); }
+-  printf 'SEG-%02d;%s;%s;%s;%s\n' "$n" "$1" "$2" "$3" "$r" | tee -a "$SALIDA"
++  if [[ "$4" == "error" || "$4" == "NO VERIFICADO"* ]]; then
++    r="NO VERIFICADO"; nv=$((nv+1))
++  elif [[ "${4,,}" == "${3,,}" ]]; then
++    r="CUMPLE"; ok=$((ok+1))
++  fi
++  printf '%s;%s;%s;%s;%s\n' "$1" "$2" "$3" "$4" "$r" | tee -a "$SALIDA"
+ }
+ q () { "$@" 2>/dev/null | tr -d '\r' || echo "error"; }
++# Valor vacio o null de la CLI -> texto dado (p. ej. propiedades nunca configuradas).
++o_si_vacio () { local v="$1"; if [[ -z "$v" || "$v" == "null" || "$v" == "None" ]]; then echo "$2"; else echo "$v"; fi; }
++
++WEB_ID=$(q az webapp show -g "$RG" -n "$WEB_APP" --query id -o tsv)
++FUNC_ID=$(q az functionapp show -g "$RG" -n "$FUNC_APP" --query id -o tsv)
++WEB_CFG="${WEB_ID}/config/web"
++FUNC_CFG="${FUNC_ID}/config/web"
++KV_ID=$(q az keyvault show -n "$KV_NAME" --query id -o tsv)
++API_PID=$(q az webapp identity show -g "$RG" -n "$WEB_APP" --query principalId -o tsv)
++FUNC_PID=$(q az functionapp identity show -g "$RG" -n "$FUNC_APP" --query principalId -o tsv)
++
++# ---------------------------------------------------------------------------
++# Controles S12 originales (los id SEG-01 a SEG-22 se conservan)
++# ---------------------------------------------------------------------------
++chk SEG-01 "API: solo HTTPS"                       "true"     "$(q az webapp show -g "$RG" -n "$WEB_APP" --query httpsOnly -o tsv)"
++chk SEG-02 "API: TLS minimo"                       "1.2"      "$(q az resource show --ids "$WEB_CFG" --query properties.minTlsVersion -o tsv)"
++chk SEG-03 "API: FTP deshabilitado"                "Disabled" "$(q az resource show --ids "$WEB_CFG" --query properties.ftpsState -o tsv)"
++chk SEG-04 "API: SCM con accion por defecto Deny"  "Deny"     "$(q az resource show --ids "$WEB_CFG" --query properties.scmIpSecurityRestrictionsDefaultAction -o tsv)"
++# SEG-05 (ADR-001 6.2): Easy Auth NO debe estar activo; si lo estuviera interceptaria
++# las solicitudes. Un authsettingsV2 nunca configurado devuelve enabled=false o vacio
++# (comportamiento exacto: PENDIENTE verificar en Azure); vacio se informa como false.
++EA2=$(q az resource show --ids "${WEB_ID}/config/authsettingsV2" --query properties.platform.enabled -o tsv)
++chk SEG-05 "API: Easy Auth deshabilitado (autenticacion propia ADR-001)" "false" "$(o_si_vacio "$EA2" false)"
++chk SEG-06 "API: identidad administrada"           "SystemAssigned" "$(q az webapp identity show -g "$RG" -n "$WEB_APP" --query type -o tsv)"
++chk SEG-07 "Functions: solo HTTPS"                 "true"     "$(q az functionapp show -g "$RG" -n "$FUNC_APP" --query httpsOnly -o tsv)"
++chk SEG-08 "Functions: TLS minimo"                 "1.2"      "$(q az resource show --ids "$FUNC_CFG" --query properties.minTlsVersion -o tsv)"
++chk SEG-09 "Functions: entrada publica denegada"   "Deny"     "$(q az resource show --ids "$FUNC_CFG" --query properties.ipSecurityRestrictionsDefaultAction -o tsv)"
++chk SEG-10 "Functions: todo el trafico por VNet"   "true"     "$(q az resource show --ids "$FUNC_CFG" --query properties.vnetRouteAllEnabled -o tsv)"
++chk SEG-11 "SQL: acceso publico"                   "Disabled" "$(q az sql server show -g "$RG" -n "$SQL_SERVER" --query publicNetworkAccess -o tsv)"
++chk SEG-12 "SQL: TLS minimo"                       "1.2"      "$(q az sql server show -g "$RG" -n "$SQL_SERVER" --query minimalTlsVersion -o tsv)"
++chk SEG-13 "SQL: solo autenticacion Entra ID"      "true"     "$(q az sql server ad-only-auth get -g "$RG" -n "$SQL_SERVER" --query azureAdOnlyAuthentication -o tsv)"
++chk SEG-14 "SQL: TDE habilitado"                   "Enabled"  "$(q az sql db tde show -g "$RG" -s "$SQL_SERVER" -d "$SQL_DB" --query state -o tsv)"
++chk SEG-15 "SQL: auditoria habilitada"             "Enabled"  "$(q az sql server audit-policy show -g "$RG" -n "$SQL_SERVER" --query state -o tsv)"
++chk SEG-16 "Key Vault: autorizacion RBAC"          "true"     "$(q az keyvault show -n "$KV_NAME" --query properties.enableRbacAuthorization -o tsv)"
++chk SEG-17 "Key Vault: proteccion de purga"        "true"     "$(q az keyvault show -n "$KV_NAME" --query properties.enablePurgeProtection -o tsv)"
++chk SEG-18 "Key Vault: acceso publico"             "Disabled" "$(q az keyvault show -n "$KV_NAME" --query properties.publicNetworkAccess -o tsv)"
++chk SEG-19 "Storage: TLS minimo"                   "TLS1_2"   "$(q az storage account show -g "$RG" -n "$STORAGE" --query minimumTlsVersion -o tsv)"
++chk SEG-20 "Storage: sin acceso anonimo a blobs"   "false"    "$(q az storage account show -g "$RG" -n "$STORAGE" --query allowBlobPublicAccess -o tsv)"
++chk SEG-21 "Storage: sin clave compartida"         "false"    "$(q az storage account show -g "$RG" -n "$STORAGE" --query allowSharedKeyAccess -o tsv)"
++chk SEG-22 "Private Endpoints no aprobados"        "0"        "$(q az network private-endpoint list -g "$RG" --query "length([?privateLinkServiceConnections[0].privateLinkServiceConnectionState.status!='Approved'])" -o tsv)"
++
++# ---------------------------------------------------------------------------
++# Complementos de exposicion publica, SCM y red (06-11-2026)
++# ---------------------------------------------------------------------------
++chk SEG-23 "Storage: acceso publico"               "Disabled" "$(q az storage account show -g "$RG" -n "$STORAGE" --query publicNetworkAccess -o tsv)"
++chk SEG-24 "Functions: SCM con accion por defecto Deny" "Deny" "$(q az resource show --ids "$FUNC_CFG" --query properties.scmIpSecurityRestrictionsDefaultAction -o tsv)"
++chk SEG-25 "API: SCM no hereda reglas del sitio principal" "false" "$(q az resource show --ids "$WEB_CFG" --query properties.scmIpSecurityRestrictionsUseMain -o tsv)"
++chk SEG-26 "Functions: SCM no hereda reglas del sitio principal" "false" "$(q az resource show --ids "$FUNC_CFG" --query properties.scmIpSecurityRestrictionsUseMain -o tsv)"
++SCM_ALLOW=$(q az webapp config access-restriction show -g "$RG" -n "$WEB_APP" --query "length(scmIpSecurityRestrictions[?action=='Allow' && ipAddress!='Any'])" -o tsv)
++chk SEG-27 "API: SCM sin reglas de permiso al cerrar la ventana" "0" "$SCM_ALLOW"
++SCM_ALLOW_F=$(q az functionapp config access-restriction show -g "$RG" -n "$FUNC_APP" --query "length(scmIpSecurityRestrictions[?action=='Allow' && ipAddress!='Any'])" -o tsv)
++chk SEG-28 "Functions: SCM sin reglas de permiso al cerrar la ventana" "0" "$SCM_ALLOW_F"
++chk SEG-29 "nsg-pe: Deny-VNet-Inbound en prioridad 4000" "Deny/4000" \
++    "$(q az network nsg rule show -g "$RG" --nsg-name nsg-pe -n Deny-VNet-Inbound --query "join('/', [access, to_string(priority)])" -o tsv)"
++chk SEG-30 "nsg-pe: 1433 permitido desde snet-app"  "Allow/10.20.1.0/24/1433" \
++    "$(q az network nsg rule show -g "$RG" --nsg-name nsg-pe -n Allow-App-To-SQL --query "join('/', [access, sourceAddressPrefix, destinationPortRange])" -o tsv)"
++chk SEG-31 "nsg-pe: 443 permitido desde snet-app"   "Allow/10.20.1.0/24/443" \
++    "$(q az network nsg rule show -g "$RG" --nsg-name nsg-pe -n Allow-App-To-KeyVault-Storage --query "join('/', [access, sourceAddressPrefix, destinationPortRange])" -o tsv)"
++
++# Registros A de las zonas DNS privadas (plano de control). La resolucion efectiva
++# desde la VNet se prueba aparte (nslookup desde la consola SSH de la Function App).
++dns () { q az network private-dns record-set a list -g "$RG" -z "$1" --query "[].aRecords[].ipv4Address | join(',', @)" -o tsv; }
++chk SEG-DNS-01 "DNS privado SQL"       "10.20.2.4" "$(dns privatelink.database.windows.net)"
++chk SEG-DNS-02 "DNS privado Key Vault" "10.20.2.5" "$(dns privatelink.vaultcore.azure.net)"
++chk SEG-DNS-03 "DNS privado blob"      "10.20.2.6" "$(dns privatelink.blob.core.windows.net)"
++chk SEG-DNS-04 "DNS privado queue"     "10.20.2.7" "$(dns privatelink.queue.core.windows.net)"
++chk SEG-DNS-05 "DNS privado table"     "10.20.2.8" "$(dns privatelink.table.core.windows.net)"
++
++# ---------------------------------------------------------------------------
++# ADR-001 tabla 6.2: RBAC, Data Protection, Key Vault, transicion
++# ---------------------------------------------------------------------------
++# Una sola lectura de asignaciones de la suscripcion (incluye ambitos de grupo de
++# recursos y de recurso; no incluye grupos de administracion).
++RA=$(q az role assignment list --all --query "[].[principalId, principalType, roleDefinitionName, scope]" -o tsv)
++if [[ "$RA" == "error" || -z "$KV_ID" || "$KV_ID" == "error" || "$API_PID" == "error" || "$FUNC_PID" == "error" ]]; then
++  RA_OK=no
++else
++  RA_OK=si
++fi
++kv_l="${KV_ID,,}"
++
++# Devuelve las lineas "rol<TAB>ambito" de un principal.
++asignaciones_de () { printf '%s\n' "$RA" | awk -F'\t' -v p="$1" '$1==p {print $3 "\t" $4}'; }
++# 1 si el ambito es el vault, un secreto/clave del vault o un ancestro del vault.
++alcanza_kv () { local s="${1,,}"; [[ "$kv_l" == "$s" || "$kv_l" == "$s/"* || "$s" == "$kv_l/"* ]]; }
++es_ancestro_o_vault () { local s="${1,,}"; [[ "$kv_l" == "$s" || "$kv_l" == "$s/"* ]]; }
++
++# Clasifica las asignaciones de un rol para un principal segun el sufijo de ambito esperado.
++# Salida: "ninguna" | "alcance <sufijo>" | "alcance amplio (N)"
++clasificar () {   # clasificar principal rol sufijo
++  local total=0 exactas=0 rol scope
++  while IFS=$'\t' read -r rol scope; do
++    [[ "$rol" == "$2" ]] || continue
++    total=$((total+1))
++    [[ "${scope,,}" == *"${3,,}" ]] && exactas=$((exactas+1))
++  done < <(asignaciones_de "$1")
++  if (( total == 0 )); then echo "ninguna"
++  elif (( total == exactas )); then echo "alcance ${3}"
++  else echo "alcance amplio ($((total-exactas)) de ${total})"; fi
++}
++
++if [[ "$RA_OK" == "si" ]]; then
++  chk SEG-DP-01 "API: Storage Blob Data Contributor solo en el contenedor ${CONTENEDOR_DP}" \
++      "alcance /containers/${CONTENEDOR_DP}" "$(clasificar "$API_PID" "Storage Blob Data Contributor" "/containers/${CONTENEDOR_DP}")"
++  chk SEG-DP-02 "API: Key Vault Crypto User solo en la clave ${CLAVE_DP}" \
++      "alcance /keys/${CLAVE_DP}" "$(clasificar "$API_PID" "Key Vault Crypto User" "/keys/${CLAVE_DP}")"
++
++  # SEG-KV-01: la API no tiene ningun rol con acceso a secretos sobre el vault.
++  c=0
++  while IFS=$'\t' read -r rol scope; do
++    case "$rol" in "Key Vault Secrets User"|"Key Vault Secrets Officer"|"Key Vault Administrator"|"Key Vault Data Access Administrator"|Owner|Contributor)
++      alcanza_kv "$scope" && c=$((c+1)) ;;
++    esac
++  done < <(asignaciones_de "$API_PID")
++  chk SEG-KV-01 "API: sin roles de secretos ni de administracion sobre Key Vault" "0" "$c"
++
++  # SEG-KV-02: Function App con Secrets User SOLO en acs-connection-string.
++  chk SEG-KV-02 "Functions: Key Vault Secrets User solo en ${SECRETO_ACS}" \
++      "alcance /secrets/${SECRETO_ACS}" "$(clasificar "$FUNC_PID" "Key Vault Secrets User" "/secrets/${SECRETO_ACS}")"
++  c=0
++  while IFS=$'\t' read -r rol scope; do
++    case "$rol" in "Key Vault Secrets Officer"|"Key Vault Administrator"|"Key Vault Data Access Administrator")
++      alcanza_kv "$scope" && c=$((c+1)) ;;
++    esac
++  done < <(asignaciones_de "$FUNC_PID")
++  chk SEG-KV-02b "Functions: sin roles de escritura o administracion en Key Vault" "0" "$c"
++
++  # SEG-KV-03: ningun usuario humano con Secrets User sobre el vault completo o un ancestro.
++  c=$(printf '%s\n' "$RA" | while IFS=$'\t' read -r pid tipo rol scope; do
++        [[ "$tipo" == "User" && "$rol" == "Key Vault Secrets User" ]] && es_ancestro_o_vault "$scope" && echo x
++      done | wc -l | tr -d ' ')
++  chk SEG-KV-03 "Ningun usuario con Key Vault Secrets User sobre el vault completo" "0" "$c"
++
++  # SEG-KV-07 (opcional): solo el operador con Secrets Officer o Administrator sobre el vault.
++  if [[ -n "$OPERADOR_OBJECT_ID" ]]; then
++    c=$(printf '%s\n' "$RA" | while IFS=$'\t' read -r pid tipo rol scope; do
++          [[ "$tipo" == "User" && "$pid" != "$OPERADOR_OBJECT_ID" ]] || continue
++          case "$rol" in "Key Vault Secrets Officer"|"Key Vault Administrator") es_ancestro_o_vault "$scope" && echo x ;; esac
++        done | wc -l | tr -d ' ')
++    chk SEG-KV-07 "Usuarios distintos del operador con Secrets Officer o Administrator en el vault" "0" "$c"
++  fi
++
++  # SEG-DP-03 (parte estatica): condicion ABAC en Storage Blob Data Owner de la Function App.
++  COND=$(q az role assignment list --all --query "[?principalId=='${FUNC_PID}' && roleDefinitionName=='Storage Blob Data Owner'].[conditionVersion, condition]" -o tsv)
++  if [[ "$COND" == "error" ]]; then cond_r="error"
++  elif [[ -z "$COND" ]]; then cond_r="sin asignacion"
++  elif grep -q "$CONTENEDOR_DP" <<<"$COND" && grep -q "2.0" <<<"$COND"; then cond_r="condicion 2.0 excluye ${CONTENEDOR_DP}"
++  else cond_r="sin condicion sobre ${CONTENEDOR_DP}"; fi
++  chk SEG-DP-03a "Functions: Storage Blob Data Owner con condicion ABAC" "condicion 2.0 excluye ${CONTENEDOR_DP}" "$cond_r"
++else
++  for id in SEG-DP-01 SEG-DP-02 SEG-KV-01 SEG-KV-02 SEG-KV-02b SEG-KV-03 SEG-DP-03a; do
++    chk "$id" "Asignaciones RBAC (lectura fallida)" "-" "NO VERIFICADO (no se pudo leer az role assignment list o las identidades)"
++  done
++fi
++# SEG-DP-03 (prueba negativa real con la identidad de la Function App): manual.
++chk SEG-DP-03b "Functions: lectura de blobs en ${CONTENEDOR_DP} rechazada (403)" "403" \
++    "NO VERIFICADO (prueba manual: docs/seguridad/plantilla_prueba_negativa_abac.md)"
++
++# SEG-KV-04: secretos apikey-* con expiracion y sin vencidos habilitados. Requiere
++# acceso al plano de datos (ventana del operador abierta o equipo dentro de la VNet).
++SEC=$(az keyvault secret list --vault-name "$KV_NAME" --query "[?starts_with(name,'apikey-')].[to_string(attributes.enabled), to_string(attributes.expires)]" -o tsv 2>/dev/null | tr -d '\r')
++st=$?
++if [[ $st -ne 0 ]]; then
++  chk SEG-KV-04 "Secretos apikey-*: sin expiracion o vencidos habilitados" "0" "NO VERIFICADO (sin acceso al plano de datos de Key Vault)"
++else
++  ahora=$(date -u +%s); malos=0
++  while IFS=$'\t' read -r hab exp; do
++    [[ -z "$hab$exp" ]] && continue
++    if [[ -z "$exp" || "$exp" == "null" ]]; then malos=$((malos+1)); continue; fi
++    t=$(date -u -d "$exp" +%s 2>/dev/null || echo 0)
++    if [[ "$hab" == "true" ]] && (( t <= ahora )); then malos=$((malos+1)); fi
++  done <<<"$SEC"
++  chk SEG-KV-04 "Secretos apikey-*: sin expiracion o vencidos habilitados" "0" "$malos"
++fi
++
++DIAG=$(q az monitor diagnostic-settings list --resource "$KV_ID" --query "length([?logs[?categoryGroup=='audit' && enabled]])" -o tsv)
++if [[ "$DIAG" =~ ^[0-9]+$ ]]; then (( DIAG > 0 )) && DIAG="existe" || DIAG="no existe"; fi
++chk SEG-KV-05 "Key Vault: diagnostico de auditoria (categoryGroup audit) activo" "existe" "$DIAG"
++
++chk SEG-KV-06a "Key Vault: sin ipRules" "0" "$(o_si_vacio "$(q az keyvault show -n "$KV_NAME" --query "length(properties.networkAcls.ipRules || \`[]\`)" -o tsv)" 0)"
++chk SEG-KV-06b "SQL: sin regla de firewall operador-temporal" "0" "$(q az sql server firewall-rule list -g "$RG" -s "$SQL_SERVER" --query "length([?name=='operador-temporal'])" -o tsv)"
++chk SEG-KV-06c "SQL: sin reglas de firewall (ninguna IP publica permitida)" "0" "$(q az sql server firewall-rule list -g "$RG" -s "$SQL_SERVER" --query "length(@)" -o tsv)"
++chk SEG-KV-08 "Key Vault: accion por defecto de red" "Deny" "$(q az keyvault show -n "$KV_NAME" --query properties.networkAcls.defaultAction -o tsv)"
++
++if [[ "$ESTADO_TRANSICION" != "levantada" ]]; then
++  chk SEG-TR-01 "API: regla de transicion ADR-001 5.11 (entrada por defecto Deny)" "Deny" \
++      "$(q az resource show --ids "$WEB_CFG" --query properties.ipSecurityRestrictionsDefaultAction -o tsv)"
++  chk SEG-TR-02 "API: sin reglas de permiso al cerrar la ventana (ipOperador vacio)" "0" \
++      "$(q az resource show --ids "$WEB_CFG" --query "length(properties.ipSecurityRestrictions[?action=='Allow' && ipAddress!='Any'])" -o tsv)"
++else
++  echo "SEG-TR-01;Regla de transicion;-;levantada (ver evidencia de aprobacion);NO APLICA" | tee -a "$SALIDA"
++fi
+ 
+-WEB_CFG=$(az webapp show -g "$RG" -n "$WEB_APP" --query id -o tsv)/config/web
+-FUNC_CFG=$(az functionapp show -g "$RG" -n "$FUNC_APP" --query id -o tsv)/config/web
+-
+-chk "API: solo HTTPS"                       "true"     "$(q az webapp show -g "$RG" -n "$WEB_APP" --query httpsOnly -o tsv)"
+-chk "API: TLS minimo"                       "1.2"      "$(q az resource show --ids "$WEB_CFG" --query properties.minTlsVersion -o tsv)"
+-chk "API: FTP deshabilitado"                "Disabled" "$(q az resource show --ids "$WEB_CFG" --query properties.ftpsState -o tsv)"
+-chk "API: SCM con accion por defecto Deny"  "Deny"     "$(q az resource show --ids "$WEB_CFG" --query properties.scmIpSecurityRestrictionsDefaultAction -o tsv)"
+-chk "API: autenticacion Entra ID activa"    "true"     "$(q az webapp auth show -g "$RG" -n "$WEB_APP" --query properties.platform.enabled -o tsv)"
+-chk "API: identidad administrada"           "SystemAssigned" "$(q az webapp identity show -g "$RG" -n "$WEB_APP" --query type -o tsv)"
+-chk "Functions: solo HTTPS"                 "true"     "$(q az functionapp show -g "$RG" -n "$FUNC_APP" --query httpsOnly -o tsv)"
+-chk "Functions: TLS minimo"                 "1.2"      "$(q az resource show --ids "$FUNC_CFG" --query properties.minTlsVersion -o tsv)"
+-chk "Functions: entrada publica denegada"   "Deny"     "$(q az resource show --ids "$FUNC_CFG" --query properties.ipSecurityRestrictionsDefaultAction -o tsv)"
+-chk "Functions: todo el trafico por VNet"   "true"     "$(q az resource show --ids "$FUNC_CFG" --query properties.vnetRouteAllEnabled -o tsv)"
+-chk "SQL: acceso publico"                   "Disabled" "$(q az sql server show -g "$RG" -n "$SQL_SERVER" --query publicNetworkAccess -o tsv)"
+-chk "SQL: TLS minimo"                       "1.2"      "$(q az sql server show -g "$RG" -n "$SQL_SERVER" --query minimalTlsVersion -o tsv)"
+-chk "SQL: solo autenticacion Entra ID"      "true"     "$(q az sql server ad-only-auth get -g "$RG" -n "$SQL_SERVER" --query azureAdOnlyAuthentication -o tsv)"
+-chk "SQL: TDE habilitado"                   "Enabled"  "$(q az sql db tde show -g "$RG" -s "$SQL_SERVER" -d "$SQL_DB" --query state -o tsv)"
+-chk "SQL: auditoria habilitada"             "Enabled"  "$(q az sql server audit-policy show -g "$RG" -n "$SQL_SERVER" --query state -o tsv)"
+-chk "Key Vault: autorizacion RBAC"          "true"     "$(q az keyvault show -n "$KV_NAME" --query properties.enableRbacAuthorization -o tsv)"
+-chk "Key Vault: proteccion de purga"        "true"     "$(q az keyvault show -n "$KV_NAME" --query properties.enablePurgeProtection -o tsv)"
+-chk "Key Vault: acceso publico"             "Disabled" "$(q az keyvault show -n "$KV_NAME" --query properties.publicNetworkAccess -o tsv)"
+-chk "Storage: TLS minimo"                   "TLS1_2"   "$(q az storage account show -g "$RG" -n "$STORAGE" --query minimumTlsVersion -o tsv)"
+-chk "Storage: sin acceso anonimo a blobs"   "false"    "$(q az storage account show -g "$RG" -n "$STORAGE" --query allowBlobPublicAccess -o tsv)"
+-chk "Storage: sin clave compartida"         "false"    "$(q az storage account show -g "$RG" -n "$STORAGE" --query allowSharedKeyAccess -o tsv)"
+-chk "Private Endpoints no aprobados"        "0"        "$(q az network private-endpoint list -g "$RG" --query "length([?privateLinkServiceConnections[0].privateLinkServiceConnectionState.status!='Approved'])" -o tsv)"
++chk SEG-FH-01 "API: ASPNETCORE_FORWARDEDHEADERS_ENABLED" "false" \
++    "$(o_si_vacio "$(q az webapp config appsettings list -g "$RG" -n "$WEB_APP" --query "[?name=='ASPNETCORE_FORWARDEDHEADERS_ENABLED'].value | [0]" -o tsv)" "sin ajuste")"
++chk SEG-EA-02 "API: sin ajuste MICROSOFT_PROVIDER_AUTHENTICATION_SECRET (Easy Auth obsoleto)" "0" \
++    "$(q az webapp config appsettings list -g "$RG" -n "$WEB_APP" --query "length([?name=='MICROSOFT_PROVIDER_AUTHENTICATION_SECRET'])" -o tsv)"
+ 
+ WAF=$(q az network application-gateway waf-policy list -g "$RG" --query "[0].policySettings.mode" -o tsv)
+ if [[ -n "$WAF" && "$WAF" != "error" ]]; then
+-  chk "WAF: modo Prevencion" "Prevention" "$WAF"
++  chk SEG-WAF "WAF: modo Prevencion" "Prevention" "$WAF"
+ else
+-  echo "WAF no desplegado: control SEG-WAF queda PENDIENTE" | tee -a "$SALIDA"
++  echo "SEG-WAF;WAF no desplegado (D11 PENDIENTE);-;-;PENDIENTE" | tee -a "$SALIDA"
+ fi
+ 
+-echo "Resumen: ${ok} de ${n} controles cumplen. Archivo: ${SALIDA}"
++echo "Resumen: ${ok} de ${n} controles cumplen; ${nv} no verificados. Archivo: ${SALIDA}"
++echo "Cookie, CSRF, limitador y encabezados reenviados: ver scripts/s12_pruebas_red.sh (RED-11 a RED-17)."
+
+# Archivos nuevos (sin seguimiento) de esta tarea
+ M docs/seguridad/politica_credenciales_y_accesos.md
+?? docs/seguridad/plantilla_claves_api.md
+?? docs/seguridad/plantilla_entrega_credenciales.md
+?? docs/seguridad/plantilla_levantamiento_transicion.md
+?? docs/seguridad/plantilla_prueba_negativa_abac.md
+?? docs/seguridad/plantilla_revision_post_restauracion.md
+?? docs/seguridad/plantilla_ventana_operador.md
+?? evidencias/2026-11-06_adr001_seguridad/01_versiones.txt
+?? evidencias/2026-11-06_adr001_seguridad/02_bash_n.txt
+?? evidencias/2026-11-06_adr001_seguridad/03_prueba_seco_endurecer.txt
+?? evidencias/2026-11-06_adr001_seguridad/04_prueba_seco_verificar.txt
+?? evidencias/2026-11-06_adr001_seguridad/05_prueba_seco_pruebas_red.txt
+?? evidencias/2026-11-06_adr001_seguridad/06_busqueda_cadenas.txt
+?? evidencias/2026-11-06_adr001_seguridad/07_diff.txt
+?? evidencias/2026-11-06_adr001_seguridad/herramienta/prueba_en_seco.sh

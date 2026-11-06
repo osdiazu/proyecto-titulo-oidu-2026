@@ -1,0 +1,11 @@
+# bash -n pruebas/consumidor_ventas_demo.sh
+exit=0
+# shellcheck
+no instalado: NO VERIFICADO
+# node --check (copia .mjs de carga_api_k6.js, panel.js, login.js)
+exit=0
+exit=0
+exit=0
+# file
+pruebas/consumidor_ventas_demo.sh: Bourne-Again shell script, ASCII text executable
+pruebas/carga_api_k6.js:           JavaScript source, ASCII text

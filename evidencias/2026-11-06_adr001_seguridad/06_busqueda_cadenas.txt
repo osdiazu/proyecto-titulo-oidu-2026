@@ -1,0 +1,8 @@
+# Busqueda de cadenas sospechosas en los archivos de esta tarea (2026-11-06T12:44Z)
+# Patrones: AccountKey=, SharedAccessSignature, accesskey=, cobk_<8>_<secreto>, -----BEGIN, password=, client_secret=, GUID completos, IPv4 publicas
+## Secretos
+docs/seguridad/politica_credenciales_y_accesos.md:40:| Búsqueda de cadenas sospechosas (`AccountKey=`, `SharedAccessSignature`, `accesskey=`, `cobk_<prefijo>_`, `-----BEGIN`, `password = '...'`, `client_secret =`): sin coincidencias | `grep -rn -I -E ...` sobre el repositorio, excluidos `.git`, `bin`, `obj` |
+## GUID completos
+Sin coincidencias
+## IPv4 (se esperan solo 10.20.x.x del plan, 203.0.113.x y 198.51.100.x de documentacion RFC 5737)
+Sin IPv4 fuera de las esperadas

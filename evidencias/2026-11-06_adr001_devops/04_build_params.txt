@@ -1,0 +1,24 @@
+# az bicep build-params --file infra/main.bicepparam --outfile <temporal> (IP_OPERADOR vacia)
+exit=0
+sqlAdminGroupObjectId = 7074...e6be
+operadorObjectId = bf48...f2fe
+ipOperador = 
+cicloKeyVault = 1
+sqlAdminGroupName = grp-cobranza-sql-admin
+location = brazilsouth
+acsDataLocation = United States
+saltosProxyConfiables = 1
+prefijo = cobranza
+ambiente = dev
+appServicePlanSku = B1
+sqlBackupRedundancy = Zone
+diasPreaviso = 7
+diasMora1 = 3
+diasMora2 = 7
+maxCorreosPorEjecucion = 10
+pausaEntreCorreosMs = 15000
+canalesPagoTexto = Transferencia bancaria a Banco Ficticio, cuenta corriente 00-000-00000-0 (DATOS DE DEMOSTRACION)
+telefonoContacto = +56 2 2000 0000 (DEMO)
+correoContacto = cobranza@embotelladora-demo.example
+# archivos .json en infra/ despues de build-params:
+0

@@ -1,0 +1,60 @@
+### E1 transicion vigente; regla operador-temporal existe; SCM con 1 regla previa; IP_PUBLICACION_SCM definida
+== func: HTTPS, TLS 1.2, sin FTP, trafico saliente por la VNet
+== func: sitio SCM independiente del principal y con accion por defecto Deny
+== func: SCM abierto SOLO a IP_PUBLICACION_SCM (regla operador-publicacion). Repetir este script sin esa variable al terminar de publicar.
+== func: sin trafico de entrada publico
+== api: HTTPS, TLS 1.2, sin FTP, trafico saliente por la VNet
+== api: sitio SCM independiente del principal y con accion por defecto Deny
+== api: SCM sin reglas de permiso
+   (IP_PUBLICACION_SCM ignorada en la Web App: con la transicion vigente la API no se publica, ADR-001 5.11 regla 1)
+== api: regla de transicion ADR-001 5.11 vigente: entrada por defecto Deny (solo la regla de ipOperador definida en main.bicep)
+== Azure SQL: TLS minimo 1.2 y sin acceso publico
+== Azure SQL: eliminando la regla de firewall operador-temporal
+== Key Vault: eliminando ipRules (no se muestran las IP)
+   ipRules eliminadas: 1
+== Key Vault: acceso publico Disabled y accion por defecto Deny
+== Storage: TLS 1.2, sin acceso anonimo a blobs, sin clave compartida, sin acceso publico
+Listo. Ejecutar scripts/s12_verificar_seguridad.sh
+codigo de salida=0
+--- llamadas que modifican (az simulado):
+az functionapp config access-restriction remove -g rg -n func --scm-site true --rule-name operador-publicacion --output none
+az functionapp config access-restriction add -g rg -n func --scm-site true --rule-name operador-publicacion --action Allow --ip-address 198.51.100.7 --priority 100 --output none
+az resource update --ids <sitio>/config/web --set properties.ipSecurityRestrictionsDefaultAction=Deny --output none
+az webapp config access-restriction remove -g rg -n api --scm-site true --rule-name operador-publicacion --output none
+az resource update --ids <sitio>/config/web --set properties.ipSecurityRestrictionsDefaultAction=Deny --output none
+az sql server update -g rg -n sql --minimal-tls-version 1.2 --enable-public-network false --output none
+az sql server firewall-rule delete -g rg -s sql -n operador-temporal --output none
+az keyvault network-rule remove -g rg -n kv --ip-address 198.51.100.7 --output none
+az keyvault update -g rg -n kv --public-network-access Disabled --default-action Deny --output none
+az storage account update -g rg -n st --min-tls-version TLS1_2 --allow-blob-public-access false --allow-shared-key-access false --public-network-access Disabled --default-action Deny --output none
+
+### E2 publicacion-aprobada con un informe de qa RECHAZADO (evidencias/qa/2026-11-06_revision_precommit.md)
+ERROR: el informe evidencias/qa/2026-11-06_revision_precommit.md no contiene un veredicto APROBADO (o contiene uno RECHAZADO).
+codigo de salida=2
+
+### E3 publicacion-aprobada con informe aprobado e IP_PUBLICACION_SCM
+== func: sitio SCM independiente del principal y con accion por defecto Deny
+== func: SCM abierto SOLO a IP_PUBLICACION_SCM (regla operador-publicacion). Repetir este script sin esa variable al terminar de publicar.
+== api: sitio SCM independiente del principal y con accion por defecto Deny
+== api: SCM abierto SOLO a IP_PUBLICACION_SCM (regla operador-publicacion). Repetir este script sin esa variable al terminar de publicar.
+== api: regla de transicion ADR-001 5.11 vigente: entrada por defecto Deny (solo la regla de ipOperador definida en main.bicep)
+codigo de salida=0
+--- reglas SCM agregadas: 2
+
+### E4 levantada sin aprobador registrado
+ERROR: /tmp/tmp.9z5CIL5gVh/lev_vacio.md no registra quien aprueba (fila 'Aprobado por' vacia).
+codigo de salida=2
+
+### E5 levantada con aprobador registrado
+== api: transicion levantada (evidencia: /tmp/tmp.9z5CIL5gVh/lev_ok.md).
+codigo de salida=0
+--- sitios con Deny forzado (esperado 1, solo la Function App): 1
+
+### E6 valor invalido de ESTADO_TRANSICION
+ERROR: ESTADO_TRANSICION debe ser vigente, publicacion-aprobada o levantada.
+codigo de salida=2
+
+### E7 IP_OPERADOR exportada en la terminal (debe ignorarse)
+AVISO: IP_OPERADOR tiene valor en esta terminal. Este script la IGNORA (no abre nada con ella).
+       Si main.bicep se desplego con ipOperador, la ventana NO esta cerrada: volver a desplegar con ipOperador vacio y repetir este script.
+--- reglas agregadas con IP_OPERADOR: 0

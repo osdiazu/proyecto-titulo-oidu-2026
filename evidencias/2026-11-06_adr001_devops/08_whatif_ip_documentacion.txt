@@ -1,0 +1,140 @@
+# What-if con IP_OPERADOR=203.0.113.10 (RFC 5737, documentacion; NO es la IP del operador)
+exit=0
+Conteo por tipo de cambio: {'Create': 54}
+Estado: Succeeded | error: None
+Create rg-cobranza-apt/providers/Microsoft.Communication/communicationServices/acs-cobranza-dev-yvlgzz
+Create rg-cobranza-apt/providers/Microsoft.Communication/emailServices/ecs-cobranza-dev
+Create rg-cobranza-apt/providers/Microsoft.Communication/emailServices/ecs-cobranza-dev/domains/AzureManagedDomain
+Create rg-cobranza-apt/providers/Microsoft.Insights/components/appi-cobranza-dev
+Create rg-cobranza-apt/providers/Microsoft.KeyVault/vaults/kv-cobranza-dev-ahfg2w
+Create rg-cobranza-apt/providers/Microsoft.KeyVault/vaults/kv-cobranza-dev-ahfg2w/keys/dataprotection-cobranza-api
+Create rg-cobranza-apt/providers/Microsoft.KeyVault/vaults/kv-cobranza-dev-ahfg2w/keys/dataprotection-cobranza-api/providers/Microsoft.Authorization/roleAssignments/9682...4fbb
+Create rg-cobranza-apt/providers/Microsoft.KeyVault/vaults/kv-cobranza-dev-ahfg2w/providers/Microsoft.Authorization/roleAssignments/91fe...8644
+Create rg-cobranza-apt/providers/Microsoft.KeyVault/vaults/kv-cobranza-dev-ahfg2w/providers/Microsoft.Insights/diagnosticSettings/diag-kv
+Create rg-cobranza-apt/providers/Microsoft.KeyVault/vaults/kv-cobranza-dev-ahfg2w/secrets/acs-connection-string
+Create rg-cobranza-apt/providers/Microsoft.KeyVault/vaults/kv-cobranza-dev-ahfg2w/secrets/acs-connection-string/providers/Microsoft.Authorization/roleAssignments/d493...7b1b
+Create rg-cobranza-apt/providers/Microsoft.Network/networkSecurityGroups/nsg-app
+Create rg-cobranza-apt/providers/Microsoft.Network/networkSecurityGroups/nsg-pe
+Create rg-cobranza-apt/providers/Microsoft.Network/privateDnsZones/privatelink.blob.core.windows.net
+Create rg-cobranza-apt/providers/Microsoft.Network/privateDnsZones/privatelink.blob.core.windows.net/virtualNetworkLinks/link-vnet-cobranza
+Create rg-cobranza-apt/providers/Microsoft.Network/privateDnsZones/privatelink.database.windows.net
+Create rg-cobranza-apt/providers/Microsoft.Network/privateDnsZones/privatelink.database.windows.net/virtualNetworkLinks/link-vnet-cobranza
+Create rg-cobranza-apt/providers/Microsoft.Network/privateDnsZones/privatelink.queue.core.windows.net
+Create rg-cobranza-apt/providers/Microsoft.Network/privateDnsZones/privatelink.queue.core.windows.net/virtualNetworkLinks/link-vnet-cobranza
+Create rg-cobranza-apt/providers/Microsoft.Network/privateDnsZones/privatelink.table.core.windows.net
+Create rg-cobranza-apt/providers/Microsoft.Network/privateDnsZones/privatelink.table.core.windows.net/virtualNetworkLinks/link-vnet-cobranza
+Create rg-cobranza-apt/providers/Microsoft.Network/privateDnsZones/privatelink.vaultcore.azure.net
+Create rg-cobranza-apt/providers/Microsoft.Network/privateDnsZones/privatelink.vaultcore.azure.net/virtualNetworkLinks/link-vnet-cobranza
+Create rg-cobranza-apt/providers/Microsoft.Network/privateEndpoints/pe-blob-cobranza-dev
+Create rg-cobranza-apt/providers/Microsoft.Network/privateEndpoints/pe-blob-cobranza-dev/privateDnsZoneGroups/default
+Create rg-cobranza-apt/providers/Microsoft.Network/privateEndpoints/pe-kv-cobranza-dev
+Create rg-cobranza-apt/providers/Microsoft.Network/privateEndpoints/pe-kv-cobranza-dev/privateDnsZoneGroups/default
+Create rg-cobranza-apt/providers/Microsoft.Network/privateEndpoints/pe-queue-cobranza-dev
+Create rg-cobranza-apt/providers/Microsoft.Network/privateEndpoints/pe-queue-cobranza-dev/privateDnsZoneGroups/default
+Create rg-cobranza-apt/providers/Microsoft.Network/privateEndpoints/pe-sql-cobranza-dev
+Create rg-cobranza-apt/providers/Microsoft.Network/privateEndpoints/pe-sql-cobranza-dev/privateDnsZoneGroups/default
+Create rg-cobranza-apt/providers/Microsoft.Network/privateEndpoints/pe-table-cobranza-dev
+Create rg-cobranza-apt/providers/Microsoft.Network/privateEndpoints/pe-table-cobranza-dev/privateDnsZoneGroups/default
+Create rg-cobranza-apt/providers/Microsoft.Network/virtualNetworks/vnet-cobranza
+Create rg-cobranza-apt/providers/Microsoft.OperationalInsights/workspaces/log-cobranza-dev
+Create rg-cobranza-apt/providers/Microsoft.Sql/servers/sql-cobranza-dev-yvlgzz
+Create rg-cobranza-apt/providers/Microsoft.Sql/servers/sql-cobranza-dev-yvlgzz/auditingSettings/default
+Create rg-cobranza-apt/providers/Microsoft.Sql/servers/sql-cobranza-dev-yvlgzz/databases/master/providers/Microsoft.Insights/diagnosticSettings/diag-auditoria-sql
+Create rg-cobranza-apt/providers/Microsoft.Sql/servers/sql-cobranza-dev-yvlgzz/databases/sqldb-cobranza
+Create rg-cobranza-apt/providers/Microsoft.Sql/servers/sql-cobranza-dev-yvlgzz/databases/sqldb-cobranza/backupLongTermRetentionPolicies/default
+Create rg-cobranza-apt/providers/Microsoft.Sql/servers/sql-cobranza-dev-yvlgzz/databases/sqldb-cobranza/backupShortTermRetentionPolicies/default
+Create rg-cobranza-apt/providers/Microsoft.Sql/servers/sql-cobranza-dev-yvlgzz/databases/sqldb-cobranza/providers/Microsoft.Insights/diagnosticSettings/diag-sqldb
+Create rg-cobranza-apt/providers/Microsoft.Sql/servers/sql-cobranza-dev-yvlgzz/databases/sqldb-cobranza/transparentDataEncryption/current
+Create rg-cobranza-apt/providers/Microsoft.Sql/servers/sql-cobranza-dev-yvlgzz/firewallRules/operador-temporal
+Create rg-cobranza-apt/providers/Microsoft.Storage/storageAccounts/stcobranzadevyvlgzz
+Create rg-cobranza-apt/providers/Microsoft.Storage/storageAccounts/stcobranzadevyvlgzz/blobServices/default
+Create rg-cobranza-apt/providers/Microsoft.Storage/storageAccounts/stcobranzadevyvlgzz/blobServices/default/containers/dataprotection-keys
+Create rg-cobranza-apt/providers/Microsoft.Storage/storageAccounts/stcobranzadevyvlgzz/blobServices/default/containers/dataprotection-keys/providers/Microsoft.Authorization/roleAssignments/0bc2...0bb9
+Create rg-cobranza-apt/providers/Microsoft.Storage/storageAccounts/stcobranzadevyvlgzz/providers/Microsoft.Authorization/roleAssignments/8627...0fa4
+Create rg-cobranza-apt/providers/Microsoft.Storage/storageAccounts/stcobranzadevyvlgzz/providers/Microsoft.Authorization/roleAssignments/8f1f...d03c
+Create rg-cobranza-apt/providers/Microsoft.Storage/storageAccounts/stcobranzadevyvlgzz/providers/Microsoft.Authorization/roleAssignments/cf31...71dc
+Create rg-cobranza-apt/providers/Microsoft.Web/serverfarms/asp-cobranza-dev
+Create rg-cobranza-apt/providers/Microsoft.Web/sites/app-api-cobranza-dev-yvlgzz
+Create rg-cobranza-apt/providers/Microsoft.Web/sites/func-jobs-cobranza-dev-yvlgzz
+
+RES Microsoft.KeyVault/vaults/keys dataprotection-cobranza-api {"attributes": {"enabled": true, "exportable": false}, "keyOps": ["wrapKey", "unwrapKey"], "keySize": 2048, "kty": "RSA"}
+RA 9682...4fbb | scope: rg-cobranza-apt/providers/Microsoft.KeyVault/vaults/kv-cobranza-dev-ahfg2w/keys/dataprotection-cobranza-api | rol: 1233...7424 | tipo: None | condVer: None
+RA 91fe...8644 | scope: rg-cobranza-apt/providers/Microsoft.KeyVault/vaults/kv-cobranza-dev-ahfg2w | rol: b86a...5cd7 | tipo: None | condVer: None
+RA d493...7b1b | scope: rg-cobranza-apt/providers/Microsoft.KeyVault/vaults/kv-cobranza-dev-ahfg2w/secrets/acs-connection-string | rol: 4633...69e6 | tipo: None | condVer: None
+RES Microsoft.Sql/servers/databases/transparentDataEncryption current {"state": "Enabled"}
+RES Microsoft.Storage/storageAccounts/blobServices/containers dataprotection-keys {"publicAccess": "None"}
+RA 0bc2...0bb9 | scope: rg-cobranza-apt/providers/Microsoft.Storage/storageAccounts/stcobranzadevyvlgzz/blobServices/default/containers/dataprotection-keys | rol: ba92...c9fe | tipo: None | condVer: None
+RA 8627...0fa4 | scope: rg-cobranza-apt/providers/Microsoft.Storage/storageAccounts/stcobranzadevyvlgzz | rol: 0a9a...aaa3 | tipo: None | condVer: None
+RA 8f1f...d03c | scope: rg-cobranza-apt/providers/Microsoft.Storage/storageAccounts/stcobranzadevyvlgzz | rol: 974c...fb88 | tipo: None | condVer: None
+RA cf31...71dc | scope: rg-cobranza-apt/providers/Microsoft.Storage/storageAccounts/stcobranzadevyvlgzz | rol: b7e6...955b | tipo: None | condVer: 2.0
+   condicion: ((!(ActionMatches{'Microsoft.Storage/storageAccounts/blobServices/containers/blobs/read'}) AND !(ActionMatches{'Microsoft.Storage/storageAccounts/blobServices/containers/blobs/write'}) AND !(ActionMatches{'Microsoft.Storage/storageAccounts/blobServices/containers/blobs/delete'}) AND !(ActionMatches{'Microsoft.Storage/storageAccounts/blobServices/containers/blobs/add/action'}) AND !(ActionMatches{'Microsoft.Storage/storageAccounts/blobServices/containers/blobs/move/action'}) AND !(ActionMatches{'Microsoft.Storage/storageAccounts/blobServices/containers/blobs/deleteBlobVersion/action'}) AND !(ActionMatches{'Microsoft.Storage/storageAccounts/blobServices/containers/blobs/permanentDelete/action'}) AND !(ActionMatches{'Microsoft.Storage/storageAccounts/blobServices/containers/blobs/tags/read'}) AND !(ActionMatches{'Microsoft.Storage/storageAccounts/blobServices/containers/blobs/tags/write'})) OR (@Resource[Microsoft.Storage/storageAccounts/blobServices/containers:name] StringNotEquals 'dataprotection-keys'))
+   siteConfig (enmascarado por what-if): *******
+   siteConfig (enmascarado por what-if): *******
+
+# Formato ResourceIdOnly
+Note: The result may contain false positive predictions (noise).
+You can help us improve the accuracy of the result by opening an issue here: https://aka.ms/WhatIfIssues
+
+Resource and property changes are indicated with this symbol:
+  + Create
+
+The deployment will update the following scope:
+
+Scope: /subscriptions/b492...0d49/resourceGroups/rg-cobranza-apt
+
+  + Microsoft.Communication/communicationServices/acs-cobranza-dev-yvlgzz
+  + Microsoft.Communication/emailServices/ecs-cobranza-dev
+  + Microsoft.Communication/emailServices/ecs-cobranza-dev/domains/AzureManagedDomain
+  + Microsoft.Insights/components/appi-cobranza-dev
+  + Microsoft.KeyVault/vaults/kv-cobranza-dev-ahfg2w
+  + Microsoft.KeyVault/vaults/kv-cobranza-dev-ahfg2w/keys/dataprotection-cobranza-api
+  + Microsoft.KeyVault/vaults/kv-cobranza-dev-ahfg2w/keys/dataprotection-cobranza-api/providers/Microsoft.Authorization/roleAssignments/9682...4fbb
+  + Microsoft.KeyVault/vaults/kv-cobranza-dev-ahfg2w/providers/Microsoft.Authorization/roleAssignments/91fe...8644
+  + Microsoft.KeyVault/vaults/kv-cobranza-dev-ahfg2w/providers/Microsoft.Insights/diagnosticSettings/diag-kv
+  + Microsoft.KeyVault/vaults/kv-cobranza-dev-ahfg2w/secrets/acs-connection-string
+  + Microsoft.KeyVault/vaults/kv-cobranza-dev-ahfg2w/secrets/acs-connection-string/providers/Microsoft.Authorization/roleAssignments/d493...7b1b
+  + Microsoft.Network/networkSecurityGroups/nsg-app
+  + Microsoft.Network/networkSecurityGroups/nsg-pe
+  + Microsoft.Network/privateDnsZones/privatelink.blob.core.windows.net
+  + Microsoft.Network/privateDnsZones/privatelink.blob.core.windows.net/virtualNetworkLinks/link-vnet-cobranza
+  + Microsoft.Network/privateDnsZones/privatelink.database.windows.net
+  + Microsoft.Network/privateDnsZones/privatelink.database.windows.net/virtualNetworkLinks/link-vnet-cobranza
+  + Microsoft.Network/privateDnsZones/privatelink.queue.core.windows.net
+  + Microsoft.Network/privateDnsZones/privatelink.queue.core.windows.net/virtualNetworkLinks/link-vnet-cobranza
+  + Microsoft.Network/privateDnsZones/privatelink.table.core.windows.net
+  + Microsoft.Network/privateDnsZones/privatelink.table.core.windows.net/virtualNetworkLinks/link-vnet-cobranza
+  + Microsoft.Network/privateDnsZones/privatelink.vaultcore.azure.net
+  + Microsoft.Network/privateDnsZones/privatelink.vaultcore.azure.net/virtualNetworkLinks/link-vnet-cobranza
+  + Microsoft.Network/privateEndpoints/pe-blob-cobranza-dev
+  + Microsoft.Network/privateEndpoints/pe-blob-cobranza-dev/privateDnsZoneGroups/default
+  + Microsoft.Network/privateEndpoints/pe-kv-cobranza-dev
+  + Microsoft.Network/privateEndpoints/pe-kv-cobranza-dev/privateDnsZoneGroups/default
+  + Microsoft.Network/privateEndpoints/pe-queue-cobranza-dev
+  + Microsoft.Network/privateEndpoints/pe-queue-cobranza-dev/privateDnsZoneGroups/default
+  + Microsoft.Network/privateEndpoints/pe-sql-cobranza-dev
+  + Microsoft.Network/privateEndpoints/pe-sql-cobranza-dev/privateDnsZoneGroups/default
+  + Microsoft.Network/privateEndpoints/pe-table-cobranza-dev
+  + Microsoft.Network/privateEndpoints/pe-table-cobranza-dev/privateDnsZoneGroups/default
+  + Microsoft.Network/virtualNetworks/vnet-cobranza
+  + Microsoft.OperationalInsights/workspaces/log-cobranza-dev
+  + Microsoft.Sql/servers/sql-cobranza-dev-yvlgzz
+  + Microsoft.Sql/servers/sql-cobranza-dev-yvlgzz/auditingSettings/default
+  + Microsoft.Sql/servers/sql-cobranza-dev-yvlgzz/databases/master/providers/Microsoft.Insights/diagnosticSettings/diag-auditoria-sql
+  + Microsoft.Sql/servers/sql-cobranza-dev-yvlgzz/databases/sqldb-cobranza
+  + Microsoft.Sql/servers/sql-cobranza-dev-yvlgzz/databases/sqldb-cobranza/backupLongTermRetentionPolicies/default
+  + Microsoft.Sql/servers/sql-cobranza-dev-yvlgzz/databases/sqldb-cobranza/backupShortTermRetentionPolicies/default
+  + Microsoft.Sql/servers/sql-cobranza-dev-yvlgzz/databases/sqldb-cobranza/providers/Microsoft.Insights/diagnosticSettings/diag-sqldb
+  + Microsoft.Sql/servers/sql-cobranza-dev-yvlgzz/databases/sqldb-cobranza/transparentDataEncryption/current
+  + Microsoft.Sql/servers/sql-cobranza-dev-yvlgzz/firewallRules/operador-temporal
+  + Microsoft.Storage/storageAccounts/stcobranzadevyvlgzz
+  + Microsoft.Storage/storageAccounts/stcobranzadevyvlgzz/blobServices/default
+  + Microsoft.Storage/storageAccounts/stcobranzadevyvlgzz/blobServices/default/containers/dataprotection-keys
+  + Microsoft.Storage/storageAccounts/stcobranzadevyvlgzz/blobServices/default/containers/dataprotection-keys/providers/Microsoft.Authorization/roleAssignments/0bc2...0bb9
+  + Microsoft.Storage/storageAccounts/stcobranzadevyvlgzz/providers/Microsoft.Authorization/roleAssignments/8627...0fa4
+  + Microsoft.Storage/storageAccounts/stcobranzadevyvlgzz/providers/Microsoft.Authorization/roleAssignments/8f1f...d03c
+  + Microsoft.Storage/storageAccounts/stcobranzadevyvlgzz/providers/Microsoft.Authorization/roleAssignments/cf31...71dc
+  + Microsoft.Web/serverfarms/asp-cobranza-dev
+  + Microsoft.Web/sites/app-api-cobranza-dev-yvlgzz
+  + Microsoft.Web/sites/func-jobs-cobranza-dev-yvlgzz
+
+Resource changes: 54 to create.

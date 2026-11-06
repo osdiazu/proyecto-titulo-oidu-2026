@@ -1,0 +1,6 @@
+# az bicep lint --file infra/main.bicep
+
+exit=0
+# az bicep lint --file infra/main.bicepparam (con variables)
+
+exit=0

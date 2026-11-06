@@ -2,20 +2,28 @@
 
 | Campo | Valor |
 | --- | --- |
-| Estado | Propuesta del agente `seguridad`, 05-11-2026. Pendiente de revisión de `qa` y de aprobación humana |
-| Redactó | Agente `seguridad` (Claude Code), 05-11-2026 |
-| Aprueba | PENDIENTE (CLAUDE.md sección 10: responsable humano no definido) |
+| Estado | Aprobada por el equipo (05-11-2026): el usuario aprobó el canal de entrega (sección A) y los valores DEMO de A.11, según lo informado por el orquestador (hallazgo M-N2 de `qa`, `evidencias/qa/2026-11-06_revision_precommit.md`). Revisión 1 (06-11-2026): corrección B-N6 y aplicación de D.6; pendiente de revisión de `qa` |
+| Redactó | Agente `seguridad` (Claude Code), 05-11-2026; revisión 1, 06-11-2026 |
+| Aprueba | El equipo, 05-11-2026 (aprobación informada por el orquestador). Nombre del integrante que aprueba: PENDIENTE de registrar (CLAUDE.md sección 10: responsable humano no definido) |
 | Base | `docs/adr/ADR-001-autenticacion-propia-sin-entra-usuarios.md` (aceptada 05-11-2026); decisiones del usuario del 05-11-2026 (consumidor DEMO "ventas-demo", altas por el propio equipo, retención definida por seguridad) |
 | Región | `brazilsouth` |
 | Requerimientos | RF-05, RF-06, RF-07, RNF-02, RNF-05, RNF-06 |
 
-Nota de alcance: este documento es diseño. Nada de lo descrito está implementado, ejecutado ni desplegado. Los scripts que se nombran no existen todavía en el repositorio (salvo los indicados como existentes). Los valores marcados DEMO son de demostración y no fueron definidos por el equipo ni por la embotelladora.
+Nota de alcance: este documento es diseño. Nada de lo descrito está implementado, ejecutado ni desplegado. Los scripts que se nombran no existen todavía en el repositorio (salvo los indicados como existentes). Los valores marcados DEMO son de demostración: no los definió la embotelladora; los de A.11 fueron aprobados por el equipo el 05-11-2026 como valores DEMO.
+
+### Historial
+
+| Versión | Fecha | Cambios |
+| --- | --- | --- |
+| Inicial | 05-11-2026 | Propuesta del agente `seguridad` |
+| Aprobación | 05-11-2026 | El equipo aprueba el canal de entrega y los valores DEMO de A.11 (informado por el orquestador) |
+| Revisión 1 | 06-11-2026 | Estado actualizado (M-N2); sección 0 corregida: `diagKv` ya está en `main.bicep` (B-N6); D.6 aplicada en `scripts/s12_*` y plantillas de `docs/seguridad/` (SEG-H08); referencias a la auditoría de Key Vault actualizadas en A.2, A.8, D.5 y E |
 
 ---
 
 ## 0. Hechos verificados en el repositorio (05-11-2026)
 
-Lo siguiente se leyó en el repositorio; las recomendaciones se apoyan en estos hechos.
+Lo siguiente se leyó en el repositorio el 05-11-2026; las recomendaciones se apoyan en estos hechos. Las filas marcadas "Actualizado 06-11-2026" se volvieron a leer en esa fecha. `devops` está modificando `infra/main.bicep` según ADR-001 (por ejemplo, retiro de `raKvApi` y alcance de `raKvFunc`); las filas sobre RBAC describen la plantilla al 06-11-2026 y deben releerse cuando termine ese cambio.
 
 | Hecho | Fuente |
 | --- | --- |
@@ -24,8 +32,8 @@ Lo siguiente se leyó en el repositorio; las recomendaciones se apoyan en estos 
 | SQL: acceso público solo con `ipOperador` (regla `operador-temporal`); auditoría con `BATCH_COMPLETED_GROUP` hacia Log Analytics | `infra/main.bicep`, `sqlServer`, `sqlAuditoria` |
 | Log Analytics con `retentionInDays: 30` | `infra/main.bicep`, `logAnalytics` |
 | PITR 35 días; LTR `P8W` / `P12M`; los LTR sobreviven a la eliminación del grupo de recursos | `infra/main.bicep`, `sqlPitr`, `sqlLtr`; `scripts/eliminar_entorno.sh` |
-| El diagnóstico de auditoría de Key Vault (`categoryGroup: audit`) solo existe en el módulo `infra/modulos/seguridad_perimetral.bicep`, no en `main.bicep` | `grep diagnosticSettings` |
-| `s12_endurecer.sh` deshabilita el acceso público de SQL, pero no modifica Key Vault ni elimina la regla `operador-temporal` | `scripts/s12_endurecer.sh` |
+| Actualizado 06-11-2026 (B-N6). El diagnóstico de auditoría de Key Vault (`categoryGroup: audit`, recurso `diagKv`, nombre `diag-kv`) está en `infra/main.bicep` y, con el mismo nombre y ámbito, en `infra/modulos/seguridad_perimetral.bicep`; en Azure es un solo recurso. El hecho anterior ("solo existe en el módulo") dejó de ser cierto | `infra/main.bicep`, recurso `diagKv` |
+| Actualizado 06-11-2026. `s12_endurecer.sh` cierra SQL y Key Vault (sin `ipRules`) y elimina la regla `operador-temporal` (SEG-H08, D.6). Escrito y validado con `bash -n` y prueba en seco con `az` simulado; no ejecutado en Azure. Hasta el 05-11-2026 solo cerraba SQL | `scripts/s12_endurecer.sh`; `evidencias/2026-11-06_adr001_seguridad/` |
 | `s14_simulacro_pitr.sh` restaura como base nueva en el mismo servidor; la base original sigue existiendo | `scripts/s14_simulacro_pitr.sh` |
 | RUT DEMO disponibles: 76555555-8, 76666666-3, 77777777-7, 78888888-0, 76123456-0 | `sql/08_datos_prueba.sql` |
 | `.gitignore` excluye `*.env`, `infra/entorno.local.env`, `local.settings.json` e `infra/*.parameters.json` | `.gitignore` |
@@ -46,7 +54,7 @@ Lo siguiente se leyó en el repositorio; las recomendaciones se apoyan en estos 
 
 | Opción | Descripción | Ventajas | Desventajas y riesgos | Resultado |
 | --- | --- | --- | --- | --- |
-| a. Secreto en Key Vault con expiración corta | El operador guarda la contraseña temporal como secreto; el destinatario la lee con `az keyvault secret show` y luego se elimina | Sin costo relevante; RBAC por secreto; auditable si el diagnóstico de Key Vault está activo | 1) Red: Key Vault solo acepta la IP de `ipOperador` (una sola IP). El destinatario debe estar en esa misma IP pública o habría que agregar otra regla de IP, lo que es relajar una regla y requiere aprobación y registro. 2) RBAC: el destinatario necesita `Key Vault Secrets User` con alcance en ese secreto y una cuenta del tenant Duoc; la asignación la crea el Owner y puede tardar minutos en propagarse. 3) Según la documentación de Key Vault ("About Azure Key Vault secrets"), el atributo `exp` de un secreto es informativo y no impide la operación get; hay que deshabilitarlo o eliminarlo. Verificar en el despliegue. 4) Con protección de purga, el secreto eliminado queda en soft-delete 90 días y no se puede purgar: quien tenga `Secrets Officer` lo puede recuperar. 5) El valor queda en la salida de la terminal del destinatario. 6) La lectura solo queda auditada si se despliega el diagnóstico de Key Vault (hoy solo en `seguridad_perimetral.bicep`) | Descartada para contraseñas. Es el canal adecuado para la clave de API (A.5) |
+| a. Secreto en Key Vault con expiración corta | El operador guarda la contraseña temporal como secreto; el destinatario la lee con `az keyvault secret show` y luego se elimina | Sin costo relevante; RBAC por secreto; auditable si el diagnóstico de Key Vault está activo | 1) Red: Key Vault solo acepta la IP de `ipOperador` (una sola IP). El destinatario debe estar en esa misma IP pública o habría que agregar otra regla de IP, lo que es relajar una regla y requiere aprobación y registro. 2) RBAC: el destinatario necesita `Key Vault Secrets User` con alcance en ese secreto y una cuenta del tenant Duoc; la asignación la crea el Owner y puede tardar minutos en propagarse. 3) Según la documentación de Key Vault ("About Azure Key Vault secrets"), el atributo `exp` de un secreto es informativo y no impide la operación get; hay que deshabilitarlo o eliminarlo. Verificar en el despliegue. 4) Con protección de purga, el secreto eliminado queda en soft-delete 90 días y no se puede purgar: quien tenga `Secrets Officer` lo puede recuperar. 5) El valor queda en la salida de la terminal del destinatario. 6) La lectura queda auditada por el diagnóstico de Key Vault (`diagKv`, incluido en `main.bicep` al 06-11-2026; antes solo en `seguridad_perimetral.bicep`) | Descartada para contraseñas. Es el canal adecuado para la clave de API (A.5) |
 | b. Mostrar una sola vez en la terminal del operador y entregar en persona | La herramienta genera la contraseña, la muestra una vez y el destinatario, presente, la usa de inmediato | Sin costo; no cambia la red ni el RBAC; no pasa por git, correo ni chat; el destinatario cambia la contraseña frente al operador, así que la vigencia real es de minutos | Requiere presencia física; el operador conoce la contraseña temporal (se mitiga con el cambio obligatorio inmediato); riesgo de que quede en el historial de la terminal (se mitiga en A.4) | Recomendada |
 | c. Correo por ACS | Envío desde `DoNotReply@<dominio administrado>` | Automatizable | Contraseña en texto plano en buzones y servidores intermedios; límite H1 (5 por minuto y 10 por hora con dominio administrado); el dominio administrado no es de la embotelladora | Descartada |
 | d1. El destinatario escribe su propia contraseña inicial en la terminal del operador (lectura sin eco, comando `hash-clave` del ADR 5.9) | Nadie más conoce la contraseña | El operador no ve la contraseña | El texto del lote de `sqlcmd` (que incluye el hash) queda en la auditoría SQL (`BATCH_COMPLETED_GROUP`, ADR 4.3). Una contraseña elegida por una persona tiene menos entropía que una aleatoria, así que el hash es más fácil de atacar fuera de línea si se filtra Log Analytics | Descartada como opción principal. Se acepta solo como variante si el equipo la aprueba |
@@ -112,7 +120,7 @@ Justificación: no tiene costo, no requiere nada de TI de Duoc, no cambia la red
 | --- | --- | --- |
 | `cob.LogAcceso` | `AltaUsuario`, `RestablecimientoClave`, `CambioClave`, `LoginExitoso` y `LoginFallido` (con motivo), `CambioEstadoUsuario`, `CambioRolUsuario`, `AltaClaveApi`, `RevocacionClaveApi`, con `Actor = ORIGINAL_LOGIN()`, fecha UTC, IP y agente de usuario | Contraseñas, hashes, claves de API |
 | Auditoría de Azure SQL (Log Analytics, 30 días) | Texto de los lotes `sqlcmd` del grupo administrador | Contraseñas en texto plano. Sí contiene el hash de la contraseña temporal y el hash SHA-256 de la clave de API (ADR 4.3); por eso la contraseña temporal es aleatoria y larga |
-| Auditoría de Key Vault (`AuditEvent`, solo si se despliega `seguridad_perimetral.bicep` o se agrega a `main.bicep`) | Quién leyó o modificó `apikey-*` y cuándo | Valores de secretos |
+| Auditoría de Key Vault (`AuditEvent`, diagnóstico `diagKv` de `main.bicep`; se verifica con SEG-KV-05) | Quién leyó o modificó `apikey-*` y cuándo | Valores de secretos |
 | `evidencias/seguridad/<fecha>_entrega_credenciales.md` (versionado en git) | Usuario, rol, tipo de operación (alta, restablecimiento o baja), fecha y hora UTC, operador, canal "presencial", confirmación del destinatario (nombre e iniciales) y hora del evento `CambioClave` | Contraseña, hash, IP pública del operador (se usa `<IP_OPERADOR>`, igual que en `evidencias/2026-11-05_whatif_brazilsouth/`) |
 | `evidencias/seguridad/<fecha>_claves_api.md` | Consumidor, prefijo, nombre del secreto, fecha de vencimiento, operador y, si existe, el Object ID del lector truncado (`xxxx…xxxx`) | Clave completa o hash |
 
@@ -130,7 +138,7 @@ Condiciones previas comunes:
 - Lo ejecuta un integrante humano, miembro de `grp-cobranza-sql-admin` (PENDIENTE confirmar qué integrantes son miembros), en su propia terminal y fuera de Claude Code.
 - Tiene acceso de red a SQL y a Key Vault con `IP_OPERADOR`. Abrir ese acceso es un despliegue de `main.bicep` que requiere confirmación humana (CLAUDE.md, reglas 5 y 7).
 - Orden recomendado dentro de una ventana de trabajo: despliegue con `IP_OPERADOR`, luego `desplegar_sql.sh`, luego las altas de esta sección, luego el despliegue con `IP_OPERADOR` vacío y por último `s12_endurecer.sh`. Hay que considerar que `s12_endurecer.sh` deshabilita el acceso público de SQL: después de endurecer, las altas requieren volver a abrir el acceso.
-- Al cerrar la sesión: `ipOperador` vacío, sin la regla `operador-temporal` y Key Vault con `publicNetworkAccess Disabled`. Se verifica con `s12_verificar_seguridad.sh`.
+- Al cerrar la sesión: `ipOperador` vacío, sin la regla `operador-temporal`, Key Vault con `publicNetworkAccess Disabled` y sin `ipRules`, y sitios SCM sin la regla `operador-publicacion`. Se cierra con `main.bicep` (`ipOperador` vacío) seguido de `s12_endurecer.sh` sin `IP_PUBLICACION_SCM`, y se verifica con `s12_verificar_seguridad.sh` (SEG-11, SEG-18, SEG-27, SEG-28, SEG-KV-06a, SEG-KV-06b, SEG-KV-06c). Registro con `docs/seguridad/plantilla_ventana_operador.md`.
 
 #### A.10.1 Alta de usuario del panel
 
@@ -384,11 +392,13 @@ Lector de la clave (integrante distinto del operador): solo `Key Vault Secrets U
 
 Cambios en `infra/`:
 
-1. Agregar a `main.bicep` el diagnóstico de auditoría de Key Vault (`categoryGroup: audit` hacia Log Analytics), que hoy solo está en `seguridad_perimetral.bicep` (hallazgo SEG-H03).
+1. Agregar a `main.bicep` el diagnóstico de auditoría de Key Vault (`categoryGroup: audit` hacia Log Analytics) (hallazgo SEG-H03). Aplicado por `devops`: `diagKv` está en `main.bicep` (verificado el 06-11-2026, B-N6).
 2. Actualizar el comentario de `raKvOperador` ("easyauth-client-secret en S11") a "claves de API (ADR-001)".
 3. Si se usa `sqlcmd -v` para pasar el hash, documentar en el script que el hash queda en la auditoría SQL (ADR 4.3).
 
-### D.6 `seguridad` (`scripts/s12_*`, `docs/seguridad/`; se aplica en una tarea posterior, cuando `qa` termine y el orquestador lo autorice)
+### D.6 `seguridad` (`scripts/s12_*`, `docs/seguridad/`)
+
+Aplicada el 06-11-2026 por encargo del orquestador (Fase B de ADR-001). Escrita y validada con `bash -n` y pruebas en seco; no ejecutada en Azure. Evidencia: `evidencias/2026-11-06_adr001_seguridad/`. Plantillas: `plantilla_entrega_credenciales.md`, `plantilla_claves_api.md`, `plantilla_revision_post_restauracion.md` y, además, `plantilla_levantamiento_transicion.md`, `plantilla_prueba_negativa_abac.md` y `plantilla_ventana_operador.md`.
 
 1. `s12_endurecer.sh`:
    - Cerrar también Key Vault: `az keyvault update --public-network-access Disabled` y eliminar sus `ipRules`.
@@ -429,12 +439,12 @@ En "Alcance", línea de identidad, reemplazar "Easy Auth v2 con roles `Ventas.Co
 | --- | --- | --- | --- | --- |
 | SEG-H01 | Alta | Si un agente de Claude Code ejecuta los scripts de alta, la contraseña temporal y la clave de API (que la herramienta del ADR 5.9 escribe en stdout) quedan en la conversación, lo que equivale a un canal de chat | ADR 5.9: `hash-clave` "escribe por salida estándar ... la contraseña temporal" y `nueva-clave-api` "escribe ... la clave completa" | A.4, reglas 1 y 2; D.2, punto 3; D.4, punto 1 |
 | SEG-H02 | Media | Log Analytics retiene 30 días y PITR cubre 35: la auditoría SQL no cubre toda la ventana de restauración | `retentionInDays: 30` y `retentionDays: 35` en `infra/main.bicep` | Retención de `cob.LogAcceso` de 90 días (B.1); C.3 se apoya en la base original |
-| SEG-H03 | Media | Sin diagnóstico de auditoría de Key Vault en `main.bicep`: las lecturas de `apikey-*` no quedan auditadas si no se despliega el módulo S12 | El diagnóstico `diagKv` solo está en `infra/modulos/seguridad_perimetral.bicep` | D.5, cambios en `infra/`, punto 1 |
+| SEG-H03 | Media | Sin diagnóstico de auditoría de Key Vault en `main.bicep`: las lecturas de `apikey-*` no quedan auditadas si no se despliega el módulo S12 | Al 05-11-2026, `diagKv` solo estaba en `infra/modulos/seguridad_perimetral.bicep` | D.5, cambios en `infra/`, punto 1. Corregido en la plantilla (06-11-2026, `diagKv` en `main.bicep`); en Azure se verifica con SEG-KV-05 |
 | SEG-H04 | Media | Restaurar desde un LTR (hasta 12 meses, sobrevive a la eliminación del entorno) reactiva claves de API cuyo valor sigue recuperable del Key Vault en soft-delete (90 días, sin purga) | `sqlLtr` P12M; `enablePurgeProtection: true`; `eliminar_entorno.sh` | C.3, punto 4 (regla conservadora); A.10.4 (revocar todo antes de eliminar el entorno) |
 | SEG-H05 | Media | El esquema del ADR no permite exigir la vigencia de la contraseña temporal (sin campo de fecha de emisión en el alta ni motivo de rechazo) | ADR 5.1 y 5.2 | A.7; D.1, puntos 4, 6 y 7; D.3, punto 2 |
 | SEG-H06 | Baja | El hash de la contraseña temporal queda en la auditoría SQL (`BATCH_COMPLETED_GROUP`) por el uso de `sqlcmd -v` | ADR 4.3; `sqlAuditoria` en `main.bicep` | Contraseña temporal aleatoria de 20 caracteres (DEMO) y de vida corta. Si las llamadas de la API por RPC registran los valores de sus parámetros en la auditoría: PENDIENTE verificar en Azure |
 | SEG-H07 | Baja | `UsuarioIngresado` puede guardar una contraseña escrita por error en el campo de usuario | ADR 5.1 | B.3 (sanitización) |
-| SEG-H08 | Media | `s12_endurecer.sh` cierra SQL pero no Key Vault ni elimina `operador-temporal`. Si se endurece con `ipOperador` todavía con valor, Key Vault queda abierto a esa IP | `scripts/s12_endurecer.sh` | D.6, punto 1 |
+| SEG-H08 | Media | `s12_endurecer.sh` cierra SQL pero no Key Vault ni elimina `operador-temporal`. Si se endurece con `ipOperador` todavía con valor, Key Vault queda abierto a esa IP | `scripts/s12_endurecer.sh` (05-11-2026) | D.6, punto 1. Corregido en el script (06-11-2026); en Azure se verifica con SEG-18, SEG-KV-06a, SEG-KV-06b y SEG-KV-06c |
 | SEG-H09 | Baja | El atributo `exp` de los secretos de Key Vault no impide la lectura (según la documentación; verificar en Azure) | Documentación "About Azure Key Vault secrets" | La vigencia se controla en SQL; al revocar, se deshabilita y se elimina el secreto (A.9) |
 
 ---
@@ -452,4 +462,4 @@ En "Alcance", línea de identidad, reemplazar "Easy Auth v2 con roles `Ventas.Co
    - Si la auditoría SQL registra los parámetros de las llamadas RPC.
    - Telemetría de encabezados y cuerpos en Application Insights.
 8. Mecanismo para que los scripts detecten que se ejecutan dentro de Claude Code (D.5).
-9. Aprobación de los valores DEMO de A.11.
+9. Aprobación de los valores DEMO de A.11: resuelto (aprobados por el equipo el 05-11-2026). Sigue PENDIENTE registrar el nombre del integrante que aprobó.

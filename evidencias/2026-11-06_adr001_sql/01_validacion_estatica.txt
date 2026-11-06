@@ -1,0 +1,40 @@
+Analisis estatico ScriptDom v2 (Microsoft.SqlServer.TransactSql.ScriptDom 180.140.0, TSql160Parser, .NET SDK 10.0.303) - 2026-11-06 09:48:58 -0300
+VALIDACION: orden 01,02,03,04,05,06,12,11,00,07,13,08 (sin motor SQL; no se ejecuto contra Azure)
+[01_esquema_cobranza.sql] sintaxis: OK
+[02_identidades_y_permisos.sql] sintaxis: OK
+[03_origen_simulado.sql] sintaxis: OK
+[04_jobs_bitacoras.sql] sintaxis: OK
+[04_jobs_bitacoras.sql] info: cob.LogNotificacion ya existe; su CREATE TABLE (con guarda) se omite.
+[04_jobs_bitacoras.sql] info: cob.LogSincronizacion ya existe; su CREATE TABLE (con guarda) se omite.
+[04_jobs_bitacoras.sql] THROW: 50001,50002,50003,50004
+[05_automatizacion_desbloqueo.sql] sintaxis: OK
+[05_automatizacion_desbloqueo.sql] THROW: 50020,50030
+[06_consultas_api.sql] sintaxis: OK
+[12_autenticacion.sql] sintaxis: OK
+[12_autenticacion.sql] THROW: 50060,50061,50062,50063,50064,50065,50066,50067,50068,50069,50070,50071,50072,50073,50074,50075,50076
+[11_procedimientos_operacion.sql] sintaxis: OK
+[11_procedimientos_operacion.sql] THROW: 50040,50041,50042,50043
+[00_verificar_esquema.sql] sintaxis: OK
+[07_pruebas_desbloqueo.sql] sintaxis: OK
+[13_pruebas_autenticacion.sql] sintaxis: OK
+[08_datos_prueba.sql] sintaxis: OK
+TOTAL errores de sintaxis=0, hallazgos=0
+  cob.ClaveApi: ClaveApiId(auto), Prefijo*, HashClave*, Consumidor*, Rol*{Ventas}, Activa, FechaCreacion, FechaVencimiento*, FechaRevocacion, UltimoUso, NombreSecretoKv*
+  cob.Cliente: ClienteId(auto), Rut*, RazonSocial*, Segmento*{Tradicional|Digital}, Email*, Telefono, TipoConvenio*, FechaRegistro
+  cob.EstadoMorosidad: EstadoId(auto), ClienteId*, FechaCambio, EstadoAnterior*{AlDia|Moroso|Suspendido|Regularizado}, EstadoNuevo*{AlDia|Moroso|Suspendido|Regularizado}, OrigenCambio*{SincronizacionAutomatica|Manual}
+  cob.Factura: FacturaId(auto), ClienteId*, NumeroFactura*, MontoTotal*, FechaEmision*, PlazoDias*, FechaVencimiento(auto), Estado{Pendiente|Vencida|Pagada}
+  cob.LogAcceso: LogAccesoId(auto), FechaUtc, Evento*{LoginExitoso|LoginFallido|CuentaBloqueada|Logout|CambioClave|AltaUsuario|RestablecimientoClave|DesbloqueoManual|CambioEstadoUsuario|CambioRolUsuario|AltaClaveApi|RevocacionClaveApi|PurgaLogAcceso|InvalidacionSesiones}, Motivo{ClaveIncorrecta|UsuarioInexistente|UsuarioInactivo|CuentaBloqueada|ClaveTemporalVencida}, UsuarioId, UsuarioIngresado, ClaveApiId, IpOrigen, AgenteUsuario, Actor, Detalle
+  cob.LogCambioPedido: LogCambioPedidoId(auto), PedidoId*, ClienteId*, EstadoAnterior*, EstadoNuevo*, OrigenCambio*, FechaCambio*
+  cob.LogNotificacion: LogNotificacionId(auto), FacturaId*, ClienteId*, TipoAviso*{Preaviso|Vencimiento|Mora1|Mora2}, Destinatario, EstadoEnvio*{Aceptado|Fallido|Limitado}, IdOperacionAcs, Intentos, Detalle, FechaRegistro, FechaActualizacion
+  cob.LogSincronizacion: LogSincronizacionId(auto), FechaInicio, FechaFin, ClientesLeidos, ClientesActualizados, PedidosLiberados, Estado{EnCurso|Exitosa|Fallida}, Detalle
+  cob.Pedido: PedidoId(auto), ClienteId*, NumeroPedido*, FechaCreacion, Estado{Retenido|Liberado|Despachado}, FechaLiberacion
+  cob.UsuarioInterno: UsuarioId(auto), Usuario*, Nombre*, Rol*{Finanzas|Ventas|Admin}, Activo, HashClave*, DebeCambiarClave, IntentosFallidos, BloqueadoHasta, UltimoAcceso, FechaCambioClave, SelloSeguridad, FechaCreacion
+  origen_sim.ClienteRegularizacion: Rut*, Regularizado, FechaRegularizacion, FechaActualizacion
+GRANT por principal:
+  app-cobranza-prueba: EXECUTE cob.sp_ConsultarEstadoCliente (06_consultas_api.sql); EXECUTE cob.sp_ListarPedidosCliente (06_consultas_api.sql); EXECUTE cob.sp_IndicadoresCartera (06_consultas_api.sql); EXECUTE cob.sp_ListarSincronizaciones (06_consultas_api.sql); EXECUTE cob.sp_Salud (06_consultas_api.sql); EXECUTE cob.sp_ObtenerUsuarioParaLogin (12_autenticacion.sql); EXECUTE cob.sp_ObtenerUsuarioPorId (12_autenticacion.sql); EXECUTE cob.sp_RegistrarLoginFallido (12_autenticacion.sql); EXECUTE cob.sp_RegistrarLoginExitoso (12_autenticacion.sql); EXECUTE cob.sp_RegistrarLogout (12_autenticacion.sql); EXECUTE cob.sp_CambiarClave (12_autenticacion.sql); EXECUTE cob.sp_ValidarClaveApi (12_autenticacion.sql)
+  func-cobranza-prueba: SELECT origen_sim.vw_ClientesRegularizados (03_origen_simulado.sql); EXECUTE cob.sp_GenerarAlertasVencimiento (04_jobs_bitacoras.sql); EXECUTE cob.sp_RegistrarNotificacion (04_jobs_bitacoras.sql); EXECUTE cob.sp_IniciarSincronizacion (04_jobs_bitacoras.sql); EXECUTE cob.sp_FinalizarSincronizacion (04_jobs_bitacoras.sql); EXECUTE cob.sp_SincronizarClientesRegularizados (05_automatizacion_desbloqueo.sql); EXECUTE cob.ListaRut (05_automatizacion_desbloqueo.sql)
+Procedimientos cob.* que leen cob.LogAcceso (FROM/JOIN; no cuenta INSERT INTO):
+  cob.sp_ListarEventosAccesoDesde
+  cob.sp_PurgarLogAcceso
+  cob.sp_VerificarCambioClave
+codigo de salida: 0

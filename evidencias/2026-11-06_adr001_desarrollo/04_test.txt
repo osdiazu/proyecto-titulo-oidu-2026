@@ -1,0 +1,1018 @@
+# dotnet test Cobranza.slnx --no-build --logger "console;verbosity=normal"
+Serie de pruebas para C:\Users\<usuario>\Documents\Proyecto de titulo - Final\Cobranza_Automatizada_Contexto_ClaudeCode\cobranza-automatizada\tests\Cobranza.Functions.Tests\bin\Debug\net10.0\Cobranza.Functions.Tests.dll (.NETCoreApp,Version=v10.0)
+Serie de pruebas para C:\Users\<usuario>\Documents\Proyecto de titulo - Final\Cobranza_Automatizada_Contexto_ClaudeCode\cobranza-automatizada\tests\Cobranza.Api.Tests\bin\Debug\net10.0\Cobranza.Api.Tests.dll (.NETCoreApp,Version=v10.0)
+1 archivos de prueba en total coincidieron con el patrón especificado.1 archivos de prueba en total coincidieron con el patrón especificado.
+
+[xUnit.net 00:00:00.00] xUnit.net VSTest Adapter v3.1.5+1b188a7b0a (64-bit .NET 10.0.11)
+[xUnit.net 00:00:00.00] xUnit.net VSTest Adapter v3.1.5+1b188a7b0a (64-bit .NET 10.0.11)
+[xUnit.net 00:00:00.36]   Discovering: Cobranza.Functions.Tests
+[xUnit.net 00:00:00.41]   Discovered:  Cobranza.Functions.Tests
+[xUnit.net 00:00:00.39]   Discovering: Cobranza.Api.Tests
+[xUnit.net 00:00:00.44]   Starting:    Cobranza.Functions.Tests
+[xUnit.net 00:00:00.46]   Discovered:  Cobranza.Api.Tests
+[xUnit.net 00:00:00.50]   Starting:    Cobranza.Api.Tests
+  Correctas Cobranza.Functions.Tests.LimiteAcsTests.Politica_NoReintenta429 [124 ms]
+  Correctas Cobranza.Functions.Tests.NotificacionesFunctionTests.Rechazo429_EnPrimerEnvio_SoloRegistraLimitado [129 ms]
+  Correctas Cobranza.Functions.Tests.LimiteAcsTests.RetryAfter_ComoFechaHttp [3 ms]
+  Correctas Cobranza.Functions.Tests.LimiteAcsTests.RetryAfter_EnSegundos [< 1 ms]
+  Correctas Cobranza.Functions.Tests.LimiteAcsTests.OtrosStatus_NoSonLimite(status: 400) [< 1 ms]
+  Correctas Cobranza.Functions.Tests.LimiteAcsTests.OtrosStatus_NoSonLimite(status: 503) [< 1 ms]
+  Correctas Cobranza.Functions.Tests.LimiteAcsTests.OtrosStatus_NoSonLimite(status: 500) [< 1 ms]
+  Correctas Cobranza.Functions.Tests.LimiteAcsTests.RetryAfter_Ausente_EsNull [< 1 ms]
+  Correctas Cobranza.Functions.Tests.LimiteAcsTests.Opciones_ValoresDemoD12_Validan [8 ms]
+  Correctas Cobranza.Functions.Tests.NotificacionesFunctionTests.OtrosErrores_RegistranFallido_YContinuan(status: 503, codigo: "ServiceUnavailable") [6 ms]
+  Correctas Cobranza.Functions.Tests.LimiteAcsTests.Opciones_SinLoteOPausa_NoValidan(max: 10, pausa: 0, propiedad: "PausaEntreCorreosMs") [2 ms]
+  Correctas Cobranza.Functions.Tests.LimiteAcsTests.Opciones_SinLoteOPausa_NoValidan(max: 0, pausa: 15000, propiedad: "MaxCorreosPorEjecucion") [< 1 ms]
+  Correctas Cobranza.Functions.Tests.LimiteAcsTests.RetryAfter_EnMilisegundos_TienePrioridad [< 1 ms]
+  Correctas Cobranza.Functions.Tests.NotificacionesFunctionTests.OtrosErrores_RegistranFallido_YContinuan(status: 500, codigo: "InternalServerError") [1 ms]
+  Correctas Cobranza.Functions.Tests.NotificacionesFunctionTests.OtrosErrores_RegistranFallido_YContinuan(status: 400, codigo: "BadRequest") [< 1 ms]
+  Correctas Cobranza.Functions.Tests.LimiteAcsTests.Politica_ConservaReintentosDe503 [3 ms]
+[xUnit.net 00:00:00.65]   Finished:    Cobranza.Functions.Tests
+  Correctas Cobranza.Functions.Tests.NotificacionesFunctionTests.CodigoTooManyRequests_SinStatus429_SeTrataComoLimite [1 ms]
+  Correctas Cobranza.Functions.Tests.LimiteAcsTests.Status429_EsLimite [< 1 ms]
+  Correctas Cobranza.Functions.Tests.NotificacionesFunctionTests.Aceptado_RegistraIdOperacion [2 ms]
+  Correctas Cobranza.Functions.Tests.NotificacionesFunctionTests.Rechazo429_SeRegistraEnLogConEventoYRetryAfter [11 ms]
+  Correctas Cobranza.Functions.Tests.NotificacionesFunctionTests.TodosLosEnviosFallidos_CadaUnoSeRegistraComoFallido [3 ms]
+  Correctas Cobranza.Functions.Tests.NotificacionesFunctionTests.Rechazo429_RegistroLimitadoFalla_IgualCortaElLote [1 ms]
+  Correctas Cobranza.Functions.Tests.NotificacionesFunctionTests.UsaMaximoYPausaDeConfiguracion [6 ms]
+  Correctas Cobranza.Functions.Tests.NotificacionesFunctionTests.Rechazo429_RegistraLimitado_YCortaElLote [2 ms]
+  Correctas Cobranza.Functions.Tests.NotificacionesFunctionTests.Rechazo429_ConRetryAfter_LoIncluyeEnElDetalle [< 1 ms]
+  Correctas Cobranza.Api.Tests.UnitariasTests.SanitizarUsuario(entrada: "usuário", esperado: "(formato no valido)") [96 ms]
+  Correctas Cobranza.Api.Tests.UnitariasTests.SanitizarUsuario(entrada: null, esperado: "(formato no valido)") [< 1 ms]
+  Correctas Cobranza.Api.Tests.UnitariasTests.SanitizarUsuario(entrada: "Clave#Secreta2026", esperado: "(formato no valido)") [< 1 ms]
+  Correctas Cobranza.Api.Tests.UnitariasTests.SanitizarUsuario(entrada: "ab", esperado: "(formato no valido)") [< 1 ms]
+  Correctas Cobranza.Api.Tests.UnitariasTests.SanitizarUsuario(entrada: "", esperado: "(formato no valido)") [< 1 ms]
+
+La serie de pruebas se ejecutó correctamente.
+Pruebas totales: 25
+     Correcto: 25
+ Tiempo total: 1,3695 Segundos
+  Correctas Cobranza.Api.Tests.UnitariasTests.SanitizarUsuario(entrada: "finanzas.demo", esperado: "finanzas.demo") [< 1 ms]
+  Correctas Cobranza.Api.Tests.UnitariasTests.SanitizarUsuario(entrada: "usuario con espacios", esperado: "(formato no valido)") [< 1 ms]
+  Correctas Cobranza.Api.Tests.UnitariasTests.SanitizarUsuario(entrada: "  Ventas_Demo-1 ", esperado: "ventas_demo-1") [< 1 ms]
+  Correctas Cobranza.Api.Tests.UnitariasTests.OpcionesDataProtection_Validas(blob: null, clave: null, esperado: False) [7 ms]
+  Correctas Cobranza.Api.Tests.UnitariasTests.OpcionesDataProtection_Validas(blob: "https://c.blob.core.windows.net/d/keys.xml", clave: "", esperado: False) [< 1 ms]
+  Correctas Cobranza.Api.Tests.UnitariasTests.OpcionesDataProtection_Validas(blob: "https://c.blob.core.windows.net/dataprotection-key"···, clave: "https://kv.vault.azure.net/keys/dataprotection-cob"···, esperado: True) [< 1 ms]
+  Correctas Cobranza.Api.Tests.UnitariasTests.OpcionesDataProtection_Validas(blob: "PENDIENTE: lo define infra/main.bicep", clave: "https://kv.vault.azure.net/keys/k", esperado: False) [< 1 ms]
+  Correctas Cobranza.Api.Tests.UnitariasTests.HashClave_ContrasenaSoloEnTerminal_StdoutSoloElHash_QueLaApiVerifica [156 ms]
+  Correctas Cobranza.Api.Tests.UnitariasTests.ArgumentosInvalidos_ErrorDeUso_SinStdout(args: ["nueva-clave-api", "--salida-archivo", "x"]) [2 ms]
+  Correctas Cobranza.Api.Tests.UnitariasTests.ArgumentosInvalidos_ErrorDeUso_SinStdout(args: ["hash-clave", "--extra"]) [< 1 ms]
+  Correctas Cobranza.Api.Tests.UnitariasTests.ArgumentosInvalidos_ErrorDeUso_SinStdout(args: ["otro-comando"]) [< 1 ms]
+  Correctas Cobranza.Api.Tests.UnitariasTests.ArgumentosInvalidos_ErrorDeUso_SinStdout(args: ["nueva-clave-api", "--consumidor", "Ventas_Demo", "--salida-archivo", "x"]) [1 ms]
+  Correctas Cobranza.Api.Tests.UnitariasTests.ArgumentosInvalidos_ErrorDeUso_SinStdout(args: ["nueva-clave-api", "--consumidor", "ventas-demo"]) [< 1 ms]
+  Correctas Cobranza.Api.Tests.UnitariasTests.ClaveApi_Formato_57Caracteres_PrefijoBase32_SecretoBase64Url [6 ms]
+  Correctas Cobranza.Api.Tests.UnitariasTests.SanitizarUsuario_MasDe50Caracteres_FormatoNoValido [< 1 ms]
+  Correctas Cobranza.Api.Tests.UnitariasTests.NuevaClaveApi_NoSobrescribeArchivoConContenido [3 ms]
+  Correctas Cobranza.Api.Tests.UnitariasTests.ClaveApi_Hash_EsSha256DeLaClaveCompletaEnUtf8 [< 1 ms]
+  Correctas Cobranza.Api.Tests.UnitariasTests.NuevaClaveApi_ClaveSoloEnArchivo_StdoutPrefijoYHash [11 ms]
+info: Microsoft.Hosting.Lifetime[0]
+      Application started. Press Ctrl+C to shut down.
+info: Microsoft.Hosting.Lifetime[0]
+      Application started. Press Ctrl+C to shut down.
+info: Microsoft.Hosting.Lifetime[0]
+      Application started. Press Ctrl+C to shut down.
+info: Microsoft.Hosting.Lifetime[0]
+      Hosting environment: Development
+info: Microsoft.Hosting.Lifetime[0]
+      Hosting environment: Development
+info: Microsoft.Hosting.Lifetime[0]
+      Hosting environment: Development
+info: Microsoft.Hosting.Lifetime[0]
+      Content root path: C:\Users\<usuario>\Documents\Proyecto de titulo - Final\Cobranza_Automatizada_Contexto_ClaudeCode\cobranza-automatizada\src\Cobranza.Api
+info: Microsoft.Hosting.Lifetime[0]
+      Content root path: C:\Users\<usuario>\Documents\Proyecto de titulo - Final\Cobranza_Automatizada_Contexto_ClaudeCode\cobranza-automatizada\src\Cobranza.Api
+info: Microsoft.Hosting.Lifetime[0]
+      Content root path: C:\Users\<usuario>\Documents\Proyecto de titulo - Final\Cobranza_Automatizada_Contexto_ClaudeCode\cobranza-automatizada\src\Cobranza.Api
+warn: Microsoft.AspNetCore.Routing.EndpointRoutingMiddleware[9]
+      A request body size limit could not be applied. This server does not support the IHttpMaxRequestBodySizeFeature.
+warn: Microsoft.AspNetCore.Routing.EndpointRoutingMiddleware[9]
+      A request body size limit could not be applied. This server does not support the IHttpMaxRequestBodySizeFeature.
+warn: Microsoft.AspNetCore.Routing.EndpointRoutingMiddleware[9]
+      A request body size limit could not be applied. This server does not support the IHttpMaxRequestBodySizeFeature.
+warn: Microsoft.AspNetCore.Routing.EndpointRoutingMiddleware[9]
+      A request body size limit could not be applied. This server does not support the IHttpMaxRequestBodySizeFeature.
+info: Microsoft.Hosting.Lifetime[0]
+      Application is shutting down...
+info: Microsoft.Hosting.Lifetime[0]
+      Application is shutting down...
+  Correctas Cobranza.Api.Tests.UnitariasTests.ClaveTemporal_20Caracteres_SinAmbiguos [56 ms]
+  Correctas Cobranza.Api.Tests.UnitariasTests.HashClave_SinTerminal_Falla_YNoEscribeNadaEnStdout [45 ms]
+  Correctas Cobranza.Api.Tests.UnitariasTests.OpcionesSeguridad_Coherentes [< 1 ms]
+  Correctas Cobranza.Api.Tests.SeguridadHttpTests.OpcionesSeguridadInvalidas_NoArranca(clave: "Seguridad:LongitudMinimaClave", valor: "200") [770 ms]
+  Correctas Cobranza.Api.Tests.SeguridadHttpTests.OpcionesSeguridadInvalidas_NoArranca(clave: "Seguridad:MaxIntentosFallidos", valor: "0") [200 ms]
+  Correctas Cobranza.Api.Tests.SeguridadHttpTests.OpcionesSeguridadInvalidas_NoArranca(clave: "Seguridad:SaltosProxyConfiables", valor: "3") [206 ms]
+  Correctas Cobranza.Api.Tests.AutorizacionYClaveApiTests.MatrizDePermisos_PorRolDeUsuario(usuario: "ventas.demo", estado: 200, pedidos: 200, cartera: 403, sinc: 403) [1 s]
+  Correctas Cobranza.Api.Tests.AutenticacionTests.Revalidacion_CambioDeRol_RechazaLaCookie [1 s]
+warn: Microsoft.AspNetCore.Routing.EndpointRoutingMiddleware[9]
+      A request body size limit could not be applied. This server does not support the IHttpMaxRequestBodySizeFeature.
+warn: Microsoft.AspNetCore.Routing.EndpointRoutingMiddleware[9]
+      A request body size limit could not be applied. This server does not support the IHttpMaxRequestBodySizeFeature.
+warn: Microsoft.AspNetCore.Routing.EndpointRoutingMiddleware[9]
+      A request body size limit could not be applied. This server does not support the IHttpMaxRequestBodySizeFeature.
+warn: Microsoft.AspNetCore.Routing.EndpointRoutingMiddleware[9]
+      A request body size limit could not be applied. This server does not support the IHttpMaxRequestBodySizeFeature.
+warn: Microsoft.AspNetCore.Routing.EndpointRoutingMiddleware[9]
+      A request body size limit could not be applied. This server does not support the IHttpMaxRequestBodySizeFeature.
+info: Microsoft.Hosting.Lifetime[0]
+      Application is shutting down...
+info: Microsoft.Hosting.Lifetime[0]
+      Application started. Press Ctrl+C to shut down.
+info: Microsoft.Hosting.Lifetime[0]
+      Hosting environment: Development
+info: Microsoft.Hosting.Lifetime[0]
+      Content root path: C:\Users\<usuario>\Documents\Proyecto de titulo - Final\Cobranza_Automatizada_Contexto_ClaudeCode\cobranza-automatizada\src\Cobranza.Api
+info: Microsoft.Hosting.Lifetime[0]
+      Application started. Press Ctrl+C to shut down.
+info: Microsoft.Hosting.Lifetime[0]
+      Hosting environment: Development
+info: Microsoft.Hosting.Lifetime[0]
+      Content root path: C:\Users\<usuario>\Documents\Proyecto de titulo - Final\Cobranza_Automatizada_Contexto_ClaudeCode\cobranza-automatizada\src\Cobranza.Api
+info: Microsoft.Hosting.Lifetime[0]
+      Application started. Press Ctrl+C to shut down.
+info: Microsoft.Hosting.Lifetime[0]
+      Hosting environment: Development
+info: Microsoft.Hosting.Lifetime[0]
+      Content root path: C:\Users\<usuario>\Documents\Proyecto de titulo - Final\Cobranza_Automatizada_Contexto_ClaudeCode\cobranza-automatizada\src\Cobranza.Api
+warn: Microsoft.AspNetCore.Routing.EndpointRoutingMiddleware[9]
+      A request body size limit could not be applied. This server does not support the IHttpMaxRequestBodySizeFeature.
+warn: Microsoft.AspNetCore.Routing.EndpointRoutingMiddleware[9]
+      A request body size limit could not be applied. This server does not support the IHttpMaxRequestBodySizeFeature.
+warn: Microsoft.AspNetCore.Routing.EndpointRoutingMiddleware[9]
+      A request body size limit could not be applied. This server does not support the IHttpMaxRequestBodySizeFeature.
+info: Microsoft.Hosting.Lifetime[0]
+      Application is shutting down...
+info: Microsoft.Hosting.Lifetime[0]
+      Application is shutting down...
+info: Microsoft.Hosting.Lifetime[0]
+      Application is shutting down...
+info: Microsoft.Hosting.Lifetime[0]
+      Application started. Press Ctrl+C to shut down.
+info: Microsoft.Hosting.Lifetime[0]
+      Hosting environment: Development
+info: Microsoft.Hosting.Lifetime[0]
+      Content root path: C:\Users\<usuario>\Documents\Proyecto de titulo - Final\Cobranza_Automatizada_Contexto_ClaudeCode\cobranza-automatizada\src\Cobranza.Api
+warn: Microsoft.AspNetCore.Routing.EndpointRoutingMiddleware[9]
+      A request body size limit could not be applied. This server does not support the IHttpMaxRequestBodySizeFeature.
+warn: Microsoft.AspNetCore.Routing.EndpointRoutingMiddleware[9]
+      A request body size limit could not be applied. This server does not support the IHttpMaxRequestBodySizeFeature.
+info: Microsoft.Hosting.Lifetime[0]
+      Application started. Press Ctrl+C to shut down.
+info: Microsoft.Hosting.Lifetime[0]
+      Hosting environment: Development
+info: Microsoft.Hosting.Lifetime[0]
+      Content root path: C:\Users\<usuario>\Documents\Proyecto de titulo - Final\Cobranza_Automatizada_Contexto_ClaudeCode\cobranza-automatizada\src\Cobranza.Api
+info: Microsoft.Hosting.Lifetime[0]
+      Application is shutting down...
+warn: Microsoft.AspNetCore.Routing.EndpointRoutingMiddleware[9]
+      A request body size limit could not be applied. This server does not support the IHttpMaxRequestBodySizeFeature.
+info: Microsoft.Hosting.Lifetime[0]
+      Application started. Press Ctrl+C to shut down.
+info: Microsoft.Hosting.Lifetime[0]
+      Hosting environment: Development
+info: Microsoft.Hosting.Lifetime[0]
+      Content root path: C:\Users\<usuario>\Documents\Proyecto de titulo - Final\Cobranza_Automatizada_Contexto_ClaudeCode\cobranza-automatizada\src\Cobranza.Api
+info: Microsoft.Hosting.Lifetime[0]
+      Application started. Press Ctrl+C to shut down.
+info: Microsoft.Hosting.Lifetime[0]
+      Hosting environment: Development
+info: Microsoft.Hosting.Lifetime[0]
+      Content root path: C:\Users\<usuario>\Documents\Proyecto de titulo - Final\Cobranza_Automatizada_Contexto_ClaudeCode\cobranza-automatizada\src\Cobranza.Api
+warn: Microsoft.AspNetCore.Routing.EndpointRoutingMiddleware[9]
+      A request body size limit could not be applied. This server does not support the IHttpMaxRequestBodySizeFeature.
+warn: Microsoft.AspNetCore.Routing.EndpointRoutingMiddleware[9]
+      A request body size limit could not be applied. This server does not support the IHttpMaxRequestBodySizeFeature.
+warn: Microsoft.AspNetCore.Routing.EndpointRoutingMiddleware[9]
+      A request body size limit could not be applied. This server does not support the IHttpMaxRequestBodySizeFeature.
+info: Microsoft.Hosting.Lifetime[0]
+      Application is shutting down...
+warn: Microsoft.AspNetCore.Routing.EndpointRoutingMiddleware[9]
+      A request body size limit could not be applied. This server does not support the IHttpMaxRequestBodySizeFeature.
+  Correctas Cobranza.Api.Tests.DesviacionesSqlTests.D12_CuentaBloqueada_ElBloqueoVenceALaHoraOriginal [1 s]
+  Correctas Cobranza.Api.Tests.SeguridadHttpTests.RED12_CookieDeSesion_HostSecureHttpOnlySameSiteStrict_SinDomainNiExpires [380 ms]
+  Correctas Cobranza.Api.Tests.AutorizacionYClaveApiTests.MatrizDePermisos_PorRolDeUsuario(usuario: "finanzas.demo", estado: 200, pedidos: 200, cartera: 200, sinc: 200) [380 ms]
+  Correctas Cobranza.Api.Tests.AutenticacionTests.AUT02_ClaveIncorrecta_401Generico_ClaveIncorrecta [371 ms]
+  Correctas Cobranza.Api.Tests.SeguridadHttpTests.ArchivosEstaticos_AccesiblesSinSesion(url: "/panel.js") [273 ms]
+  Correctas Cobranza.Api.Tests.AutorizacionYClaveApiTests.MatrizDePermisos_PorRolDeUsuario(usuario: "admin.demo", estado: 403, pedidos: 403, cartera: 403, sinc: 200) [378 ms]
+warn: Microsoft.AspNetCore.Routing.EndpointRoutingMiddleware[9]
+      A request body size limit could not be applied. This server does not support the IHttpMaxRequestBodySizeFeature.
+info: Microsoft.Hosting.Lifetime[0]
+      Application is shutting down...
+warn: Microsoft.AspNetCore.Routing.EndpointRoutingMiddleware[9]
+      A request body size limit could not be applied. This server does not support the IHttpMaxRequestBodySizeFeature.
+warn: Microsoft.AspNetCore.Routing.EndpointRoutingMiddleware[9]
+      A request body size limit could not be applied. This server does not support the IHttpMaxRequestBodySizeFeature.
+info: Microsoft.Hosting.Lifetime[0]
+      Application started. Press Ctrl+C to shut down.
+info: Microsoft.Hosting.Lifetime[0]
+      Hosting environment: Development
+info: Microsoft.Hosting.Lifetime[0]
+      Content root path: C:\Users\<usuario>\Documents\Proyecto de titulo - Final\Cobranza_Automatizada_Contexto_ClaudeCode\cobranza-automatizada\src\Cobranza.Api
+info: Microsoft.Hosting.Lifetime[0]
+      Application is shutting down...
+warn: Microsoft.AspNetCore.Routing.EndpointRoutingMiddleware[9]
+      A request body size limit could not be applied. This server does not support the IHttpMaxRequestBodySizeFeature.
+info: Microsoft.Hosting.Lifetime[0]
+      Application is shutting down...
+info: Microsoft.Hosting.Lifetime[0]
+      Application started. Press Ctrl+C to shut down.
+info: Microsoft.Hosting.Lifetime[0]
+      Hosting environment: Development
+info: Microsoft.Hosting.Lifetime[0]
+      Content root path: C:\Users\<usuario>\Documents\Proyecto de titulo - Final\Cobranza_Automatizada_Contexto_ClaudeCode\cobranza-automatizada\src\Cobranza.Api
+warn: Cobranza.Api.Seguridad.ClaveApiHandler[0]
+      Clave de API rechazada: formato invalido.
+info: Cobranza.Api.Seguridad.ClaveApiHandler[7]
+      ClaveApi was not authenticated. Failure message: Clave de API invalida.
+info: Cobranza.Api.Seguridad.ClaveApiHandler[12]
+      AuthenticationScheme: ClaveApi was challenged.
+info: Microsoft.Hosting.Lifetime[0]
+      Application is shutting down...
+info: Microsoft.Hosting.Lifetime[0]
+      Application started. Press Ctrl+C to shut down.
+info: Microsoft.Hosting.Lifetime[0]
+      Hosting environment: Development
+info: Microsoft.Hosting.Lifetime[0]
+      Content root path: C:\Users\<usuario>\Documents\Proyecto de titulo - Final\Cobranza_Automatizada_Contexto_ClaudeCode\cobranza-automatizada\src\Cobranza.Api
+warn: Microsoft.AspNetCore.Routing.EndpointRoutingMiddleware[9]
+      A request body size limit could not be applied. This server does not support the IHttpMaxRequestBodySizeFeature.
+info: Microsoft.Hosting.Lifetime[0]
+      Application is shutting down...
+info: Microsoft.Hosting.Lifetime[0]
+      Application started. Press Ctrl+C to shut down.
+info: Microsoft.Hosting.Lifetime[0]
+      Hosting environment: Development
+info: Microsoft.Hosting.Lifetime[0]
+      Content root path: C:\Users\<usuario>\Documents\Proyecto de titulo - Final\Cobranza_Automatizada_Contexto_ClaudeCode\cobranza-automatizada\src\Cobranza.Api
+info: Microsoft.Hosting.Lifetime[0]
+      Application is shutting down...
+  Correctas Cobranza.Api.Tests.AutenticacionTests.CambiarClave_ActualIncorrecta_401_CuentaComoIntentoFallido [421 ms]
+  Correctas Cobranza.Api.Tests.SeguridadHttpTests.ArchivosEstaticos_AccesiblesSinSesion(url: "/") [282 ms]
+  Correctas Cobranza.Api.Tests.DesviacionesSqlTests.D12_CuentaBloqueada_ConClaveIncorrecta_EnviaCuentaBloqueada_YNoExtiendeElBloqueo [735 ms]
+  Correctas Cobranza.Api.Tests.AutorizacionYClaveApiTests.ClaveApi_FormatoInvalido_401_SinConsultarLaBase(clave: "cobk_abcdefgh_012345678901234567890123456789012345"···) [312 ms]
+  Correctas Cobranza.Api.Tests.AutenticacionTests.Login_FaltaUnCampo_400(json: "{\"clave\":\"x\"}") [323 ms]
+  Correctas Cobranza.Api.Tests.SeguridadHttpTests.ArchivosEstaticos_AccesiblesSinSesion(url: "/login.html") [274 ms]
+info: Microsoft.Hosting.Lifetime[0]
+      Application started. Press Ctrl+C to shut down.
+info: Microsoft.Hosting.Lifetime[0]
+      Hosting environment: Development
+info: Microsoft.Hosting.Lifetime[0]
+      Content root path: C:\Users\<usuario>\Documents\Proyecto de titulo - Final\Cobranza_Automatizada_Contexto_ClaudeCode\cobranza-automatizada\src\Cobranza.Api
+warn: Microsoft.AspNetCore.Routing.EndpointRoutingMiddleware[9]
+      A request body size limit could not be applied. This server does not support the IHttpMaxRequestBodySizeFeature.
+info: Microsoft.Hosting.Lifetime[0]
+      Application is shutting down...
+info: Microsoft.Hosting.Lifetime[0]
+      Application started. Press Ctrl+C to shut down.
+info: Microsoft.Hosting.Lifetime[0]
+      Hosting environment: Development
+info: Microsoft.Hosting.Lifetime[0]
+      Content root path: C:\Users\<usuario>\Documents\Proyecto de titulo - Final\Cobranza_Automatizada_Contexto_ClaudeCode\cobranza-automatizada\src\Cobranza.Api
+warn: Cobranza.Api.Seguridad.ClaveApiHandler[0]
+      Clave de API rechazada: formato invalido.
+info: Cobranza.Api.Seguridad.ClaveApiHandler[7]
+      ClaveApi was not authenticated. Failure message: Clave de API invalida.
+info: Cobranza.Api.Seguridad.ClaveApiHandler[12]
+      AuthenticationScheme: ClaveApi was challenged.
+info: Microsoft.Hosting.Lifetime[0]
+      Application is shutting down...
+info: Microsoft.Hosting.Lifetime[0]
+      Application started. Press Ctrl+C to shut down.
+info: Microsoft.Hosting.Lifetime[0]
+      Hosting environment: Development
+info: Microsoft.Hosting.Lifetime[0]
+      Content root path: C:\Users\<usuario>\Documents\Proyecto de titulo - Final\Cobranza_Automatizada_Contexto_ClaudeCode\cobranza-automatizada\src\Cobranza.Api
+warn: Microsoft.AspNetCore.Routing.EndpointRoutingMiddleware[9]
+      A request body size limit could not be applied. This server does not support the IHttpMaxRequestBodySizeFeature.
+info: Microsoft.Hosting.Lifetime[0]
+      Application is shutting down...
+info: Microsoft.Hosting.Lifetime[0]
+      Application started. Press Ctrl+C to shut down.
+info: Microsoft.Hosting.Lifetime[0]
+      Hosting environment: Development
+info: Microsoft.Hosting.Lifetime[0]
+      Content root path: C:\Users\<usuario>\Documents\Proyecto de titulo - Final\Cobranza_Automatizada_Contexto_ClaudeCode\cobranza-automatizada\src\Cobranza.Api
+info: Microsoft.Hosting.Lifetime[0]
+      Application is shutting down...
+info: Microsoft.Hosting.Lifetime[0]
+      Application started. Press Ctrl+C to shut down.
+info: Microsoft.Hosting.Lifetime[0]
+      Hosting environment: Development
+info: Microsoft.Hosting.Lifetime[0]
+      Content root path: C:\Users\<usuario>\Documents\Proyecto de titulo - Final\Cobranza_Automatizada_Contexto_ClaudeCode\cobranza-automatizada\src\Cobranza.Api
+warn: Microsoft.AspNetCore.Routing.EndpointRoutingMiddleware[9]
+      A request body size limit could not be applied. This server does not support the IHttpMaxRequestBodySizeFeature.
+info: Microsoft.Hosting.Lifetime[0]
+      Application started. Press Ctrl+C to shut down.
+info: Microsoft.Hosting.Lifetime[0]
+      Hosting environment: Development
+info: Microsoft.Hosting.Lifetime[0]
+      Content root path: C:\Users\<usuario>\Documents\Proyecto de titulo - Final\Cobranza_Automatizada_Contexto_ClaudeCode\cobranza-automatizada\src\Cobranza.Api
+warn: Cobranza.Api.Seguridad.ClaveApiHandler[0]
+      Clave de API rechazada: formato invalido.
+info: Cobranza.Api.Seguridad.ClaveApiHandler[7]
+      ClaveApi was not authenticated. Failure message: Clave de API invalida.
+info: Cobranza.Api.Seguridad.ClaveApiHandler[12]
+      AuthenticationScheme: ClaveApi was challenged.
+info: Microsoft.Hosting.Lifetime[0]
+      Application is shutting down...
+warn: Microsoft.AspNetCore.Routing.EndpointRoutingMiddleware[9]
+      A request body size limit could not be applied. This server does not support the IHttpMaxRequestBodySizeFeature.
+info: Microsoft.Hosting.Lifetime[0]
+      Application is shutting down...
+  Correctas Cobranza.Api.Tests.DesviacionesSqlTests.D12_BloqueoVencidoExactamente_SeTrataComoNoBloqueado [349 ms]
+  Correctas Cobranza.Api.Tests.AutorizacionYClaveApiTests.ClaveApi_FormatoInvalido_401_SinConsultarLaBase(clave: "cobk_abcdefgh_012345678901234567890123456789012345"···) [295 ms]
+  Correctas Cobranza.Api.Tests.AutenticacionTests.Login_FaltaUnCampo_400(json: "{\"usuario\":\"\",\"clave\":\"x\"}") [285 ms]
+  Correctas Cobranza.Api.Tests.SeguridadHttpTests.ArchivosEstaticos_AccesiblesSinSesion(url: "/panel.css") [257 ms]
+  Correctas Cobranza.Api.Tests.AutorizacionYClaveApiTests.ClaveApi_FormatoInvalido_401_SinConsultarLaBase(clave: "cobk_abcdefg1_012345678901234567890123456789012345"···) [291 ms]
+  Correctas Cobranza.Api.Tests.DesviacionesSqlTests.D12_CambiarClave_ConCuentaBloqueada_NoEnviaClaveIncorrecta [355 ms]
+info: Microsoft.Hosting.Lifetime[0]
+      Application started. Press Ctrl+C to shut down.
+info: Microsoft.Hosting.Lifetime[0]
+      Hosting environment: Development
+info: Microsoft.Hosting.Lifetime[0]
+      Content root path: C:\Users\<usuario>\Documents\Proyecto de titulo - Final\Cobranza_Automatizada_Contexto_ClaudeCode\cobranza-automatizada\src\Cobranza.Api
+warn: Microsoft.AspNetCore.Routing.EndpointRoutingMiddleware[9]
+      A request body size limit could not be applied. This server does not support the IHttpMaxRequestBodySizeFeature.
+info: Microsoft.Hosting.Lifetime[0]
+      Application is shutting down...
+info: Microsoft.Hosting.Lifetime[0]
+      Application started. Press Ctrl+C to shut down.
+info: Microsoft.Hosting.Lifetime[0]
+      Hosting environment: Development
+info: Microsoft.Hosting.Lifetime[0]
+      Content root path: C:\Users\<usuario>\Documents\Proyecto de titulo - Final\Cobranza_Automatizada_Contexto_ClaudeCode\cobranza-automatizada\src\Cobranza.Api
+info: Microsoft.Hosting.Lifetime[0]
+      Application is shutting down...
+info: Microsoft.Hosting.Lifetime[0]
+      Application started. Press Ctrl+C to shut down.
+info: Microsoft.Hosting.Lifetime[0]
+      Hosting environment: Development
+info: Microsoft.Hosting.Lifetime[0]
+      Content root path: C:\Users\<usuario>\Documents\Proyecto de titulo - Final\Cobranza_Automatizada_Contexto_ClaudeCode\cobranza-automatizada\src\Cobranza.Api
+info: Microsoft.Hosting.Lifetime[0]
+      Application started. Press Ctrl+C to shut down.
+info: Microsoft.Hosting.Lifetime[0]
+      Hosting environment: Development
+info: Microsoft.Hosting.Lifetime[0]
+      Content root path: C:\Users\<usuario>\Documents\Proyecto de titulo - Final\Cobranza_Automatizada_Contexto_ClaudeCode\cobranza-automatizada\src\Cobranza.Api
+warn: Cobranza.Api.Seguridad.ClaveApiHandler[0]
+      Clave de API rechazada: formato invalido.
+info: Cobranza.Api.Seguridad.ClaveApiHandler[7]
+      ClaveApi was not authenticated. Failure message: Clave de API invalida.
+info: Cobranza.Api.Seguridad.ClaveApiHandler[12]
+      AuthenticationScheme: ClaveApi was challenged.
+info: Microsoft.Hosting.Lifetime[0]
+      Application is shutting down...
+warn: Microsoft.AspNetCore.Routing.EndpointRoutingMiddleware[9]
+      A request body size limit could not be applied. This server does not support the IHttpMaxRequestBodySizeFeature.
+info: Microsoft.Hosting.Lifetime[0]
+      Application started. Press Ctrl+C to shut down.
+info: Microsoft.Hosting.Lifetime[0]
+      Hosting environment: Development
+info: Microsoft.Hosting.Lifetime[0]
+      Content root path: C:\Users\<usuario>\Documents\Proyecto de titulo - Final\Cobranza_Automatizada_Contexto_ClaudeCode\cobranza-automatizada\src\Cobranza.Api
+warn: Microsoft.AspNetCore.Routing.EndpointRoutingMiddleware[9]
+      A request body size limit could not be applied. This server does not support the IHttpMaxRequestBodySizeFeature.
+info: Microsoft.Hosting.Lifetime[0]
+      Application is shutting down...
+warn: Cobranza.Api.Seguridad.ServicioAutenticacion[0]
+      Login rechazado: el usuario 1 dejo de existir durante el inicio de sesion (50061).
+info: Microsoft.Hosting.Lifetime[0]
+      Application is shutting down...
+  Correctas Cobranza.Api.Tests.AutenticacionTests.Login_FaltaUnCampo_400(json: "{\"usuario\":\"finanzas.demo\"}") [302 ms]
+  Correctas Cobranza.Api.Tests.SeguridadHttpTests.ArchivosEstaticos_AccesiblesSinSesion(url: "/login.js") [282 ms]
+  Correctas Cobranza.Api.Tests.SeguridadHttpTests.Production_SinDataProtection_NoArranca [165 ms]
+  Correctas Cobranza.Api.Tests.AutorizacionYClaveApiTests.ClaveApi_FormatoInvalido_401_SinConsultarLaBase(clave: "cobk_ABCDEFGH_012345678901234567890123456789012345"···) [306 ms]
+  Correctas Cobranza.Api.Tests.AutenticacionTests.Login_FaltaUnCampo_400(json: "null") [304 ms]
+  Correctas Cobranza.Api.Tests.DesviacionesSqlTests.D5_UsuarioEliminadoDuranteElLogin_401Generico_SinCookie_NoEs500 [334 ms]
+  Correctas Cobranza.Api.Tests.SeguridadHttpTests.ForwardedHeadersDeLaPlataformaHabilitado_NoArranca [145 ms]
+info: Microsoft.Hosting.Lifetime[0]
+      Application started. Press Ctrl+C to shut down.
+info: Microsoft.Hosting.Lifetime[0]
+      Hosting environment: Development
+info: Microsoft.Hosting.Lifetime[0]
+      Content root path: C:\Users\<usuario>\Documents\Proyecto de titulo - Final\Cobranza_Automatizada_Contexto_ClaudeCode\cobranza-automatizada\src\Cobranza.Api
+warn: Cobranza.Api.Seguridad.ClaveApiHandler[0]
+      Clave de API rechazada: formato invalido.
+info: Cobranza.Api.Seguridad.ClaveApiHandler[7]
+      ClaveApi was not authenticated. Failure message: Clave de API invalida.
+info: Cobranza.Api.Seguridad.ClaveApiHandler[12]
+      AuthenticationScheme: ClaveApi was challenged.
+info: Microsoft.Hosting.Lifetime[0]
+      Application is shutting down...
+info: Microsoft.Hosting.Lifetime[0]
+      Application started. Press Ctrl+C to shut down.
+info: Microsoft.Hosting.Lifetime[0]
+      Hosting environment: Development
+info: Microsoft.Hosting.Lifetime[0]
+      Content root path: C:\Users\<usuario>\Documents\Proyecto de titulo - Final\Cobranza_Automatizada_Contexto_ClaudeCode\cobranza-automatizada\src\Cobranza.Api
+warn: Microsoft.AspNetCore.Routing.EndpointRoutingMiddleware[9]
+      A request body size limit could not be applied. This server does not support the IHttpMaxRequestBodySizeFeature.
+info: Microsoft.Hosting.Lifetime[0]
+      Application started. Press Ctrl+C to shut down.
+info: Microsoft.Hosting.Lifetime[0]
+      Hosting environment: Development
+info: Microsoft.Hosting.Lifetime[0]
+      Content root path: C:\Users\<usuario>\Documents\Proyecto de titulo - Final\Cobranza_Automatizada_Contexto_ClaudeCode\cobranza-automatizada\src\Cobranza.Api
+info: Microsoft.Hosting.Lifetime[0]
+      Application is shutting down...
+warn: Microsoft.AspNetCore.Routing.EndpointRoutingMiddleware[9]
+      A request body size limit could not be applied. This server does not support the IHttpMaxRequestBodySizeFeature.
+info: Microsoft.Hosting.Lifetime[0]
+      Application is shutting down...
+info: Microsoft.Hosting.Lifetime[0]
+      Application started. Press Ctrl+C to shut down.
+info: Microsoft.Hosting.Lifetime[0]
+      Hosting environment: Development
+info: Microsoft.Hosting.Lifetime[0]
+      Content root path: C:\Users\<usuario>\Documents\Proyecto de titulo - Final\Cobranza_Automatizada_Contexto_ClaudeCode\cobranza-automatizada\src\Cobranza.Api
+info: Microsoft.Hosting.Lifetime[0]
+      Application is shutting down...
+info: Microsoft.Hosting.Lifetime[0]
+      Application started. Press Ctrl+C to shut down.
+info: Microsoft.Hosting.Lifetime[0]
+      Hosting environment: Development
+info: Microsoft.Hosting.Lifetime[0]
+      Content root path: C:\Users\<usuario>\Documents\Proyecto de titulo - Final\Cobranza_Automatizada_Contexto_ClaudeCode\cobranza-automatizada\src\Cobranza.Api
+info: Microsoft.Hosting.Lifetime[0]
+      Application is shutting down...
+info: Microsoft.Hosting.Lifetime[0]
+      Application started. Press Ctrl+C to shut down.
+info: Microsoft.Hosting.Lifetime[0]
+      Hosting environment: Development
+info: Microsoft.Hosting.Lifetime[0]
+      Content root path: C:\Users\<usuario>\Documents\Proyecto de titulo - Final\Cobranza_Automatizada_Contexto_ClaudeCode\cobranza-automatizada\src\Cobranza.Api
+warn: Microsoft.AspNetCore.Routing.EndpointRoutingMiddleware[9]
+      A request body size limit could not be applied. This server does not support the IHttpMaxRequestBodySizeFeature.
+warn: Microsoft.AspNetCore.Routing.EndpointRoutingMiddleware[9]
+      A request body size limit could not be applied. This server does not support the IHttpMaxRequestBodySizeFeature.
+warn: Microsoft.AspNetCore.Routing.EndpointRoutingMiddleware[9]
+      A request body size limit could not be applied. This server does not support the IHttpMaxRequestBodySizeFeature.
+warn: Microsoft.AspNetCore.Routing.EndpointRoutingMiddleware[9]
+      A request body size limit could not be applied. This server does not support the IHttpMaxRequestBodySizeFeature.
+info: Microsoft.Hosting.Lifetime[0]
+      Application started. Press Ctrl+C to shut down.
+info: Microsoft.Hosting.Lifetime[0]
+      Hosting environment: Development
+info: Microsoft.Hosting.Lifetime[0]
+      Content root path: C:\Users\<usuario>\Documents\Proyecto de titulo - Final\Cobranza_Automatizada_Contexto_ClaudeCode\cobranza-automatizada\src\Cobranza.Api
+warn: Microsoft.AspNetCore.Routing.EndpointRoutingMiddleware[9]
+      A request body size limit could not be applied. This server does not support the IHttpMaxRequestBodySizeFeature.
+warn: Microsoft.AspNetCore.Routing.EndpointRoutingMiddleware[9]
+      A request body size limit could not be applied. This server does not support the IHttpMaxRequestBodySizeFeature.
+info: Cobranza.Api.Seguridad.ClaveApiHandler[13]
+      AuthenticationScheme: ClaveApi was forbidden.
+warn: Microsoft.AspNetCore.Routing.EndpointRoutingMiddleware[9]
+      A request body size limit could not be applied. This server does not support the IHttpMaxRequestBodySizeFeature.
+info: Cobranza.Api.Seguridad.ClaveApiHandler[13]
+      AuthenticationScheme: ClaveApi was forbidden.
+info: Microsoft.Hosting.Lifetime[0]
+      Application is shutting down...
+  Correctas Cobranza.Api.Tests.AutorizacionYClaveApiTests.ClaveApi_FormatoInvalido_401_SinConsultarLaBase(clave: "no-es-una-clave") [288 ms]
+  Correctas Cobranza.Api.Tests.SeguridadHttpTests.Salud_Anonima [279 ms]
+  Correctas Cobranza.Api.Tests.AutenticacionTests.AUT13_TokenDeOtroUsuario_400 [331 ms]
+  Correctas Cobranza.Api.Tests.AutorizacionYClaveApiTests.ClaveApi_CacheEvitaConsultarLaBaseEnCadaSolicitud [293 ms]
+  Correctas Cobranza.Api.Tests.SeguridadHttpTests.Development_SinDataProtection_Arranca [292 ms]
+  Correctas Cobranza.Api.Tests.SeguridadHttpTests.Telemetria_EliminaEncabezadosSensibles_YConservaElPrefijo [1 ms]
+  Correctas Cobranza.Api.Tests.AutorizacionYClaveApiTests.EndpointsDeAutenticacion_RechazanClaveApi [273 ms]
+warn: Microsoft.AspNetCore.Routing.EndpointRoutingMiddleware[9]
+      A request body size limit could not be applied. This server does not support the IHttpMaxRequestBodySizeFeature.
+info: Microsoft.Hosting.Lifetime[0]
+      Application started. Press Ctrl+C to shut down.
+info: Microsoft.Hosting.Lifetime[0]
+      Hosting environment: Development
+info: Microsoft.Hosting.Lifetime[0]
+      Content root path: C:\Users\<usuario>\Documents\Proyecto de titulo - Final\Cobranza_Automatizada_Contexto_ClaudeCode\cobranza-automatizada\src\Cobranza.Api
+info: Microsoft.Hosting.Lifetime[0]
+      Application is shutting down...
+warn: Microsoft.AspNetCore.Routing.EndpointRoutingMiddleware[9]
+      A request body size limit could not be applied. This server does not support the IHttpMaxRequestBodySizeFeature.
+info: Microsoft.Hosting.Lifetime[0]
+      Application is shutting down...
+info: Microsoft.Hosting.Lifetime[0]
+      Application started. Press Ctrl+C to shut down.
+info: Microsoft.Hosting.Lifetime[0]
+      Hosting environment: Development
+info: Microsoft.Hosting.Lifetime[0]
+      Content root path: C:\Users\<usuario>\Documents\Proyecto de titulo - Final\Cobranza_Automatizada_Contexto_ClaudeCode\cobranza-automatizada\src\Cobranza.Api
+info: Microsoft.Hosting.Lifetime[0]
+      Application is shutting down...
+info: Microsoft.Hosting.Lifetime[0]
+      Application started. Press Ctrl+C to shut down.
+info: Microsoft.Hosting.Lifetime[0]
+      Hosting environment: Development
+info: Microsoft.Hosting.Lifetime[0]
+      Content root path: C:\Users\<usuario>\Documents\Proyecto de titulo - Final\Cobranza_Automatizada_Contexto_ClaudeCode\cobranza-automatizada\src\Cobranza.Api
+info: Microsoft.Hosting.Lifetime[0]
+      Application is shutting down...
+info: Microsoft.Hosting.Lifetime[0]
+      Application started. Press Ctrl+C to shut down.
+info: Microsoft.Hosting.Lifetime[0]
+      Hosting environment: Development
+info: Microsoft.Hosting.Lifetime[0]
+      Content root path: C:\Users\<usuario>\Documents\Proyecto de titulo - Final\Cobranza_Automatizada_Contexto_ClaudeCode\cobranza-automatizada\src\Cobranza.Api
+warn: Microsoft.AspNetCore.Routing.EndpointRoutingMiddleware[9]
+      A request body size limit could not be applied. This server does not support the IHttpMaxRequestBodySizeFeature.
+warn: Microsoft.AspNetCore.Routing.EndpointRoutingMiddleware[9]
+      A request body size limit could not be applied. This server does not support the IHttpMaxRequestBodySizeFeature.
+info: Microsoft.Hosting.Lifetime[0]
+      Application is shutting down...
+info: Microsoft.Hosting.Lifetime[0]
+      Application started. Press Ctrl+C to shut down.
+info: Microsoft.Hosting.Lifetime[0]
+      Hosting environment: Development
+info: Microsoft.Hosting.Lifetime[0]
+      Content root path: C:\Users\<usuario>\Documents\Proyecto de titulo - Final\Cobranza_Automatizada_Contexto_ClaudeCode\cobranza-automatizada\src\Cobranza.Api
+warn: Cobranza.Api.Seguridad.ClaveApiHandler[0]
+      Clave de API rechazada (prefijo t43skhfe).
+info: Microsoft.Hosting.Lifetime[0]
+      Application started. Press Ctrl+C to shut down.
+info: Microsoft.Hosting.Lifetime[0]
+      Hosting environment: Development
+info: Microsoft.Hosting.Lifetime[0]
+      Content root path: C:\Users\<usuario>\Documents\Proyecto de titulo - Final\Cobranza_Automatizada_Contexto_ClaudeCode\cobranza-automatizada\src\Cobranza.Api
+info: Cobranza.Api.Seguridad.ClaveApiHandler[7]
+      ClaveApi was not authenticated. Failure message: Clave de API invalida.
+info: Cobranza.Api.Seguridad.ClaveApiHandler[12]
+      AuthenticationScheme: ClaveApi was challenged.
+info: Microsoft.Hosting.Lifetime[0]
+      Application is shutting down...
+warn: Microsoft.AspNetCore.Routing.EndpointRoutingMiddleware[9]
+      A request body size limit could not be applied. This server does not support the IHttpMaxRequestBodySizeFeature.
+warn: Microsoft.AspNetCore.Routing.EndpointRoutingMiddleware[9]
+      A request body size limit could not be applied. This server does not support the IHttpMaxRequestBodySizeFeature.
+info: Microsoft.Hosting.Lifetime[0]
+      Application started. Press Ctrl+C to shut down.
+info: Microsoft.Hosting.Lifetime[0]
+      Hosting environment: Development
+info: Microsoft.Hosting.Lifetime[0]
+      Content root path: C:\Users\<usuario>\Documents\Proyecto de titulo - Final\Cobranza_Automatizada_Contexto_ClaudeCode\cobranza-automatizada\src\Cobranza.Api
+warn: Microsoft.AspNetCore.Routing.EndpointRoutingMiddleware[9]
+      A request body size limit could not be applied. This server does not support the IHttpMaxRequestBodySizeFeature.
+warn: Microsoft.AspNetCore.Routing.EndpointRoutingMiddleware[9]
+      A request body size limit could not be applied. This server does not support the IHttpMaxRequestBodySizeFeature.
+info: Microsoft.Hosting.Lifetime[0]
+      Application is shutting down...
+  Correctas Cobranza.Api.Tests.SeguridadHttpTests.Telemetria_EstaRegistradaEnLaApi [249 ms]
+  Correctas Cobranza.Api.Tests.AutenticacionTests.AUT05_LoginTrasVencerElBloqueo_200_YContadorEnCero [571 ms]
+  Correctas Cobranza.Api.Tests.AutorizacionYClaveApiTests.A01_EncabezadoEasyAuthFalsificado_NoAutentica [281 ms]
+  Correctas Cobranza.Api.Tests.SeguridadHttpTests.CookieAntifalsificacion_HostSecureHttpOnlySameSiteStrict [281 ms]
+  Correctas Cobranza.Api.Tests.AutenticacionTests.AUT14_Logout_204_CookieEliminada_Logout [350 ms]
+  Correctas Cobranza.Api.Tests.AutorizacionYClaveApiTests.AUT12_ClaveVencida_401 [317 ms]
+  Correctas Cobranza.Api.Tests.AutenticacionTests.CambiarClave_SinSesion_401 [282 ms]
+warn: Microsoft.AspNetCore.Routing.EndpointRoutingMiddleware[9]
+      A request body size limit could not be applied. This server does not support the IHttpMaxRequestBodySizeFeature.
+warn: Microsoft.AspNetCore.Routing.EndpointRoutingMiddleware[9]
+      A request body size limit could not be applied. This server does not support the IHttpMaxRequestBodySizeFeature.
+info: Microsoft.Hosting.Lifetime[0]
+      Application started. Press Ctrl+C to shut down.
+info: Microsoft.Hosting.Lifetime[0]
+      Hosting environment: Development
+info: Microsoft.Hosting.Lifetime[0]
+      Content root path: C:\Users\<usuario>\Documents\Proyecto de titulo - Final\Cobranza_Automatizada_Contexto_ClaudeCode\cobranza-automatizada\src\Cobranza.Api
+warn: Microsoft.AspNetCore.Routing.EndpointRoutingMiddleware[9]
+      A request body size limit could not be applied. This server does not support the IHttpMaxRequestBodySizeFeature.
+info: Cobranza.Api.Seguridad.ClaveApiHandler[13]
+      AuthenticationScheme: ClaveApi was forbidden.
+info: Cobranza.Api.Seguridad.ClaveApiHandler[13]
+      AuthenticationScheme: ClaveApi was forbidden.
+info: Microsoft.Hosting.Lifetime[0]
+      Application is shutting down...
+warn: Microsoft.AspNetCore.Routing.EndpointRoutingMiddleware[9]
+      A request body size limit could not be applied. This server does not support the IHttpMaxRequestBodySizeFeature.
+warn: Microsoft.AspNetCore.Routing.EndpointRoutingMiddleware[9]
+      A request body size limit could not be applied. This server does not support the IHttpMaxRequestBodySizeFeature.
+info: Microsoft.Hosting.Lifetime[0]
+      Application started. Press Ctrl+C to shut down.
+info: Microsoft.Hosting.Lifetime[0]
+      Hosting environment: Development
+info: Microsoft.Hosting.Lifetime[0]
+      Content root path: C:\Users\<usuario>\Documents\Proyecto de titulo - Final\Cobranza_Automatizada_Contexto_ClaudeCode\cobranza-automatizada\src\Cobranza.Api
+warn: Microsoft.AspNetCore.Routing.EndpointRoutingMiddleware[9]
+      A request body size limit could not be applied. This server does not support the IHttpMaxRequestBodySizeFeature.
+warn: Microsoft.AspNetCore.Routing.EndpointRoutingMiddleware[9]
+      A request body size limit could not be applied. This server does not support the IHttpMaxRequestBodySizeFeature.
+warn: Microsoft.AspNetCore.Routing.EndpointRoutingMiddleware[9]
+      A request body size limit could not be applied. This server does not support the IHttpMaxRequestBodySizeFeature.
+info: Microsoft.Hosting.Lifetime[0]
+      Application is shutting down...
+warn: Microsoft.AspNetCore.Routing.EndpointRoutingMiddleware[9]
+      A request body size limit could not be applied. This server does not support the IHttpMaxRequestBodySizeFeature.
+warn: Cobranza.Api.LimiteLogin[0]
+      Login rechazado por el limitador de tasa (429).
+info: Microsoft.Hosting.Lifetime[0]
+      Application is shutting down...
+info: Microsoft.Hosting.Lifetime[0]
+      Application started. Press Ctrl+C to shut down.
+info: Microsoft.Hosting.Lifetime[0]
+      Hosting environment: Development
+info: Microsoft.Hosting.Lifetime[0]
+      Content root path: C:\Users\<usuario>\Documents\Proyecto de titulo - Final\Cobranza_Automatizada_Contexto_ClaudeCode\cobranza-automatizada\src\Cobranza.Api
+info: Microsoft.Hosting.Lifetime[0]
+      Application is shutting down...
+info: Microsoft.Hosting.Lifetime[0]
+      Application started. Press Ctrl+C to shut down.
+info: Microsoft.Hosting.Lifetime[0]
+      Hosting environment: Development
+info: Microsoft.Hosting.Lifetime[0]
+      Content root path: C:\Users\<usuario>\Documents\Proyecto de titulo - Final\Cobranza_Automatizada_Contexto_ClaudeCode\cobranza-automatizada\src\Cobranza.Api
+info: Microsoft.Hosting.Lifetime[0]
+      Application started. Press Ctrl+C to shut down.
+info: Microsoft.Hosting.Lifetime[0]
+      Hosting environment: Development
+info: Microsoft.Hosting.Lifetime[0]
+      Content root path: C:\Users\<usuario>\Documents\Proyecto de titulo - Final\Cobranza_Automatizada_Contexto_ClaudeCode\cobranza-automatizada\src\Cobranza.Api
+warn: Microsoft.AspNetCore.Routing.EndpointRoutingMiddleware[9]
+      A request body size limit could not be applied. This server does not support the IHttpMaxRequestBodySizeFeature.
+warn: Microsoft.AspNetCore.Routing.EndpointRoutingMiddleware[9]
+      A request body size limit could not be applied. This server does not support the IHttpMaxRequestBodySizeFeature.
+warn: Microsoft.AspNetCore.Routing.EndpointRoutingMiddleware[9]
+      A request body size limit could not be applied. This server does not support the IHttpMaxRequestBodySizeFeature.
+info: Microsoft.Hosting.Lifetime[0]
+      Application started. Press Ctrl+C to shut down.
+info: Microsoft.Hosting.Lifetime[0]
+      Hosting environment: Development
+info: Microsoft.Hosting.Lifetime[0]
+      Content root path: C:\Users\<usuario>\Documents\Proyecto de titulo - Final\Cobranza_Automatizada_Contexto_ClaudeCode\cobranza-automatizada\src\Cobranza.Api
+warn: Microsoft.AspNetCore.Routing.EndpointRoutingMiddleware[9]
+      A request body size limit could not be applied. This server does not support the IHttpMaxRequestBodySizeFeature.
+warn: Cobranza.Api.Seguridad.ClaveApiHandler[0]
+      Clave de API rechazada (prefijo 4j4xtry5).
+info: Cobranza.Api.Seguridad.ClaveApiHandler[7]
+      ClaveApi was not authenticated. Failure message: Clave de API invalida.
+info: Cobranza.Api.Seguridad.ClaveApiHandler[12]
+      AuthenticationScheme: ClaveApi was challenged.
+info: Microsoft.Hosting.Lifetime[0]
+      Application is shutting down...
+info: Microsoft.Hosting.Lifetime[0]
+      Application is shutting down...
+warn: Microsoft.AspNetCore.Routing.EndpointRoutingMiddleware[9]
+      A request body size limit could not be applied. This server does not support the IHttpMaxRequestBodySizeFeature.
+warn: Microsoft.AspNetCore.Routing.EndpointRoutingMiddleware[9]
+      A request body size limit could not be applied. This server does not support the IHttpMaxRequestBodySizeFeature.
+warn: Microsoft.AspNetCore.Routing.EndpointRoutingMiddleware[9]
+      A request body size limit could not be applied. This server does not support the IHttpMaxRequestBodySizeFeature.
+warn: Microsoft.AspNetCore.Routing.EndpointRoutingMiddleware[9]
+      A request body size limit could not be applied. This server does not support the IHttpMaxRequestBodySizeFeature.
+warn: Microsoft.AspNetCore.Routing.EndpointRoutingMiddleware[9]
+      A request body size limit could not be applied. This server does not support the IHttpMaxRequestBodySizeFeature.
+warn: Microsoft.AspNetCore.Routing.EndpointRoutingMiddleware[9]
+      A request body size limit could not be applied. This server does not support the IHttpMaxRequestBodySizeFeature.
+info: Microsoft.Hosting.Lifetime[0]
+      Application started. Press Ctrl+C to shut down.
+info: Microsoft.Hosting.Lifetime[0]
+      Hosting environment: Development
+info: Microsoft.Hosting.Lifetime[0]
+      Content root path: C:\Users\<usuario>\Documents\Proyecto de titulo - Final\Cobranza_Automatizada_Contexto_ClaudeCode\cobranza-automatizada\src\Cobranza.Api
+warn: Cobranza.Api.Seguridad.ClaveApiHandler[0]
+      Clave de API rechazada (prefijo fdga3q47).
+info: Cobranza.Api.Seguridad.ClaveApiHandler[7]
+      ClaveApi was not authenticated. Failure message: Clave de API invalida.
+info: Cobranza.Api.Seguridad.ClaveApiHandler[12]
+      AuthenticationScheme: ClaveApi was challenged.
+info: Microsoft.Hosting.Lifetime[0]
+      Application is shutting down...
+  Correctas Cobranza.Api.Tests.AutorizacionYClaveApiTests.AUT11_ClaveApi_EnCartera_403_YEnSincronizaciones_403 [269 ms]
+  Correctas Cobranza.Api.Tests.AutenticacionTests.AUT01_LoginCorrectoFinanzas_200_Cookie_LoginExitoso [333 ms]
+  Correctas Cobranza.Api.Tests.SeguridadHttpTests.RED16_XForwardedForEscritoPorElCliente_NoCambiaIpNiEvadeElLimitador [757 ms]
+  Correctas Cobranza.Api.Tests.AutorizacionYClaveApiTests.AUT10_ClaveApiValida_EstadoCliente_200 [284 ms]
+  Correctas Cobranza.Api.Tests.AutorizacionYClaveApiTests.ClaveApi_FormatoValidoPeroDesconocida_401_YSeRegistraSoloElPrefijo [274 ms]
+  Correctas Cobranza.Api.Tests.AutenticacionTests.AUT03_UsuarioInexistente_MismaRespuesta_UnaVerificacion_UsuarioInexistente [377 ms]
+  Correctas Cobranza.Api.Tests.AutorizacionYClaveApiTests.AUT12_ClaveRevocada_401_TrasVencerLaCache [289 ms]
+warn: Microsoft.AspNetCore.Routing.EndpointRoutingMiddleware[9]
+      A request body size limit could not be applied. This server does not support the IHttpMaxRequestBodySizeFeature.
+warn: Microsoft.AspNetCore.Routing.EndpointRoutingMiddleware[9]
+      A request body size limit could not be applied. This server does not support the IHttpMaxRequestBodySizeFeature.
+warn: Microsoft.AspNetCore.Routing.EndpointRoutingMiddleware[9]
+      A request body size limit could not be applied. This server does not support the IHttpMaxRequestBodySizeFeature.
+warn: Cobranza.Api.LimiteLogin[0]
+      Login rechazado por el limitador de tasa (429).
+warn: Microsoft.AspNetCore.Routing.EndpointRoutingMiddleware[9]
+      A request body size limit could not be applied. This server does not support the IHttpMaxRequestBodySizeFeature.
+info: Microsoft.Hosting.Lifetime[0]
+      Application started. Press Ctrl+C to shut down.
+info: Microsoft.Hosting.Lifetime[0]
+      Hosting environment: Development
+info: Microsoft.Hosting.Lifetime[0]
+      Content root path: C:\Users\<usuario>\Documents\Proyecto de titulo - Final\Cobranza_Automatizada_Contexto_ClaudeCode\cobranza-automatizada\src\Cobranza.Api
+warn: Microsoft.AspNetCore.Routing.EndpointRoutingMiddleware[9]
+      A request body size limit could not be applied. This server does not support the IHttpMaxRequestBodySizeFeature.
+info: Microsoft.Hosting.Lifetime[0]
+      Application is shutting down...
+warn: Microsoft.AspNetCore.Routing.EndpointRoutingMiddleware[9]
+      A request body size limit could not be applied. This server does not support the IHttpMaxRequestBodySizeFeature.
+warn: Microsoft.AspNetCore.Routing.EndpointRoutingMiddleware[9]
+      A request body size limit could not be applied. This server does not support the IHttpMaxRequestBodySizeFeature.
+info: Microsoft.Hosting.Lifetime[0]
+      Application started. Press Ctrl+C to shut down.
+info: Microsoft.Hosting.Lifetime[0]
+      Hosting environment: Development
+info: Microsoft.Hosting.Lifetime[0]
+      Content root path: C:\Users\<usuario>\Documents\Proyecto de titulo - Final\Cobranza_Automatizada_Contexto_ClaudeCode\cobranza-automatizada\src\Cobranza.Api
+warn: Microsoft.AspNetCore.Routing.EndpointRoutingMiddleware[9]
+      A request body size limit could not be applied. This server does not support the IHttpMaxRequestBodySizeFeature.
+warn: Microsoft.AspNetCore.Routing.EndpointRoutingMiddleware[9]
+      A request body size limit could not be applied. This server does not support the IHttpMaxRequestBodySizeFeature.
+info: Cobranza.Api.Seguridad.ClaveApiHandler[13]
+      AuthenticationScheme: ClaveApi was forbidden.
+info: Microsoft.Hosting.Lifetime[0]
+      Application is shutting down...
+warn: Microsoft.AspNetCore.Routing.EndpointRoutingMiddleware[9]
+      A request body size limit could not be applied. This server does not support the IHttpMaxRequestBodySizeFeature.
+warn: Microsoft.AspNetCore.Routing.EndpointRoutingMiddleware[9]
+      A request body size limit could not be applied. This server does not support the IHttpMaxRequestBodySizeFeature.
+info: Microsoft.Hosting.Lifetime[0]
+      Application is shutting down...
+info: Microsoft.Hosting.Lifetime[0]
+      Application started. Press Ctrl+C to shut down.
+info: Microsoft.Hosting.Lifetime[0]
+      Hosting environment: Development
+info: Microsoft.Hosting.Lifetime[0]
+      Content root path: C:\Users\<usuario>\Documents\Proyecto de titulo - Final\Cobranza_Automatizada_Contexto_ClaudeCode\cobranza-automatizada\src\Cobranza.Api
+warn: Microsoft.AspNetCore.Routing.EndpointRoutingMiddleware[9]
+      A request body size limit could not be applied. This server does not support the IHttpMaxRequestBodySizeFeature.
+info: Microsoft.Hosting.Lifetime[0]
+      Application started. Press Ctrl+C to shut down.
+info: Microsoft.Hosting.Lifetime[0]
+      Hosting environment: Development
+info: Microsoft.Hosting.Lifetime[0]
+      Content root path: C:\Users\<usuario>\Documents\Proyecto de titulo - Final\Cobranza_Automatizada_Contexto_ClaudeCode\cobranza-automatizada\src\Cobranza.Api
+info: Microsoft.Hosting.Lifetime[0]
+      Application is shutting down...
+info: Microsoft.Hosting.Lifetime[0]
+      Application is shutting down...
+info: Microsoft.Hosting.Lifetime[0]
+      Application started. Press Ctrl+C to shut down.
+info: Microsoft.Hosting.Lifetime[0]
+      Hosting environment: Development
+info: Microsoft.Hosting.Lifetime[0]
+      Content root path: C:\Users\<usuario>\Documents\Proyecto de titulo - Final\Cobranza_Automatizada_Contexto_ClaudeCode\cobranza-automatizada\src\Cobranza.Api
+warn: Microsoft.AspNetCore.Routing.EndpointRoutingMiddleware[9]
+      A request body size limit could not be applied. This server does not support the IHttpMaxRequestBodySizeFeature.
+warn: Microsoft.AspNetCore.Routing.EndpointRoutingMiddleware[9]
+      A request body size limit could not be applied. This server does not support the IHttpMaxRequestBodySizeFeature.
+warn: Microsoft.AspNetCore.Routing.EndpointRoutingMiddleware[9]
+      A request body size limit could not be applied. This server does not support the IHttpMaxRequestBodySizeFeature.
+warn: Microsoft.AspNetCore.Routing.EndpointRoutingMiddleware[9]
+      A request body size limit could not be applied. This server does not support the IHttpMaxRequestBodySizeFeature.
+warn: Microsoft.AspNetCore.Routing.EndpointRoutingMiddleware[9]
+      A request body size limit could not be applied. This server does not support the IHttpMaxRequestBodySizeFeature.
+info: Microsoft.Hosting.Lifetime[0]
+      Application is shutting down...
+info: Microsoft.Hosting.Lifetime[0]
+      Application started. Press Ctrl+C to shut down.
+info: Microsoft.Hosting.Lifetime[0]
+      Hosting environment: Development
+info: Microsoft.Hosting.Lifetime[0]
+      Content root path: C:\Users\<usuario>\Documents\Proyecto de titulo - Final\Cobranza_Automatizada_Contexto_ClaudeCode\cobranza-automatizada\src\Cobranza.Api
+info: Microsoft.Hosting.Lifetime[0]
+      Application is shutting down...
+  Correctas Cobranza.Api.Tests.SeguridadHttpTests.RED15_MasDeDiezIntentosPorMinutoDesdeLaMismaIp_429 [782 ms]
+  Correctas Cobranza.Api.Tests.SeguridadHttpTests.Production_DataProtectionConUriNoHttps_NoArranca [139 ms]
+  Correctas Cobranza.Api.Tests.AutorizacionYClaveApiTests.ClaveApi_TienePrioridadSobreLaCookie [327 ms]
+  Correctas Cobranza.Api.Tests.AutenticacionTests.MensajeDeFallo_IdenticoParaTodasLasCausas [697 ms]
+  Correctas Cobranza.Api.Tests.AutorizacionYClaveApiTests.SinCredenciales_EndpointsProtegidos_401 [280 ms]
+  Correctas Cobranza.Api.Tests.SeguridadHttpTests.IpConPuerto_SeRegistraSinPuerto [324 ms]
+  Correctas Cobranza.Api.Tests.AutenticacionTests.CambiarClave_Politica_400 [344 ms]
+  Correctas Cobranza.Api.Tests.AutorizacionYClaveApiTests.ClaveApi_NoSeRegistraEnLogsNiSeEnviaASql [277 ms]
+info: Microsoft.Hosting.Lifetime[0]
+      Application started. Press Ctrl+C to shut down.
+info: Microsoft.Hosting.Lifetime[0]
+      Hosting environment: Development
+info: Microsoft.Hosting.Lifetime[0]
+      Content root path: C:\Users\<usuario>\Documents\Proyecto de titulo - Final\Cobranza_Automatizada_Contexto_ClaudeCode\cobranza-automatizada\src\Cobranza.Api
+warn: Microsoft.AspNetCore.Routing.EndpointRoutingMiddleware[9]
+      A request body size limit could not be applied. This server does not support the IHttpMaxRequestBodySizeFeature.
+info: Microsoft.Hosting.Lifetime[0]
+      Application is shutting down...
+info: Microsoft.Hosting.Lifetime[0]
+      Application started. Press Ctrl+C to shut down.
+info: Microsoft.Hosting.Lifetime[0]
+      Hosting environment: Development
+info: Microsoft.Hosting.Lifetime[0]
+      Content root path: C:\Users\<usuario>\Documents\Proyecto de titulo - Final\Cobranza_Automatizada_Contexto_ClaudeCode\cobranza-automatizada\src\Cobranza.Api
+warn: Microsoft.AspNetCore.Routing.EndpointRoutingMiddleware[9]
+      A request body size limit could not be applied. This server does not support the IHttpMaxRequestBodySizeFeature.
+warn: Microsoft.AspNetCore.Routing.EndpointRoutingMiddleware[9]
+      A request body size limit could not be applied. This server does not support the IHttpMaxRequestBodySizeFeature.
+info: Microsoft.Hosting.Lifetime[0]
+      Application is shutting down...
+info: Microsoft.Hosting.Lifetime[0]
+      Application started. Press Ctrl+C to shut down.
+info: Microsoft.Hosting.Lifetime[0]
+      Hosting environment: Development
+info: Microsoft.Hosting.Lifetime[0]
+      Content root path: C:\Users\<usuario>\Documents\Proyecto de titulo - Final\Cobranza_Automatizada_Contexto_ClaudeCode\cobranza-automatizada\src\Cobranza.Api
+warn: Microsoft.AspNetCore.Routing.EndpointRoutingMiddleware[9]
+      A request body size limit could not be applied. This server does not support the IHttpMaxRequestBodySizeFeature.
+info: Microsoft.Hosting.Lifetime[0]
+      Application is shutting down...
+info: Microsoft.Hosting.Lifetime[0]
+      Application started. Press Ctrl+C to shut down.
+info: Microsoft.Hosting.Lifetime[0]
+      Hosting environment: Development
+info: Microsoft.Hosting.Lifetime[0]
+      Content root path: C:\Users\<usuario>\Documents\Proyecto de titulo - Final\Cobranza_Automatizada_Contexto_ClaudeCode\cobranza-automatizada\src\Cobranza.Api
+warn: Microsoft.AspNetCore.Routing.EndpointRoutingMiddleware[9]
+      A request body size limit could not be applied. This server does not support the IHttpMaxRequestBodySizeFeature.
+warn: Microsoft.AspNetCore.Routing.EndpointRoutingMiddleware[9]
+      A request body size limit could not be applied. This server does not support the IHttpMaxRequestBodySizeFeature.
+warn: Microsoft.AspNetCore.Routing.EndpointRoutingMiddleware[9]
+      A request body size limit could not be applied. This server does not support the IHttpMaxRequestBodySizeFeature.
+warn: Microsoft.AspNetCore.Routing.EndpointRoutingMiddleware[9]
+      A request body size limit could not be applied. This server does not support the IHttpMaxRequestBodySizeFeature.
+info: Microsoft.Hosting.Lifetime[0]
+      Application is shutting down...
+  Correctas Cobranza.Api.Tests.AutorizacionYClaveApiTests.A01_EasyAuthHandler_NoExisteEnElEnsamblado [147 ms]
+  Correctas Cobranza.Api.Tests.AutenticacionTests.Sesion_ExpiraPorInactividad [325 ms]
+  Correctas Cobranza.Api.Tests.AutenticacionTests.AUT06_LogoutPermitidoConDebeCambiarClave [356 ms]
+  Correctas Cobranza.Api.Tests.AutenticacionTests.AUT16_ClaveTemporalVencida_401_ClaveTemporalVencida_ContadorSinCambio [368 ms]
+  Correctas Cobranza.Api.Tests.AutenticacionTests.NuncaSeEnvianContrasenasEnTextoPlanoNiSeRegistranEnLogs [459 ms]
+info: Microsoft.Hosting.Lifetime[0]
+      Application started. Press Ctrl+C to shut down.
+info: Microsoft.Hosting.Lifetime[0]
+      Hosting environment: Development
+info: Microsoft.Hosting.Lifetime[0]
+      Content root path: C:\Users\<usuario>\Documents\Proyecto de titulo - Final\Cobranza_Automatizada_Contexto_ClaudeCode\cobranza-automatizada\src\Cobranza.Api
+warn: Microsoft.AspNetCore.Routing.EndpointRoutingMiddleware[9]
+      A request body size limit could not be applied. This server does not support the IHttpMaxRequestBodySizeFeature.
+info: Microsoft.Hosting.Lifetime[0]
+      Application is shutting down...
+info: Microsoft.Hosting.Lifetime[0]
+      Application started. Press Ctrl+C to shut down.
+info: Microsoft.Hosting.Lifetime[0]
+      Hosting environment: Development
+info: Microsoft.Hosting.Lifetime[0]
+      Content root path: C:\Users\<usuario>\Documents\Proyecto de titulo - Final\Cobranza_Automatizada_Contexto_ClaudeCode\cobranza-automatizada\src\Cobranza.Api
+warn: Microsoft.AspNetCore.Routing.EndpointRoutingMiddleware[9]
+      A request body size limit could not be applied. This server does not support the IHttpMaxRequestBodySizeFeature.
+info: Microsoft.Hosting.Lifetime[0]
+      Application is shutting down...
+info: Microsoft.Hosting.Lifetime[0]
+      Application started. Press Ctrl+C to shut down.
+info: Microsoft.Hosting.Lifetime[0]
+      Hosting environment: Development
+info: Microsoft.Hosting.Lifetime[0]
+      Content root path: C:\Users\<usuario>\Documents\Proyecto de titulo - Final\Cobranza_Automatizada_Contexto_ClaudeCode\cobranza-automatizada\src\Cobranza.Api
+warn: Microsoft.AspNetCore.Routing.EndpointRoutingMiddleware[9]
+      A request body size limit could not be applied. This server does not support the IHttpMaxRequestBodySizeFeature.
+warn: Cobranza.Api.Seguridad.ServicioAutenticacion[0]
+      No se pudo revalidar la sesion del usuario 2; se rechaza la cookie.
+      System.InvalidOperationException: Base no disponible (simulado).
+         at Cobranza.Api.Tests.RepositorioUsuariosFalso.ObtenerUsuarioPorIdAsync(Int32 usuarioId, Boolean incluirHash, CancellationToken ct) in C:\Users\<usuario>\Documents\Proyecto de titulo - Final\Cobranza_Automatizada_Contexto_ClaudeCode\cobranza-automatizada\tests\Cobranza.Api.Tests\Dobles.cs:line 132
+         at Cobranza.Api.Seguridad.ServicioAutenticacion.ValidarPrincipalAsync(CookieValidatePrincipalContext ctx) in C:\Users\<usuario>\Documents\Proyecto de titulo - Final\Cobranza_Automatizada_Contexto_ClaudeCode\cobranza-automatizada\src\Cobranza.Api\Seguridad\ServicioAutenticacion.cs:line 207
+info: Microsoft.Hosting.Lifetime[0]
+      Application is shutting down...
+info: Microsoft.Hosting.Lifetime[0]
+      Application started. Press Ctrl+C to shut down.
+info: Microsoft.Hosting.Lifetime[0]
+      Hosting environment: Development
+info: Microsoft.Hosting.Lifetime[0]
+      Content root path: C:\Users\<usuario>\Documents\Proyecto de titulo - Final\Cobranza_Automatizada_Contexto_ClaudeCode\cobranza-automatizada\src\Cobranza.Api
+warn: Microsoft.AspNetCore.Routing.EndpointRoutingMiddleware[9]
+      A request body size limit could not be applied. This server does not support the IHttpMaxRequestBodySizeFeature.
+warn: Microsoft.AspNetCore.Routing.EndpointRoutingMiddleware[9]
+      A request body size limit could not be applied. This server does not support the IHttpMaxRequestBodySizeFeature.
+warn: Microsoft.AspNetCore.Routing.EndpointRoutingMiddleware[9]
+      A request body size limit could not be applied. This server does not support the IHttpMaxRequestBodySizeFeature.
+warn: Microsoft.AspNetCore.Routing.EndpointRoutingMiddleware[9]
+      A request body size limit could not be applied. This server does not support the IHttpMaxRequestBodySizeFeature.
+warn: Microsoft.AspNetCore.Routing.EndpointRoutingMiddleware[9]
+      A request body size limit could not be applied. This server does not support the IHttpMaxRequestBodySizeFeature.
+warn: Microsoft.AspNetCore.Routing.EndpointRoutingMiddleware[9]
+      A request body size limit could not be applied. This server does not support the IHttpMaxRequestBodySizeFeature.
+warn: Microsoft.AspNetCore.Routing.EndpointRoutingMiddleware[9]
+      A request body size limit could not be applied. This server does not support the IHttpMaxRequestBodySizeFeature.
+warn: Microsoft.AspNetCore.Routing.EndpointRoutingMiddleware[9]
+      A request body size limit could not be applied. This server does not support the IHttpMaxRequestBodySizeFeature.
+  Correctas Cobranza.Api.Tests.AutenticacionTests.Sesion_DuracionAbsolutaDeOchoHoras [332 ms]
+  Correctas Cobranza.Api.Tests.AutenticacionTests.AUT09_RolVentas_EnCartera_403 [313 ms]
+  Correctas Cobranza.Api.Tests.AutenticacionTests.Revalidacion_ErrorDeBase_FallaCerrada [329 ms]
+warn: Microsoft.AspNetCore.Routing.EndpointRoutingMiddleware[9]
+      A request body size limit could not be applied. This server does not support the IHttpMaxRequestBodySizeFeature.
+warn: Microsoft.AspNetCore.Routing.EndpointRoutingMiddleware[9]
+      A request body size limit could not be applied. This server does not support the IHttpMaxRequestBodySizeFeature.
+warn: Microsoft.AspNetCore.Routing.EndpointRoutingMiddleware[9]
+      A request body size limit could not be applied. This server does not support the IHttpMaxRequestBodySizeFeature.
+info: Microsoft.Hosting.Lifetime[0]
+      Application is shutting down...
+info: Microsoft.Hosting.Lifetime[0]
+      Application started. Press Ctrl+C to shut down.
+info: Microsoft.Hosting.Lifetime[0]
+      Hosting environment: Development
+info: Microsoft.Hosting.Lifetime[0]
+      Content root path: C:\Users\<usuario>\Documents\Proyecto de titulo - Final\Cobranza_Automatizada_Contexto_ClaudeCode\cobranza-automatizada\src\Cobranza.Api
+warn: Microsoft.AspNetCore.Routing.EndpointRoutingMiddleware[9]
+      A request body size limit could not be applied. This server does not support the IHttpMaxRequestBodySizeFeature.
+info: Microsoft.Hosting.Lifetime[0]
+      Application is shutting down...
+info: Microsoft.Hosting.Lifetime[0]
+      Application started. Press Ctrl+C to shut down.
+info: Microsoft.Hosting.Lifetime[0]
+      Hosting environment: Development
+info: Microsoft.Hosting.Lifetime[0]
+      Content root path: C:\Users\<usuario>\Documents\Proyecto de titulo - Final\Cobranza_Automatizada_Contexto_ClaudeCode\cobranza-automatizada\src\Cobranza.Api
+warn: Microsoft.AspNetCore.Routing.EndpointRoutingMiddleware[9]
+      A request body size limit could not be applied. This server does not support the IHttpMaxRequestBodySizeFeature.
+warn: Microsoft.AspNetCore.Routing.EndpointRoutingMiddleware[9]
+      A request body size limit could not be applied. This server does not support the IHttpMaxRequestBodySizeFeature.
+warn: Microsoft.AspNetCore.Routing.EndpointRoutingMiddleware[9]
+      A request body size limit could not be applied. This server does not support the IHttpMaxRequestBodySizeFeature.
+warn: Microsoft.AspNetCore.Routing.EndpointRoutingMiddleware[9]
+      A request body size limit could not be applied. This server does not support the IHttpMaxRequestBodySizeFeature.
+warn: Microsoft.AspNetCore.Routing.EndpointRoutingMiddleware[9]
+      A request body size limit could not be applied. This server does not support the IHttpMaxRequestBodySizeFeature.
+warn: Microsoft.AspNetCore.Routing.EndpointRoutingMiddleware[9]
+      A request body size limit could not be applied. This server does not support the IHttpMaxRequestBodySizeFeature.
+info: Microsoft.Hosting.Lifetime[0]
+      Application is shutting down...
+info: Microsoft.Hosting.Lifetime[0]
+      Application started. Press Ctrl+C to shut down.
+info: Microsoft.Hosting.Lifetime[0]
+      Hosting environment: Development
+info: Microsoft.Hosting.Lifetime[0]
+      Content root path: C:\Users\<usuario>\Documents\Proyecto de titulo - Final\Cobranza_Automatizada_Contexto_ClaudeCode\cobranza-automatizada\src\Cobranza.Api
+warn: Microsoft.AspNetCore.Routing.EndpointRoutingMiddleware[9]
+      A request body size limit could not be applied. This server does not support the IHttpMaxRequestBodySizeFeature.
+warn: Microsoft.AspNetCore.Routing.EndpointRoutingMiddleware[9]
+      A request body size limit could not be applied. This server does not support the IHttpMaxRequestBodySizeFeature.
+warn: Microsoft.AspNetCore.Routing.EndpointRoutingMiddleware[9]
+      A request body size limit could not be applied. This server does not support the IHttpMaxRequestBodySizeFeature.
+info: Microsoft.Hosting.Lifetime[0]
+      Application is shutting down...
+  Correctas Cobranza.Api.Tests.AutenticacionTests.AUT03_TiempoSimilar_InexistenteFrenteAClaveIncorrecta [772 ms]
+  Correctas Cobranza.Api.Tests.AutenticacionTests.AUT18_ContrasenaEscritaEnElCampoUsuario_SeGuardaFormatoNoValido [326 ms]
+  Correctas Cobranza.Api.Tests.AutenticacionTests.AUT04_CincoFallos_Bloquea_YElSextoConClaveCorrectaDa401 [558 ms]
+  Correctas Cobranza.Api.Tests.AutenticacionTests.AUT07_CambioDeClave_204_YLaCookieAnteriorDejaDeServirAlRevalidar [467 ms]
+info: Microsoft.Hosting.Lifetime[0]
+      Application started. Press Ctrl+C to shut down.
+info: Microsoft.Hosting.Lifetime[0]
+      Hosting environment: Development
+info: Microsoft.Hosting.Lifetime[0]
+      Content root path: C:\Users\<usuario>\Documents\Proyecto de titulo - Final\Cobranza_Automatizada_Contexto_ClaudeCode\cobranza-automatizada\src\Cobranza.Api
+warn: Microsoft.AspNetCore.Routing.EndpointRoutingMiddleware[9]
+      A request body size limit could not be applied. This server does not support the IHttpMaxRequestBodySizeFeature.
+info: Microsoft.Hosting.Lifetime[0]
+      Application is shutting down...
+info: Microsoft.Hosting.Lifetime[0]
+      Application started. Press Ctrl+C to shut down.
+info: Microsoft.Hosting.Lifetime[0]
+      Hosting environment: Development
+info: Microsoft.Hosting.Lifetime[0]
+      Content root path: C:\Users\<usuario>\Documents\Proyecto de titulo - Final\Cobranza_Automatizada_Contexto_ClaudeCode\cobranza-automatizada\src\Cobranza.Api
+warn: Microsoft.AspNetCore.Routing.EndpointRoutingMiddleware[9]
+      A request body size limit could not be applied. This server does not support the IHttpMaxRequestBodySizeFeature.
+warn: Microsoft.AspNetCore.Routing.EndpointRoutingMiddleware[9]
+      A request body size limit could not be applied. This server does not support the IHttpMaxRequestBodySizeFeature.
+warn: Microsoft.AspNetCore.Routing.EndpointRoutingMiddleware[9]
+      A request body size limit could not be applied. This server does not support the IHttpMaxRequestBodySizeFeature.
+warn: Microsoft.AspNetCore.Routing.EndpointRoutingMiddleware[9]
+      A request body size limit could not be applied. This server does not support the IHttpMaxRequestBodySizeFeature.
+info: Microsoft.Hosting.Lifetime[0]
+      Application is shutting down...
+info: Microsoft.Hosting.Lifetime[0]
+      Application started. Press Ctrl+C to shut down.
+info: Microsoft.Hosting.Lifetime[0]
+      Hosting environment: Development
+info: Microsoft.Hosting.Lifetime[0]
+      Content root path: C:\Users\<usuario>\Documents\Proyecto de titulo - Final\Cobranza_Automatizada_Contexto_ClaudeCode\cobranza-automatizada\src\Cobranza.Api
+warn: Microsoft.AspNetCore.Routing.EndpointRoutingMiddleware[9]
+      A request body size limit could not be applied. This server does not support the IHttpMaxRequestBodySizeFeature.
+warn: Microsoft.AspNetCore.Routing.EndpointRoutingMiddleware[9]
+      A request body size limit could not be applied. This server does not support the IHttpMaxRequestBodySizeFeature.
+warn: Microsoft.AspNetCore.Routing.EndpointRoutingMiddleware[9]
+      A request body size limit could not be applied. This server does not support the IHttpMaxRequestBodySizeFeature.
+info: Microsoft.Hosting.Lifetime[0]
+      Application is shutting down...
+info: Microsoft.Hosting.Lifetime[0]
+      Application started. Press Ctrl+C to shut down.
+info: Microsoft.Hosting.Lifetime[0]
+      Hosting environment: Development
+info: Microsoft.Hosting.Lifetime[0]
+      Content root path: C:\Users\<usuario>\Documents\Proyecto de titulo - Final\Cobranza_Automatizada_Contexto_ClaudeCode\cobranza-automatizada\src\Cobranza.Api
+warn: Microsoft.AspNetCore.Routing.EndpointRoutingMiddleware[9]
+      A request body size limit could not be applied. This server does not support the IHttpMaxRequestBodySizeFeature.
+info: Microsoft.Hosting.Lifetime[0]
+      Application is shutting down...
+  Correctas Cobranza.Api.Tests.AutenticacionTests.AUT08_DesactivacionConSesionAbierta_RechazadaAlRevalidar [347 ms]
+  Correctas Cobranza.Api.Tests.AutenticacionTests.AUT13_PostSinTokenCsrf_400 [345 ms]
+  Correctas Cobranza.Api.Tests.AutenticacionTests.AUT06_DebeCambiarClave_SoloYoCambiarClaveYLogout [478 ms]
+  Correctas Cobranza.Api.Tests.AutenticacionTests.Login_UsuarioSeNormalizaAMinusculas [326 ms]
+info: Microsoft.Hosting.Lifetime[0]
+      Application started. Press Ctrl+C to shut down.
+info: Microsoft.Hosting.Lifetime[0]
+      Hosting environment: Development
+info: Microsoft.Hosting.Lifetime[0]
+      Content root path: C:\Users\<usuario>\Documents\Proyecto de titulo - Final\Cobranza_Automatizada_Contexto_ClaudeCode\cobranza-automatizada\src\Cobranza.Api
+warn: Microsoft.AspNetCore.Routing.EndpointRoutingMiddleware[9]
+      A request body size limit could not be applied. This server does not support the IHttpMaxRequestBodySizeFeature.
+info: Microsoft.Hosting.Lifetime[0]
+      Application is shutting down...
+[xUnit.net 00:00:13.53]   Finished:    Cobranza.Api.Tests
+  Correctas Cobranza.Api.Tests.AutenticacionTests.AUT16_ClaveTemporalDentroDeVigencia_Permite [376 ms]
+
+La serie de pruebas se ejecutó correctamente.
+Pruebas totales: 102
+     Correcto: 102
+ Tiempo total: 14,2744 Segundos
+exit=0

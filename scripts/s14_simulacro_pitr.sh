@@ -75,3 +75,6 @@ marca "Servicio verificado por el operador"
 marca "RTO medido (incidente -> servicio restablecido): $(( T_SERVICIO - T_INCIDENTE )) s = $(( (T_SERVICIO - T_INCIDENTE) / 60 )) min"
 marca "Metas: RPO < 900 s (15 min); RTO < 14400 s (4 h)"
 marca "Pendiente post simulacro: decidir si se mantiene ${DB_REST} o se vuelve a ${SQL_DB} y se elimina la restaurada (costo)."
+# ADR-001 4.2 / politica C.3 (06-11-2026): la restauracion no termina sin esta revision.
+marca "OBLIGATORIO (ADR-001 4.2): scripts/s14_revision_post_restauracion.sh --base-original ${SQL_DB} --base-restaurada ${DB_REST} --punto ${PUNTO}"
+marca "Luego verificar AUT-08, AUT-12 y AUT-17 en ${DB_REST}."
